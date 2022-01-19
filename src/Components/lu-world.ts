@@ -128,9 +128,27 @@
 
 		public async init()
 		{
+			const vertex = `#version 300 es
+in vec4 aVertexPosition;
+in vec4 aVertexColor;
+uniform mat4 uModelViewMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+out lowp vec4 vColor;
+void main(void) {
+	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
+	vColor = aVertexColor;
+}`;
+			const fragment = `#version 300 es
+in lowp vec4 vColor;
+out lowp vec4 outColor;
+void main(void) {
+	outColor = vColor;
+}`;
+
 			await this.support.init(
-				<HTMLScriptElement>document.getElementById( 'vertex' ),
-				<HTMLScriptElement>document.getElementById( 'fragment' )
+				<HTMLScriptElement>document.getElementById( 'vertex' ) || vertex,
+				<HTMLScriptElement>document.getElementById( 'fragment' ) || fragment
 			);
 
 			this.support.enables( this.support.gl.DEPTH_TEST, this.support.gl.CULL_FACE );
