@@ -1,0 +1,16 @@
+{
+	"compilerOptions": {
+		"outFile": "../docs/luminus.js",
+		"module": "amd",
+		"target": "es2019",
+		"removeComments": true,
+		"strictNullChecks": true,
+		"noImplicitAny": true,
+		"sourceMap": false
+	},
+	"include": [
+		"./index.ts",
+		"./Components/*.ts",
+		"./Models/*.ts"
+	]
+}

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Luminus</title>
+<script src="./luminus.js"></script>
+<script type="x-shader/x-vertex" id="vertex">#version 300 es
+
+in vec4 aVertexPosition;
+in vec4 aVertexColor;
+uniform mat4 uModelViewMatrix;
+uniform mat4 uViewMatrix;
+uniform mat4 uProjectionMatrix;
+out lowp vec4 vColor;
+void main(void) {
+	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
+	vColor = aVertexColor;
+}
+</script>
+<script type="x-shader/x-fragment" id="fragment">#version 300 es
+
+in lowp vec4 vColor;
+out lowp vec4 outColor;
+void main(void) {
+	outColor = vColor;
+}
+</script>
+<script>
+window.addEventListener('DOMContentLoaded', () => {
+} );
+</script>
+<style>
+html, body { margin: 0; padding: 0; }
+body { overflow: hidden; position: absolute; }
+</style>
+</head>
+<body>
+	<lu-world
+		width="600" height="400"
+		style="background:black;"
+		vertex="vertex" fragment="fragment"
+		top="10" bottom="-10" left="-15" right="15" near="-20" far="20"
+		eyex="5" eyey="5" eyez="5"
+		upx="0" upy="1" upz="0"
+		centerx="0" centery="0" centerz="0"
+	>
+		<lu-axis></lu-axis>
+	</lu-world>
+</body>
+</html>
