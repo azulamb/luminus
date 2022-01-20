@@ -50,6 +50,15 @@
 			};
 		}
 
+		get x() { return parseFloat( this.getAttribute( 'x' ) || '0' ) || 0; }
+		set x( value ) { this.setAttribute( 'x', value + '' ); }
+
+		get y() { return parseFloat( this.getAttribute( 'y' ) || '0' ) || 0; }
+		set y( value ) { this.setAttribute( 'y', value + '' ); }
+
+		get z() { return parseFloat( this.getAttribute( 'z' ) || '0' ) || 0; }
+		set z( value ) { this.setAttribute( 'z', value + '' ); }
+
 		get complete() { return this.model && this.model.complete === true; }
 
 		get support()

@@ -25,8 +25,10 @@
 })(document.currentScript);
 (() => {
     function create4() { return new Float32Array(16); }
-    function identity4() {
-        const m = create4();
+    function identity4(m) {
+        if (!m) {
+            m = create4();
+        }
         m[1] = m[2] = m[3] = m[4] = m[6] = m[7] = m[8] = m[9] = m[11] = m[12] = m[13] = m[14] = 0;
         m[0] = m[5] = m[10] = m[15] = 1;
         return m;
@@ -101,10 +103,61 @@
         m[15] = 1;
         return m;
     }
+    function translation4(x, y, z, m) {
+        if (!m) {
+            m = identity4();
+        }
+        else {
+            identity4(m);
+        }
+        m[12] = x;
+        m[13] = y;
+        m[14] = z;
+        return m;
+    }
+    ;
+    function scaling4(x, y, z, m) {
+        if (!m) {
+            m = identity4();
+        }
+        else {
+            identity4(m);
+        }
+        m[0] = x;
+        m[5] = y;
+        m[10] = z;
+        return m;
+    }
+    function multiply4(a, b, m) {
+        if (!m) {
+            m = create4();
+        }
+        m[0] = b[0] * a[0] + b[1] * a[4] + b[2] * m[8] + b[3] * m[12];
+        m[1] = b[0] * a[1] + b[1] * a[5] + b[2] * m[9] + b[3] * m[13];
+        m[2] = b[0] * a[2] + b[1] * a[6] + b[2] * m[10] + b[3] * m[14];
+        m[3] = b[0] * a[3] + b[1] * a[7] + b[2] * m[11] + b[3] * m[15];
+        m[4] = b[4] * a[0] + b[5] * a[4] + b[6] * m[8] + b[7] * m[12];
+        m[5] = b[4] * a[1] + b[5] * a[5] + b[6] * m[9] + b[7] * m[13];
+        m[6] = b[4] * a[2] + b[5] * a[6] + b[6] * m[10] + b[7] * m[14];
+        m[7] = b[4] * a[3] + b[5] * a[7] + b[6] * m[11] + b[7] * m[15];
+        m[8] = b[8] * a[0] + b[9] * a[4] + b[10] * m[8] + b[11] * m[12];
+        m[9] = b[8] * a[1] + b[9] * a[5] + b[10] * m[9] + b[11] * m[13];
+        m[10] = b[8] * a[2] + b[9] * a[6] + b[10] * m[10] + b[11] * m[14];
+        m[11] = b[8] * a[3] + b[9] * a[7] + b[10] * m[11] + b[11] * m[15];
+        m[12] = b[12] * a[0] + b[13] * a[4] + b[14] * m[8] + b[15] * m[12];
+        m[13] = b[12] * a[1] + b[13] * a[5] + b[14] * m[9] + b[15] * m[13];
+        m[14] = b[12] * a[2] + b[13] * a[6] + b[14] * m[10] + b[15] * m[14];
+        m[15] = b[12] * a[3] + b[13] * a[7] + b[14] * m[11] + b[15] * m[15];
+        return m;
+    }
+    ;
     Luminus.matrix = {
         create4: create4,
         identity4: identity4,
+        translation4: translation4,
+        scaling4: scaling4,
         lookAt: lookAt,
+        multiply4: multiply4,
     };
 })();
 (() => {
@@ -392,6 +445,12 @@
                 }
             };
         }
+        get x() { return parseFloat(this.getAttribute('x') || '0') || 0; }
+        set x(value) { this.setAttribute('x', value + ''); }
+        get y() { return parseFloat(this.getAttribute('y') || '0') || 0; }
+        set y(value) { this.setAttribute('y', value + ''); }
+        get z() { return parseFloat(this.getAttribute('z') || '0') || 0; }
+        set z(value) { this.setAttribute('z', value + ''); }
         get complete() { return this.model && this.model.complete === true; }
         get support() {
             var _a;
@@ -530,6 +589,8 @@ void main(void) {
             this.support.clear();
             for (const model of this.children) {
                 if (model instanceof Luminus.model) {
+                    Luminus.matrix.translation4(model.x, model.y, model.z, this.uModel);
+                    gl2.uniformMatrix4fv(this.support.info.uniform.uModelViewMatrix, false, this.uModel);
                     model.render(this.support);
                 }
             }

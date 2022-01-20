@@ -16,16 +16,22 @@ slider-input { width: 400px; }
 
 		console.log( Luminus );
 
-		const world = document.getElementById( 'world' );
+		const target =
+		{
+			world: document.getElementById( 'world' ),
+			cube: document.getElementById( 'cube' ),
+		};
 		document.querySelectorAll( 'slider-input' ).forEach( ( slider ) =>
 		{
 			const key = slider.id;
-			slider.value = world[ key ];
+
+			const element = target[ slider.target ];
+			slider.value = element[ key ];
 			slider.addEventListener( 'change', () =>
 			{
-				console.log( slider.value );
-				world[ key ] = slider.value;
-				world.render();
+				console.log( `${ slider.target }::${ slider.value }` );
+				element[ key ] = slider.value;
+				target.world.render();
 			} );
 		} );
 	} );
@@ -91,6 +97,9 @@ slider-input { width: 400px; }
 		this.s.value = value;
 		this.v.value = value;
 	}
+
+	get target() { return this.getAttribute( 'target' ) || ''; }
+	set target( value ) { this.setAttribute( 'target', value ); }
 } );
 </script>
 </head>
@@ -105,10 +114,13 @@ slider-input { width: 400px; }
 		centerx="0" centery="0" centerz="0"
 	>
 		<lu-axis></lu-axis>
-		<lu-cube></lu-cube>
+		<lu-cube id="cube"></lu-cube>
 	</lu-world>
-	<slider-input id="eyex" max="10">Camera-x</slider-input>
-	<slider-input id="eyey" max="10">Camera-y</slider-input>
-	<slider-input id="eyez" max="10">Camera-z</slider-input>
+	<slider-input id="eyex" max="10" target="world">Camera-x</slider-input>
+	<slider-input id="eyey" max="10" target="world">Camera-y</slider-input>
+	<slider-input id="eyez" max="10" target="world">Camera-z</slider-input>
+	<slider-input id="x" min="-10" max="10" target="cube">Cube-x</slider-input>
+	<slider-input id="y" min="-10" max="10" target="cube">Cube-y</slider-input>
+	<slider-input id="z" min="-10" max="10" target="cube">Cube-z</slider-input>
 </body>
 </html>

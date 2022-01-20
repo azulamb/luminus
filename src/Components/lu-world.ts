@@ -194,7 +194,9 @@ void main(void) {
 			{
 				if ( model instanceof Luminus.model )
 				{
-					(<LuminusModelElement>model).render( this.support );
+					Luminus.matrix.translation4( model.x, model.y, model.z,this.uModel );
+					gl2.uniformMatrix4fv( this.support.info.uniform.uModelViewMatrix, false, this.uModel );
+					model.render( this.support );
 				}
 			}
 

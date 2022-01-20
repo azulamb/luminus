@@ -21,6 +21,12 @@ interface LuminusModelElement extends HTMLElement
 	model: LuminusModel;
 	readonly complete: boolean;
 	readonly support: LuminusSupport | undefined;
+	// Translate x
+	x: number;
+	// Translate y
+	y: number;
+	// Translate z
+	z: number;
 	initStyle(): HTMLStyleElement;
 	render( support: LuminusSupport ): void;
 	rerender(): void;
@@ -79,9 +85,14 @@ interface LuminusModelCube extends LuminusModel
 
 interface Matrix
 {
+	// Init matrix.
 	create4(): Float32Array;
-	identity4(): Float32Array;
+	identity4( m?: Float32Array ): Float32Array;
+	translation4( x: number, y: number, z: number, m?: Float32Array ): Float32Array;
+	scaling4( x: number, y: number, z: number, m?: Float32Array ): Float32Array;
 	lookAt( eye: number[], center: number[], up: number[], m?: Float32Array ): Float32Array;
+	// calc
+	multiply4( a: Float32Array, b: Float32Array, m?: Float32Array ): Float32Array;
 }
 
 interface LuminusSupport
