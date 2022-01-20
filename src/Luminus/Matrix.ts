@@ -1,4 +1,3 @@
-
 ( () =>
 {
 	function create4() { return new Float32Array( 16 ); }

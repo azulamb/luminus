@@ -1,7 +1,10 @@
 ![](./docs/icon.svg)
 
 # Luminus
-Luminus is 3d webcomponents.
+
+Luminus is 3d webcomponents. (Use WebGL 2)
+
+## Sample
 
 ```html
 <!DOCTYPE html>
@@ -9,7 +12,7 @@ Luminus is 3d webcomponents.
 <head>
 <meta charset="utf-8">
 <title>Luminus</title>
-<script src="./luminus.js"></script>
+<script src="./luminus.js" data-debug></script>
 </head>
 <body style="display:flex;justify-content:center;">
 	<lu-world
@@ -21,7 +24,12 @@ Luminus is 3d webcomponents.
 		centerx="0" centery="0" centerz="0"
 	>
 		<lu-axis></lu-axis>
+		<lu-cube></lu-cube>
 	</lu-world>
 </body>
 </html>
 ```
+
+## TODO
+
+* Add minify.

@@ -25,13 +25,18 @@
 
 			const shadow = this.attachShadow( { mode: 'open' } );
 
+			shadow.appendChild( this.initStyle() );
+		}
+
+		public initStyle()
+		{
 			const style = document.createElement( 'style' );
 			style.innerHTML =
 			[
 				':host { display: none; }',
 			].join( '' );
 
-			shadow.appendChild( style );
+			return style;
 		}
 
 		get model() { return this._model; }

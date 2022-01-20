@@ -8,7 +8,7 @@
 {
 	( ( component, prefix = 'lu' ) =>
 	{
-		const tagname = prefix + '-axis';
+		const tagname = prefix + '-cube';
 		if ( customElements.get( tagname ) ) { return; }
 		customElements.define( tagname, component );
 	} )( class extends Luminus.model implements LuminusModelAxisElement
@@ -17,16 +17,36 @@
 		{
 			super();
 
-			const model =  <LuminusModelAxis>new Luminus.models.axis();
-			this.model = model;
+			const model =  <LuminusModelCube>new Luminus.models.cube();
+			const color = this.color;
+			model.color[ 0 ] = color[ 0 ];
+			model.color[ 1 ] = color[ 1 ];
+			model.color[ 2 ] = color[ 2 ];
+			model.color[ 3 ] = color[ 3 ];
+			model.load();
 
-			if ( this.hasAttribute( 'length' ) )
-			{
-				model.length = this.length;
-			} else
-			{
-				this.length = model.length;
-			}
+			this.model = model;
+		}
+
+		public initStyle()
+		{
+			const style = document.createElement( 'style' );
+			style.innerHTML =
+			[
+				':host { display: none; color: #99ccfd; }',
+			].join( '' );
+
+			return style;
+		}
+
+		get color(): number[]
+		{
+			return (window.getComputedStyle( this, '' ).color
+				.replace( /\s/g, '' )
+				.replace( /rgba{0,1}\(([0-9\.\,]+)\)/, '$1' ) + ',1'
+			).split( ',' )
+				.slice( 0, 4 )
+				.map( ( v, i ) => { return i === 3 ? parseFloat( v ) : parseInt( v ) / 255.0; } );
 		}
 
 		get length() { return (<LuminusModelAxis>this.model).length; }

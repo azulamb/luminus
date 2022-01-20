@@ -10,6 +10,7 @@
 
 	const luminus: Luminus =
 	{
+		console: console,
 		loaded: loaded,
 		matrix: <any>null,
 		model: <any>null,
@@ -17,6 +18,17 @@
 		createProgram: () => { return <any>null; },
 		createSupport: () => { return <any>null; },
 	};
+
+	if ( script.dataset.debug === undefined )
+	{
+		luminus.console = {
+			debug: () => {},
+			error: () => {},
+			info: () => {},
+			log: () => {},
+			warn: () => {},
+		};
+	}
 
 	(<any>window).Luminus = luminus;
 } )( <HTMLScriptElement>document.currentScript );

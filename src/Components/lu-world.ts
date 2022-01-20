@@ -17,6 +17,7 @@
 		customElements.define( tagname, component );
 	} )( class extends HTMLElement implements LuminusWorldElement
 	{
+		private _complete: boolean;
 		private canvas: HTMLCanvasElement;
 		private lSupport: LuminusSupport;
 		private uProjection: Float32Array;
@@ -26,6 +27,7 @@
 		constructor()
 		{
 			super();
+			this._complete = false;
 
 			const shadow = this.attachShadow( { mode: 'open' } );
 
@@ -40,8 +42,6 @@
 
 			this.width = ( this.hasAttribute( 'width' ) ? ( parseInt( this.getAttribute( 'width' ) || '' ) ) : 0 ) || 400;
 			this.height = ( this.hasAttribute( 'height' ) ? ( parseInt( this.getAttribute( 'height' ) || '' ) ) : 0 ) || 400;
-
-			this.lSupport = Luminus.createSupport( <WebGL2RenderingContext>this.canvas.getContext("webgl2") );
 
 			const contents = document.createElement( 'div' );
 			contents.appendChild( this.canvas );
@@ -69,6 +69,8 @@
 				}, true);
 			} )();
 		}
+
+		get complete() { return this._complete; }
 
 		get support() { return this.lSupport; }
 
@@ -128,6 +130,7 @@
 
 		public async init()
 		{
+			Luminus.console.info( 'Start: init lu-world.' );
 			const vertex = `#version 300 es
 in vec4 aVertexPosition;
 in vec4 aVertexColor;
@@ -146,24 +149,30 @@ void main(void) {
 	outColor = vColor;
 }`;
 
-			await this.support.init(
+			const support = Luminus.createSupport( <WebGL2RenderingContext>this.canvas.getContext("webgl2") );
+			await support.init(
 				<HTMLScriptElement>document.getElementById( 'vertex' ) || vertex,
 				<HTMLScriptElement>document.getElementById( 'fragment' ) || fragment
 			);
+			this.lSupport = support;
 
-			this.support.enables( this.support.gl.DEPTH_TEST, this.support.gl.CULL_FACE );
+			support.enables( support.gl.DEPTH_TEST, support.gl.CULL_FACE );
 
 			// TODO: frustum
-			this.uProjection = this.support.orthographic( this.left, this.right, this.bottom, this.top, this.near, this.far );
+			this.uProjection = support.orthographic( this.left, this.right, this.bottom, this.top, this.near, this.far );
 
-			this.uView = this.support.matrix.identity4();
+			this.uView = support.matrix.identity4();
 
-			this.uModel = this.support.matrix.identity4();
-			// TODO: onload event
+			this.uModel = support.matrix.identity4();
+
+			this._complete = true;
 		}
 
 		public render()
 		{
+			if ( !this.complete ) { return; }
+			Luminus.console.info( 'Render:' );
+
 			const gl2 = this.support.gl;
 
 			this.support.matrix.lookAt(

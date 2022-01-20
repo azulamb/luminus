@@ -3,10 +3,100 @@
 <head>
 <meta charset="utf-8">
 <title>Luminus</title>
-<script src="./luminus.js"></script>
+<script src="./luminus.js" data-debug></script>
+<style>
+slider-input { width: 400px; }
+</style>
+<script>
+( ( element ) =>
+{
+	customElements.whenDefined( 'lu-world' ).then( () =>
+	{
+		customElements.define( 'slider-input', element );
+
+		console.log( Luminus );
+
+		const world = document.getElementById( 'world' );
+		document.querySelectorAll( 'slider-input' ).forEach( ( slider ) =>
+		{
+			const key = slider.id;
+			slider.value = world[ key ];
+			slider.addEventListener( 'change', () =>
+			{
+				console.log( slider.value );
+				world[ key ] = slider.value;
+				world.render();
+			} );
+		} );
+	} );
+} )(class Slider extends HTMLElement
+{
+	constructor()
+	{
+		super();
+
+		const shadow = this.attachShadow( { mode: 'open' } );
+
+		const style = document.createElement( 'style' );
+		style.innerHTML =
+		[
+			':host { display: block; }',
+			':host > div { width: 100%; display: grid; grid-template-columns: 20% 70% 10%; }',
+			':host > div > input[type="range"] {}',
+		].join( '' );
+
+		const name = document.createElement( 'div' );
+		name.appendChild( document.createElement( 'slot' ) );
+
+		const onChange = ( e ) =>
+		{
+			e.stopPropagation();
+			this.dispatchEvent( new CustomEvent( 'change' ) );
+		};
+
+		this.s = document.createElement( 'input' );
+		this.s.type = 'range';
+		this.s.step = '0.1';
+		this.s.addEventListener( 'change', ( e ) => { this.v.value = this.s.value; onChange( e ); } );
+
+		this.v = document.createElement( 'input' );
+		this.v.type = 'number';
+		this.s.step = '0.1';
+		this.v.addEventListener( 'change', ( e ) => { this.s.value = this.v.value; onChange( e ); } );
+
+		const contents = document.createElement( 'div' );
+		contents.appendChild( style );
+		contents.appendChild( name );
+		contents.appendChild( this.s );
+		contents.appendChild( this.v );
+
+		shadow.appendChild( contents );
+
+		this.min = parseInt( this.getAttribute( 'min' ) ) || 0;
+		this.max = parseInt( this.getAttribute( 'max' ) ) || 1;
+		this.value = this.value;
+		this.s.min = this.min;
+		this.s.max = this.max;
+	}
+
+	get min() { return parseFloat( this.v.min ) || 0; }
+	set min( value ) { this.v.min = value + ''; this.setAttribute( 'min', this.v.min ); }
+
+	get max() { return parseFloat( this.v.max ) || 0; }
+	set max( value ) { this.v.max = value + ''; this.setAttribute( 'max', this.v.max ); }
+
+	get value() { return parseFloat( this.s.value ); }
+	set value( value )
+	{
+		this.s.value = value;
+		this.v.value = value;
+	}
+} );
+</script>
 </head>
-<body style="display:flex;justify-content:center;">
+<body style="display:flex;justify-content:center;flex-direction:column;align-items:center;">
 	<lu-world
+		id="world"
 		width="600" height="400"
 		style="background:black;width:600px;height:400px;"
 		top="10" bottom="-10" left="-15" right="15" near="-20" far="20"
@@ -15,6 +105,10 @@
 		centerx="0" centery="0" centerz="0"
 	>
 		<lu-axis></lu-axis>
+		<lu-cube></lu-cube>
 	</lu-world>
+	<slider-input id="eyex" max="10">Camera-x</slider-input>
+	<slider-input id="eyey" max="10">Camera-y</slider-input>
+	<slider-input id="eyez" max="10">Camera-z</slider-input>
 </body>
 </html>

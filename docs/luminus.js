@@ -4,6 +4,7 @@
         customElements.whenDefined('lu-model'),
     ]).then(() => { });
     const luminus = {
+        console: console,
         loaded: loaded,
         matrix: null,
         model: null,
@@ -11,6 +12,15 @@
         createProgram: () => { return null; },
         createSupport: () => { return null; },
     };
+    if (script.dataset.debug === undefined) {
+        luminus.console = {
+            debug: () => { },
+            error: () => { },
+            info: () => { },
+            log: () => { },
+            warn: () => { },
+        };
+    }
     window.Luminus = luminus;
 })(document.currentScript);
 (() => {
@@ -231,7 +241,66 @@
             super();
             const model = new Luminus.models.axis();
             this.model = model;
-            this.length = model.length;
+            if (this.hasAttribute('length')) {
+                model.length = this.length;
+            }
+            else {
+                this.length = model.length;
+            }
+        }
+        get length() { return this.model.length; }
+        set length(value) {
+            const length = typeof value === 'number' ? value : parseFloat(value);
+            this.model.length = length;
+            this.setAttribute('length', length + '');
+            this.rerender();
+        }
+        static get observedAttributes() { return ['length']; }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            this.length = newVal;
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-cube';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends Luminus.model {
+        constructor() {
+            super();
+            const model = new Luminus.models.cube();
+            const color = this.color;
+            model.color[0] = color[0];
+            model.color[1] = color[1];
+            model.color[2] = color[2];
+            model.color[3] = color[3];
+            model.load();
+            this.model = model;
+        }
+        initStyle() {
+            const style = document.createElement('style');
+            style.innerHTML =
+                [
+                    ':host { display: none; color: #99ccfd; }',
+                ].join('');
+            return style;
+        }
+        get color() {
+            return (window.getComputedStyle(this, '').color
+                .replace(/\s/g, '')
+                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
+                .slice(0, 4)
+                .map((v, i) => { return i === 3 ? parseFloat(v) : parseInt(v) / 255.0; });
         }
         get length() { return this.model.length; }
         set length(value) {
@@ -303,12 +372,15 @@
         constructor() {
             super();
             const shadow = this.attachShadow({ mode: 'open' });
+            shadow.appendChild(this.initStyle());
+        }
+        initStyle() {
             const style = document.createElement('style');
             style.innerHTML =
                 [
                     ':host { display: none; }',
                 ].join('');
-            shadow.appendChild(style);
+            return style;
         }
         get model() { return this._model; }
         set model(model) {
@@ -347,6 +419,7 @@
     })(class extends HTMLElement {
         constructor() {
             super();
+            this._complete = false;
             const shadow = this.attachShadow({ mode: 'open' });
             const style = document.createElement('style');
             style.innerHTML =
@@ -357,7 +430,6 @@
             this.canvas = document.createElement('canvas');
             this.width = (this.hasAttribute('width') ? (parseInt(this.getAttribute('width') || '')) : 0) || 400;
             this.height = (this.hasAttribute('height') ? (parseInt(this.getAttribute('height') || '')) : 0) || 400;
-            this.lSupport = Luminus.createSupport(this.canvas.getContext("webgl2"));
             const contents = document.createElement('div');
             contents.appendChild(this.canvas);
             shadow.appendChild(style);
@@ -378,6 +450,7 @@
                 }, true);
             })();
         }
+        get complete() { return this._complete; }
         get support() { return this.lSupport; }
         get width() { return this.canvas.width; }
         set width(value) { this.canvas.width = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0); }
@@ -416,6 +489,7 @@
         get centerz() { return parseFloat(this.getAttribute('centerz') || '') || 0; }
         set centerz(value) { this.setAttribute('centerz', value + ''); }
         async init() {
+            Luminus.console.info('Start: init lu-world.');
             const vertex = `#version 300 es
 in vec4 aVertexPosition;
 in vec4 aVertexColor;
@@ -433,13 +507,20 @@ out lowp vec4 outColor;
 void main(void) {
 	outColor = vColor;
 }`;
-            await this.support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
-            this.support.enables(this.support.gl.DEPTH_TEST, this.support.gl.CULL_FACE);
-            this.uProjection = this.support.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
-            this.uView = this.support.matrix.identity4();
-            this.uModel = this.support.matrix.identity4();
+            const support = Luminus.createSupport(this.canvas.getContext("webgl2"));
+            await support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
+            this.lSupport = support;
+            support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
+            this.uProjection = support.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
+            this.uView = support.matrix.identity4();
+            this.uModel = support.matrix.identity4();
+            this._complete = true;
         }
         render() {
+            if (!this.complete) {
+                return;
+            }
+            Luminus.console.info('Render:');
             const gl2 = this.support.gl;
             this.support.matrix.lookAt([this.eyex, this.eyey, this.eyez], [this.centerx, this.centery, this.centerz], [this.upx, this.upy, this.upz], this.uView);
             gl2.useProgram(this.support.info.program);
@@ -524,46 +605,72 @@ void main(void) {
     }
     Luminus.models.axis = Axis;
 })();
-class Cube extends Luminus.models.model {
-    onload() {
-        this.loaded = false;
-        this.complete = undefined;
-        this.obj = JSON.parse('{"verts":[0,0,1,0,0,0,0,1,1,0,1,0,1,0,1,1,0,0,1,1,1,1,1,0,0,0,1,0,1,1,1,0,1,1,1,1,0,0,0,0,1,0,1,0,0,1,1,0,0,0,1,1,0,1,0,0,0,1,0,0,0,1,1,1,1,1,0,1,0,1,1,0],"texcoords":[[153,204,255,255]],"faces":[2,1,0,3,1,2,4,5,6,6,5,7,10,9,8,11,9,10,12,13,14,14,13,15,18,17,16,19,17,18,20,21,22,22,21,23],"colors":[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]}');
-        this.obj.texcoords = this.obj.texcoords.map((v) => { return [v[0] / 255.0, v[1] / 255.0, v[2] / 255.0, v[3] / 255.0]; });
-        this.loaded = true;
-        return Promise.resolve();
-    }
-    prepare(support) {
-        this.complete = false;
-        const gl2 = support.gl;
-        const vao = support.gl.createVertexArray();
-        if (!vao) {
-            return Promise.reject(new Error('Failure createVertexArray.'));
+(() => {
+    class Cube extends Luminus.models.model {
+        constructor() {
+            super(...arguments);
+            this.color = new Float32Array(4);
         }
-        support.gl.bindVertexArray(vao);
-        const positionBuffer = gl2.createBuffer();
-        gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
-        gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array(this.obj.verts), gl2.STATIC_DRAW);
-        gl2.enableVertexAttribArray(support.info.in.aVertexPosition);
-        gl2.vertexAttribPointer(support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0);
-        const colorBuffer = gl2.createBuffer();
-        gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
-        gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array(this.obj.colors.reduce((prev, now) => { return prev.concat(this.obj.texcoords[now]); }, [])), gl2.STATIC_DRAW);
-        gl2.enableVertexAttribArray(support.info.in.aVertexColor);
-        gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
-        const indexBuffer = gl2.createBuffer();
-        gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
-        gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, new Uint16Array(this.obj.faces), gl2.STATIC_DRAW);
-        support.gl.bindVertexArray(null);
-        this.vao = vao;
-        this.count = this.obj.faces.length;
-        this.complete = true;
-        return Promise.resolve();
+        onload() {
+            this.verts = new Float32Array([
+                0, 0, 1, 0, 0, 0, 0, 1, 1,
+                0, 1, 0, 1, 0, 1, 1, 0, 0,
+                1, 1, 1, 1, 1, 0, 0, 0, 1,
+                0, 1, 1, 1, 0, 1, 1, 1, 1,
+                0, 0, 0, 0, 1, 0, 1, 0, 0,
+                1, 1, 0, 0, 0, 1, 1, 0, 1,
+                0, 0, 0, 1, 0, 0, 0, 1, 1,
+                1, 1, 1, 0, 1, 0, 1, 1, 0,
+            ]);
+            this.colors = new Float32Array([...Array(24 * 4)]);
+            for (let i = 0; i < this.colors.length; i += 4) {
+                this.colors[i] = this.color[0];
+                this.colors[i + 1] = this.color[1];
+                this.colors[i + 2] = this.color[2];
+                this.colors[i + 3] = this.color[3];
+            }
+            this.faces = new Uint16Array([
+                2, 1, 0, 3, 1, 2,
+                4, 5, 6, 6, 5, 7,
+                10, 9, 8, 11, 9, 10,
+                12, 13, 14, 14, 13, 15,
+                18, 17, 16, 19, 17, 18,
+                20, 21, 22, 22, 21, 23,
+            ]);
+            return Promise.resolve();
+        }
+        onprepare(support) {
+            Luminus.console.info('Start: cube-prepare.');
+            const gl2 = support.gl;
+            const vao = support.gl.createVertexArray();
+            if (!vao) {
+                return Promise.reject(new Error('Failure createVertexArray.'));
+            }
+            support.gl.bindVertexArray(vao);
+            const positionBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
+            gl2.bufferData(gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW);
+            gl2.enableVertexAttribArray(support.info.in.aVertexPosition);
+            gl2.vertexAttribPointer(support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0);
+            const colorBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
+            gl2.bufferData(gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW);
+            gl2.enableVertexAttribArray(support.info.in.aVertexColor);
+            gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
+            const indexBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);
+            support.gl.bindVertexArray(null);
+            this.vao = vao;
+            this.count = this.faces.length;
+            return Promise.resolve();
+        }
+        onrender(support) {
+            const gl = support.gl;
+            support.gl.bindVertexArray(this.vao);
+            gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
+            support.gl.bindVertexArray(null);
+        }
     }
-    onrender(support) {
-        const gl = support.gl;
-        support.gl.bindVertexArray(this.vao);
-        gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
-        support.gl.bindVertexArray(null);
-    }
-}
+    Luminus.models.cube = Cube;
+})();

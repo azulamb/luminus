@@ -4,6 +4,7 @@
 
 interface LuminusWorldElement extends HTMLElement
 {
+	readonly complete: boolean;
 	readonly support: LuminusSupport;
 	width: number; height: number;
 	top: number; bottom: number; left: number; right: number; near: number; far: number;
@@ -20,6 +21,7 @@ interface LuminusModelElement extends HTMLElement
 	model: LuminusModel;
 	readonly complete: boolean;
 	readonly support: LuminusSupport | undefined;
+	initStyle(): HTMLStyleElement;
 	render( support: LuminusSupport ): void;
 	rerender(): void;
 }
@@ -64,6 +66,11 @@ interface LuminusModel
 interface LuminusModelAxis extends LuminusModel
 {
 	length: number;
+}
+
+interface LuminusModelCube extends LuminusModel
+{
+	color: Float32Array;
 }
 
 /**
@@ -112,6 +119,14 @@ interface LuminusProgramInfo
 
 interface Luminus
 {
+	console:
+	{
+		debug(...data: any[]): void;
+		error(...data: any[]): void;
+		info(...data: any[]): void;
+		log(...data: any[]): void;
+		warn(...data: any[]): void;
+	};
 	loaded: Promise<void>;
 	matrix: Matrix;
 	model: { new (...params: any[]): LuminusModelElement; };
