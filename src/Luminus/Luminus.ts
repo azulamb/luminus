@@ -10,6 +10,7 @@
 
 	const luminus: Luminus =
 	{
+		version: '',
 		console: console,
 		loaded: loaded,
 		matrix: <any>null,

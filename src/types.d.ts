@@ -130,6 +130,7 @@ interface LuminusProgramInfo
 
 interface Luminus
 {
+	version: string;
 	console:
 	{
 		debug(...data: any[]): void;
