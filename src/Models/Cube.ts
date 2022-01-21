@@ -9,24 +9,29 @@
 		protected vao: WebGLVertexArrayObject;
 		protected verts: Float32Array;
 		protected colors: Float32Array;
-		protected faces: Uint16Array;
 		protected count: number;
 
 		public onload()
 		{
 			this.verts = new Float32Array(
 			[
-				0, 0, 1, 0, 0, 0, 0, 1, 1,
-				0, 1, 0, 1, 0, 1, 1, 0, 0,
-				1, 1, 1, 1, 1, 0, 0, 0, 1,
-				0, 1, 1, 1, 0, 1, 1, 1, 1,
-				0, 0, 0, 0, 1, 0, 1, 0, 0,
-				1, 1, 0, 0, 0, 1, 1, 0, 1,
-				0, 0, 0, 1, 0, 0, 0, 1, 1,
-				1, 1, 1, 0, 1, 0, 1, 1, 0,
+				1, 1, 0,
+				1, 1, 1,
+				1, 0, 0,
+				1, 0, 1,
+				0, 0, 1,
+				1, 1, 1,
+				0, 1, 1,
+				1, 1, 0,
+				0, 1, 0,
+				1, 0, 0,
+				0, 0, 0,
+				0, 0, 1,
+				0, 1, 0,
+				0, 1, 1,
 			] );
 
-			this.colors = new Float32Array( [ ...Array( 24 * 4 ) ] );
+			this.colors = new Float32Array( [ ...Array( this.verts.length / 3 * 4 ) ] );
 			for ( let i = 0 ; i < this.colors.length ; i += 4 )
 			{
 				this.colors[ i ] = this.color[ 0 ];
@@ -34,16 +39,6 @@
 				this.colors[ i + 2 ] = this.color[ 2 ];
 				this.colors[ i + 3 ] = this.color[ 3 ];
 			}
-
-			this.faces = new Uint16Array(
-			[
-				2, 1, 0, 3, 1, 2,
-				4, 5, 6, 6, 5, 7,
-				10, 9, 8, 11, 9, 10,
-				12, 13, 14, 14, 13, 15,
-				18, 17, 16, 19, 17, 18,
-				20, 21, 22, 22, 21, 23,
-			] );
 
 			return Promise.resolve();
 		}
@@ -70,14 +65,9 @@
 			gl2.enableVertexAttribArray( support.info.in.aVertexColor );
 			gl2.vertexAttribPointer( support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0 );
 
-			const indexBuffer = gl2.createBuffer();
-			gl2.bindBuffer( gl2.ELEMENT_ARRAY_BUFFER, indexBuffer );
-			gl2.bufferData( gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW );
-
 			support.gl.bindVertexArray( null );
 
 			this.vao = vao;
-			this.count = this.faces.length;
 
 			return Promise.resolve();
 		}
@@ -87,7 +77,7 @@
 			const gl = support.gl;
 
 			support.gl.bindVertexArray( this.vao );
-			gl.drawElements( gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0 );
+			gl.drawArrays( gl.TRIANGLE_STRIP, 0, 14 );
 			support.gl.bindVertexArray( null );
 		}
 	}
