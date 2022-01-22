@@ -18,7 +18,7 @@ interface LuminusWorldElement extends HTMLElement
 
 interface LuminusModelElement extends HTMLElement
 {
-	model: LuminusModel;
+	model: LuminusModel<unknown>;
 	readonly complete: boolean;
 	readonly support: LuminusSupport | undefined;
 	// Translate x
@@ -37,11 +37,20 @@ interface LuminusModelAxisElement extends LuminusModelElement
 	length: number;
 }
 
+// Load .vox model only.
+interface LuminusModelVoxElement extends LuminusModelElement
+{
+	model: LuminusModelVox;
+	src: string;
+	//toJSON()
+	toVox(): Uint8Array;
+}
+
 /**
  * Models
  */
 
-interface LuminusModel
+interface LuminusModel<T>
 {
 	/*
 	loaded = complete = undefined
@@ -57,26 +66,31 @@ interface LuminusModel
 	*/
 	loaded?: boolean;
 	complete?: boolean;
-	load(): Promise<void>;
+	load( p?: Promise<T> ): Promise<void>;
 	prepare( support: LuminusSupport ): Promise<void>;
 	render( support: LuminusSupport ): void;
 
 	afterload?: () => unknown;
 
 	// Overwrite
-	onload(): Promise<unknown>;
+	onload( result: T ): Promise<unknown>;
 	onprepare( support: LuminusSupport ): Promise<unknown>;
 	onrender( support: LuminusSupport ): void;
 }
 
-interface LuminusModelAxis extends LuminusModel
+interface LuminusModelAxis extends LuminusModel<void>
 {
 	length: number;
 }
 
-interface LuminusModelCube extends LuminusModel
+interface LuminusModelCube extends LuminusModel<void>
 {
 	color: Float32Array;
+}
+
+interface LuminusModelVox extends LuminusModel<Response>
+{
+	export(): Uint8Array;
 }
 
 /**
@@ -144,8 +158,8 @@ interface Luminus
 	model: { new (...params: any[]): LuminusModelElement; };
 	models:
 	{
-		model: { new (...params: any[]): LuminusModel; },
-		[ keys: string ]: { new (...params: any[]): LuminusModel; },
+		model: { new (...params: any[]): LuminusModel<unknown>; },
+		[ keys: string ]: { new (...params: any[]): LuminusModel<any>; },
 	},
 	createProgram( support: LuminusSupport ): LuminusProgramInfo;
 	createSupport( gl2: WebGL2RenderingContext ): LuminusSupport;

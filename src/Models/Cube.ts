@@ -1,8 +1,8 @@
 ( () =>
 {
-	class Cube extends Luminus.models.model  implements LuminusModel
+	class Cube extends Luminus.models.model  implements LuminusModel<Response>
 	{
-		public loaded?: boolean;
+		public loaded?: boolean = true;
 		public complete?: boolean;
 		public color: Float32Array = new Float32Array( 4 );
 
@@ -11,8 +11,10 @@
 		protected colors: Float32Array;
 		protected count: number;
 
-		public onload()
+		public onprepare( support: LuminusSupport )
 		{
+			Luminus.console.info( 'Start: cube-prepare.' );
+
 			this.verts = new Float32Array(
 			[
 				1, 1, 0,
@@ -40,12 +42,6 @@
 				this.colors[ i + 3 ] = this.color[ 3 ];
 			}
 
-			return Promise.resolve();
-		}
-
-		public onprepare( support: LuminusSupport )
-		{
-			Luminus.console.info( 'Start: cube-prepare.' );
 			const gl2 = support.gl;
 
 			const vao = support.gl.createVertexArray();

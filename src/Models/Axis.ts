@@ -2,7 +2,7 @@
 {
 	class Axis extends Luminus.models.model implements LuminusModelAxis
 	{
-		public loaded?: boolean;
+		public loaded?: boolean = true;
 		public complete?: boolean;
 		private _length: number;
 		private _change: boolean;

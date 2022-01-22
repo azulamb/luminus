@@ -17,7 +17,7 @@
 		} );
 	} )( class extends HTMLElement implements LuminusModelElement
 	{
-		private _model: LuminusModel;
+		private _model: LuminusModel<unknown>;
 
 		constructor()
 		{
@@ -40,7 +40,7 @@
 		}
 
 		get model() { return this._model; }
-		set model( model: LuminusModel )
+		set model( model: LuminusModel<unknown> )
 		{
 			this._model = model;
 			model.afterload = () =>

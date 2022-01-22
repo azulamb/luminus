@@ -7,8 +7,35 @@
 ゲームなどの場合最適化など考えないといけないが、そこまでスピードを求めないのであればDOMでモデルを管理できればお手軽に3D描画をできるのではないかという発想で作りました。
 基本的には3D空間のタグの中にモデルを突っ込めばよく、それらの位置なども可能な限り属性でなんとかしたいと考えています。
 
+## サーバーを立てて確認
+
+fetchはサーバーを立てず使えないので簡易サーバーを使って確認する。
+
+### Denoで簡易Webサーバー
+
+Denoでは以下のようにする。
+
+#### インストール
+
+```sh
+deno install --allow-net --allow-read https://deno.land/std@0.106.0/http/file_server.ts
+```
+
+#### 実行
+
+```sh
+file_server docs
+```
+
+以下のように立ち上がったらブラウザで `http://127.0.0.1:4507/` にアクセスします。（Windowsはこうしないと）
+
+```
+HTTP server listening on http://0.0.0.0:4507/
+```
+
 ## 読み込みについて
 
+TODO: 再度見直す
 * `Luminus` の作成
   * `Luminus.matrix` の作成
   * `Luminus.createSupport` の作成
