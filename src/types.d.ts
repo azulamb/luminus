@@ -6,12 +6,17 @@ interface LuminusWorldElement extends HTMLElement
 {
 	readonly complete: boolean;
 	readonly support: LuminusSupport;
+	// screen
 	width: number; height: number;
+	// camera
 	top: number; bottom: number; left: number; right: number; near: number; far: number;
 	view: 'volume' | 'frustum';
 	eyex: number; eyey: number; eyez: number;
 	upx: number; upy: number; upz: number;
 	centerx: number; centery: number; centerz: number;
+	// light
+	lightx: number; lighty: number; lightz: number;
+
 	init(): WebGLProgram | null;
 	render(): void;
 }
@@ -42,7 +47,7 @@ interface LuminusModelVoxElement extends LuminusModelElement
 {
 	model: LuminusModelVox;
 	src: string;
-	//toJSON()
+	// Export minimize vox.
 	toVox(): Uint8Array;
 }
 
@@ -73,6 +78,7 @@ interface LuminusModel<T>
 	afterload?: () => unknown;
 
 	// Overwrite
+	minLight?: number;
 	onload( result: T ): Promise<unknown>;
 	onprepare( support: LuminusSupport ): Promise<unknown>;
 	onrender( support: LuminusSupport ): void;
@@ -107,6 +113,7 @@ interface Matrix
 	lookAt( eye: number[], center: number[], up: number[], m?: Float32Array ): Float32Array;
 	// calc
 	multiply4( a: Float32Array, b: Float32Array, m?: Float32Array ): Float32Array;
+	inverse4( a: Float32Array, m?: Float32Array ): Float32Array;
 }
 
 interface LuminusSupport

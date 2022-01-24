@@ -134,25 +134,75 @@ Luminus.version = '0.0.1';
         if (!m) {
             m = create4();
         }
-        m[0] = b[0] * a[0] + b[1] * a[4] + b[2] * m[8] + b[3] * m[12];
-        m[1] = b[0] * a[1] + b[1] * a[5] + b[2] * m[9] + b[3] * m[13];
-        m[2] = b[0] * a[2] + b[1] * a[6] + b[2] * m[10] + b[3] * m[14];
-        m[3] = b[0] * a[3] + b[1] * a[7] + b[2] * m[11] + b[3] * m[15];
-        m[4] = b[4] * a[0] + b[5] * a[4] + b[6] * m[8] + b[7] * m[12];
-        m[5] = b[4] * a[1] + b[5] * a[5] + b[6] * m[9] + b[7] * m[13];
-        m[6] = b[4] * a[2] + b[5] * a[6] + b[6] * m[10] + b[7] * m[14];
-        m[7] = b[4] * a[3] + b[5] * a[7] + b[6] * m[11] + b[7] * m[15];
-        m[8] = b[8] * a[0] + b[9] * a[4] + b[10] * m[8] + b[11] * m[12];
-        m[9] = b[8] * a[1] + b[9] * a[5] + b[10] * m[9] + b[11] * m[13];
-        m[10] = b[8] * a[2] + b[9] * a[6] + b[10] * m[10] + b[11] * m[14];
-        m[11] = b[8] * a[3] + b[9] * a[7] + b[10] * m[11] + b[11] * m[15];
-        m[12] = b[12] * a[0] + b[13] * a[4] + b[14] * m[8] + b[15] * m[12];
-        m[13] = b[12] * a[1] + b[13] * a[5] + b[14] * m[9] + b[15] * m[13];
-        m[14] = b[12] * a[2] + b[13] * a[6] + b[14] * m[10] + b[15] * m[14];
-        m[15] = b[12] * a[3] + b[13] * a[7] + b[14] * m[11] + b[15] * m[15];
+        m[0] = b[0] * a[0] + b[1] * a[4] + b[2] * a[8] + b[3] * a[12];
+        m[1] = b[0] * a[1] + b[1] * a[5] + b[2] * a[9] + b[3] * a[13];
+        m[2] = b[0] * a[2] + b[1] * a[6] + b[2] * a[10] + b[3] * a[14];
+        m[3] = b[0] * a[3] + b[1] * a[7] + b[2] * a[11] + b[3] * a[15];
+        m[4] = b[4] * a[0] + b[5] * a[4] + b[6] * a[8] + b[7] * a[12];
+        m[5] = b[4] * a[1] + b[5] * a[5] + b[6] * a[9] + b[7] * a[13];
+        m[6] = b[4] * a[2] + b[5] * a[6] + b[6] * a[10] + b[7] * a[14];
+        m[7] = b[4] * a[3] + b[5] * a[7] + b[6] * a[11] + b[7] * a[15];
+        m[8] = b[8] * a[0] + b[9] * a[4] + b[10] * a[8] + b[11] * a[12];
+        m[9] = b[8] * a[1] + b[9] * a[5] + b[10] * a[9] + b[11] * a[13];
+        m[10] = b[8] * a[2] + b[9] * a[6] + b[10] * a[10] + b[11] * a[14];
+        m[11] = b[8] * a[3] + b[9] * a[7] + b[10] * a[11] + b[11] * a[15];
+        m[12] = b[12] * a[0] + b[13] * a[4] + b[14] * a[8] + b[15] * a[12];
+        m[13] = b[12] * a[1] + b[13] * a[5] + b[14] * a[9] + b[15] * a[13];
+        m[14] = b[12] * a[2] + b[13] * a[6] + b[14] * a[10] + b[15] * a[14];
+        m[15] = b[12] * a[3] + b[13] * a[7] + b[14] * a[11] + b[15] * a[15];
         return m;
     }
     ;
+    function inverse4(a, m) {
+        const d = a[0] * a[5] * a[10] * a[15] +
+            a[0] * a[6] * a[11] * a[13] +
+            a[0] * a[7] * a[9] * a[14] +
+            a[1] * a[4] * a[11] * a[14] +
+            a[1] * a[6] * a[8] * a[15] +
+            a[1] * a[7] * a[10] * a[12] +
+            a[2] * a[4] * a[9] * a[15] +
+            a[2] * a[5] * a[11] * a[12] +
+            a[2] * a[7] * a[8] * a[13] +
+            a[3] * a[4] * a[10] * a[13] +
+            a[3] * a[5] * a[8] * a[14] +
+            a[3] * a[6] * a[9] * a[12] -
+            a[0] * a[5] * a[11] * a[14] -
+            a[0] * a[6] * a[9] * a[15] -
+            a[0] * a[7] * a[10] * a[13] -
+            a[1] * a[4] * a[10] * a[15] -
+            a[1] * a[6] * a[11] * a[12] -
+            a[1] * a[7] * a[8] * a[14] -
+            a[2] * a[4] * a[11] * a[13] -
+            a[2] * a[5] * a[8] * a[15] -
+            a[2] * a[7] * a[9] * a[12] -
+            a[3] * a[4] * a[9] * a[14] -
+            a[3] * a[5] * a[10] * a[12] -
+            a[3] * a[6] * a[8] * a[13];
+        if (!m) {
+            m = create4();
+        }
+        if (Math.abs(d) < 1.0e-10) {
+            return identity4(m);
+        }
+        const id = 1.0 / d;
+        m[0] = id * (a[5] * a[10] * a[15] + a[6] * a[11] * a[13] + a[7] * a[9] * a[14] - a[5] * a[11] * a[14] - a[6] * a[9] * a[15] - a[7] * a[10] * a[13]);
+        m[1] = id * (a[1] * a[11] * a[14] + a[2] * a[9] * a[15] + a[3] * a[10] * a[13] - a[1] * a[10] * a[15] - a[2] * a[11] * a[13] - a[3] * a[9] * a[14]);
+        m[2] = id * (a[1] * a[6] * a[15] + a[2] * a[7] * a[13] + a[3] * a[5] * a[14] - a[1] * a[7] * a[14] - a[2] * a[5] * a[15] - a[3] * a[6] * a[13]);
+        m[3] = id * (a[1] * a[7] * a[10] + a[2] * a[5] * a[11] + a[3] * a[6] * a[9] - a[1] * a[6] * a[11] - a[2] * a[7] * a[9] - a[3] * a[5] * a[10]);
+        m[4] = id * (a[4] * a[11] * a[14] + a[6] * a[8] * a[15] + a[7] * a[10] * a[12] - a[4] * a[10] * a[15] - a[6] * a[11] * a[12] - a[7] * a[8] * a[14]);
+        m[5] = id * (a[0] * a[10] * a[15] + a[2] * a[11] * a[12] + a[3] * a[8] * a[14] - a[0] * a[11] * a[14] - a[2] * a[8] * a[15] - a[3] * a[10] * a[12]);
+        m[6] = id * (a[0] * a[7] * a[14] + a[2] * a[4] * a[15] + a[3] * a[6] * a[12] - a[0] * a[6] * a[15] - a[2] * a[7] * a[12] - a[3] * a[4] * a[14]);
+        m[7] = id * (a[0] * a[6] * a[11] + a[2] * a[7] * a[8] + a[3] * a[4] * a[10] - a[0] * a[7] * a[10] - a[2] * a[4] * a[11] - a[3] * a[6] * a[8]);
+        m[8] = id * (a[4] * a[9] * a[15] + a[5] * a[11] * a[12] + a[7] * a[8] * a[13] - a[4] * a[11] * a[13] - a[5] * a[8] * a[15] - a[7] * a[9] * a[12]);
+        m[9] = id * (a[0] * a[11] * a[13] + a[1] * a[8] * a[15] + a[3] * a[9] * a[12] - a[0] * a[9] * a[15] - a[1] * a[11] * a[12] - a[3] * a[8] * a[13]);
+        m[10] = id * (a[0] * a[5] * a[15] + a[1] * a[7] * a[12] + a[3] * a[4] * a[13] - a[0] * a[7] * a[13] - a[1] * a[4] * a[15] - a[3] * a[5] * a[12]);
+        m[11] = id * (a[0] * a[7] * a[9] + a[1] * a[4] * a[11] + a[3] * a[5] * a[8] - a[0] * a[5] * a[11] - a[1] * a[7] * a[8] - a[3] * a[4] * a[9]);
+        m[12] = id * (a[4] * a[10] * a[13] + a[5] * a[8] * a[14] + a[6] * a[9] * a[12] - a[4] * a[9] * a[14] - a[5] * a[10] * a[12] - a[6] * a[8] * a[13]);
+        m[13] = id * (a[0] * a[9] * a[14] + a[1] * a[10] * a[12] + a[2] * a[8] * a[13] - a[0] * a[10] * a[13] - a[1] * a[8] * a[14] - a[2] * a[9] * a[12]);
+        m[14] = id * (a[0] * a[6] * a[13] + a[1] * a[4] * a[14] + a[2] * a[5] * a[12] - a[0] * a[5] * a[14] - a[1] * a[6] * a[12] - a[2] * a[4] * a[13]);
+        m[15] = id * (a[0] * a[5] * a[10] + a[1] * a[6] * a[8] + a[2] * a[4] * a[9] - a[0] * a[6] * a[9] - a[1] * a[4] * a[10] - a[2] * a[5] * a[8]);
+        return m;
+    }
     Luminus.matrix = {
         create4: create4,
         identity4: identity4,
@@ -160,6 +210,7 @@ Luminus.version = '0.0.1';
         scaling4: scaling4,
         lookAt: lookAt,
         multiply4: multiply4,
+        inverse4: inverse4,
     };
 })();
 (() => {
@@ -533,7 +584,7 @@ Luminus.version = '0.0.1';
             const style = document.createElement('style');
             style.innerHTML =
                 [
-                    ':host { display: block; }',
+                    ':host { display: block; color: white; }',
                     'canvas { display: block; width: 100%; height: 100%; }',
                 ].join('');
             this.canvas = document.createElement('canvas');
@@ -597,18 +648,32 @@ Luminus.version = '0.0.1';
         set centery(value) { this.setAttribute('centery', value + ''); }
         get centerz() { return parseFloat(this.getAttribute('centerz') || '') || 0; }
         set centerz(value) { this.setAttribute('centerz', value + ''); }
+        get lightx() { return parseFloat(this.getAttribute('lightx') || '') || 0; }
+        set lightx(value) { this.setAttribute('lightx', value + ''); }
+        get lighty() { return parseFloat(this.getAttribute('lighty') || '') || 0; }
+        set lighty(value) { this.setAttribute('lighty', value + ''); }
+        get lightz() { return parseFloat(this.getAttribute('lightz') || '') || 0; }
+        set lightz(value) { this.setAttribute('lightz', value + ''); }
         async init() {
             Luminus.console.info('Start: init lu-world.');
             const vertex = `#version 300 es
 in vec4 aVertexPosition;
 in vec4 aVertexColor;
+in vec3 aVertexNormal;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform vec3 aLightColor;
+uniform float minLight;
+uniform vec3 lightDirection;
+uniform mat4 iModelViewMatrix;
 out lowp vec4 vColor;
 void main(void) {
 	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
-	vColor = aVertexColor;
+
+	vec3 invLight = normalize( iModelViewMatrix * vec4( lightDirection, 0.0 ) ).xyz;
+	float diffuse = minLight + ( 1.0 - minLight ) * clamp( dot( aVertexNormal, invLight ), 0.0, 1.0 );
+	vColor = aVertexColor * vec4( vec3( diffuse ), 1.0 );
 }`;
             const fragment = `#version 300 es
 in lowp vec4 vColor;
@@ -620,9 +685,12 @@ void main(void) {
             await support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
             this.lSupport = support;
             support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
+            this.light = new Float32Array(this.color);
+            this.minLight = 0.3;
             this.uProjection = support.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
             this.uView = support.matrix.identity4();
             this.uModel = support.matrix.identity4();
+            this.iModel = support.matrix.identity4();
             this._complete = true;
         }
         render() {
@@ -636,15 +704,33 @@ void main(void) {
             gl2.uniformMatrix4fv(this.support.info.uniform.uProjectionMatrix, false, this.uProjection);
             gl2.uniformMatrix4fv(this.support.info.uniform.uViewMatrix, false, this.uView);
             gl2.uniformMatrix4fv(this.support.info.uniform.uModelViewMatrix, false, this.uModel);
+            gl2.uniform1f(this.support.info.uniform.minLight, this.minLight);
+            gl2.uniform3f(this.support.info.uniform.lightDirection, this.lightx, this.lighty, this.lightz);
+            this.light.set(this.color);
+            gl2.uniform3fv(this.support.info.uniform.aLightColor, this.light);
+            gl2.uniformMatrix4fv(this.support.info.uniform.iModelViewMatrix, false, this.iModel);
             this.support.clear();
             for (const model of this.children) {
                 if (model instanceof Luminus.model) {
-                    Luminus.matrix.translation4(model.x, model.y, model.z, this.uModel);
+                    this.support.matrix.translation4(model.x, model.y, model.z, this.uModel);
                     gl2.uniformMatrix4fv(this.support.info.uniform.uModelViewMatrix, false, this.uModel);
+                    this.support.matrix.inverse4(this.uModel, this.iModel);
+                    gl2.uniformMatrix4fv(this.support.info.uniform.iProjectionMatrix, false, this.iModel);
+                    if (model.model.minLight !== undefined) {
+                        gl2.uniform1f(this.support.info.uniform.minLight, model.model.minLight);
+                    }
                     model.render(this.support);
+                    gl2.uniform1f(this.support.info.uniform.minLight, this.minLight);
                 }
             }
             gl2.flush();
+        }
+        get color() {
+            return (window.getComputedStyle(this, '').color
+                .replace(/\s/g, '')
+                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
+                .slice(0, 3)
+                .map((v) => { return parseInt(v) / 255.0; });
         }
         static get observedAttributes() { return ['width', 'height']; }
         attributeChangedCallback(attrName, oldVal, newVal) {
@@ -667,6 +753,7 @@ void main(void) {
         constructor() {
             super();
             this.loaded = true;
+            this.minLight = 1;
             this._length = 10;
         }
         get length() { return this._length; }
@@ -726,29 +813,37 @@ void main(void) {
         }
         onprepare(support) {
             Luminus.console.info('Start: cube-prepare.');
-            this.verts = new Float32Array([
-                1, 1, 0,
-                1, 1, 1,
-                1, 0, 0,
-                1, 0, 1,
-                0, 0, 1,
-                1, 1, 1,
-                0, 1, 1,
-                1, 1, 0,
-                0, 1, 0,
-                1, 0, 0,
-                0, 0, 0,
-                0, 0, 1,
-                0, 1, 0,
-                0, 1, 1,
+            const verts = new Float32Array([
+                0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1,
+                0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0,
+                0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1,
+                1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1,
+                0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0,
             ]);
-            this.colors = new Float32Array([...Array(this.verts.length / 3 * 4)]);
-            for (let i = 0; i < this.colors.length; i += 4) {
-                this.colors[i] = this.color[0];
-                this.colors[i + 1] = this.color[1];
-                this.colors[i + 2] = this.color[2];
-                this.colors[i + 3] = this.color[3];
+            const colors = new Float32Array([...Array(verts.length / 3 * 4)]);
+            for (let i = 0; i < colors.length; i += 4) {
+                colors[i] = this.color[0];
+                colors[i + 1] = this.color[1];
+                colors[i + 2] = this.color[2];
+                colors[i + 3] = this.color[3];
             }
+            const normals = new Float32Array([
+                0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+                0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+                0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+                0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+                -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+            ]);
+            const faces = new Uint16Array([
+                0, 1, 2, 0, 2, 3,
+                4, 5, 6, 4, 6, 7,
+                8, 9, 10, 8, 10, 11,
+                12, 13, 14, 12, 14, 15,
+                16, 17, 18, 16, 18, 19,
+                20, 21, 22, 20, 22, 23,
+            ]);
             const gl2 = support.gl;
             const vao = support.gl.createVertexArray();
             if (!vao) {
@@ -757,14 +852,22 @@ void main(void) {
             support.gl.bindVertexArray(vao);
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
-            gl2.bufferData(gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW);
+            gl2.bufferData(gl2.ARRAY_BUFFER, verts, gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.info.in.aVertexPosition);
             gl2.vertexAttribPointer(support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
-            gl2.bufferData(gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW);
+            gl2.bufferData(gl2.ARRAY_BUFFER, colors, gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.info.in.aVertexColor);
             gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
+            const normalBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ARRAY_BUFFER, normalBuffer);
+            gl2.bufferData(gl2.ARRAY_BUFFER, normals, gl2.STATIC_DRAW);
+            gl2.enableVertexAttribArray(support.info.in.aVertexNormal);
+            gl2.vertexAttribPointer(support.info.in.aVertexNormal, 3, gl2.FLOAT, false, 0, 0);
+            const indexBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
+            gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, faces, gl2.STATIC_DRAW);
             support.gl.bindVertexArray(null);
             this.vao = vao;
             return Promise.resolve();
@@ -772,7 +875,7 @@ void main(void) {
         onrender(support) {
             const gl = support.gl;
             support.gl.bindVertexArray(this.vao);
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 14);
+            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
             support.gl.bindVertexArray(null);
         }
     }
@@ -910,25 +1013,32 @@ void main(void) {
     }
     function createCube(x, y, z) {
         return [
-            x, y + 1, z + 1,
-            x, y + 1, z,
-            x + 1, y + 1, z + 1,
-            x + 1, y + 1, z,
-            x, y, z + 1,
-            x, y, z,
-            x + 1, y, z,
-            x + 1, y, z + 1,
+            x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1,
+            x, y, z, x, y + 1, z, x + 1, y + 1, z, x + 1, y, z,
+            x, y + 1, z, x, y + 1, z + 1, x + 1, y + 1, z + 1, x + 1, y + 1, z,
+            x, y, z, x + 1, y, z, x + 1, y, z + 1, x, y, z + 1,
+            x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x + 1, y, z + 1,
+            x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z,
+        ];
+    }
+    function createNormal() {
+        return [
+            0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+            0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+            0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+            0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+            1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+            -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
         ];
     }
     function createFace(n) {
-        n *= 8;
         return [
-            n + 3, n + 2, n + 6, n + 2, n + 7, n + 6,
-            n + 6, n + 7, n + 4, n + 7, n + 2, n + 4,
-            n + 4, n + 2, n + 0, n + 2, n + 3, n + 0,
-            n + 0, n + 3, n + 1, n + 3, n + 6, n + 1,
-            n + 1, n + 6, n + 5, n + 6, n + 4, n + 5,
-            n + 5, n + 4, n + 1, n + 4, n + 0, n + 1,
+            n, n + 1, n + 2, n, n + 2, n + 3,
+            n + 4, n + 5, n + 6, n + 4, n + 6, n + 7,
+            n + 8, n + 9, n + 10, n + 8, n + 10, n + 11,
+            n + 12, n + 13, n + 14, n + 12, n + 14, n + 15,
+            n + 16, n + 17, n + 18, n + 16, n + 18, n + 19,
+            n + 20, n + 21, n + 22, n + 20, n + 22, n + 23,
         ];
     }
     class Vox extends Luminus.models.model {
@@ -964,19 +1074,22 @@ void main(void) {
                 this.vox = vox;
                 const verts = [];
                 const colors = [];
+                const normals = [];
                 const faces = [];
                 vox.models.forEach((model) => {
                     model.xyzi.forEach((voxel) => {
-                        const index = Math.floor(verts.length / 24);
+                        const index = verts.length / 3;
                         verts.push(...createCube(voxel.y, voxel.z, voxel.x));
                         const c = vox.palette[voxel.c];
                         const color = [c[0] / 255.0, c[1] / 255.0, c[2] / 255.0, c[3] / 255.0];
-                        colors.push(...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color);
+                        colors.push(...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color);
+                        normals.push(...createNormal());
                         faces.push(...createFace(index));
                     });
                 });
                 this.verts = new Float32Array(verts);
                 this.colors = new Float32Array(colors);
+                this.normals = new Float32Array(normals);
                 this.faces = new Uint16Array(faces);
             });
         }
@@ -998,6 +1111,11 @@ void main(void) {
             gl2.bufferData(gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.info.in.aVertexColor);
             gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
+            const normalBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ARRAY_BUFFER, normalBuffer);
+            gl2.bufferData(gl2.ARRAY_BUFFER, this.normals, gl2.STATIC_DRAW);
+            gl2.enableVertexAttribArray(support.info.in.aVertexNormal);
+            gl2.vertexAttribPointer(support.info.in.aVertexNormal, 3, gl2.FLOAT, false, 0, 0);
             const indexBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
             gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);

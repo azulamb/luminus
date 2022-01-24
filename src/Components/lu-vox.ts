@@ -19,7 +19,7 @@
 		{
 			super();
 
-			const model =  <LuminusModelVox>new Luminus.models.vox();
+			const model = <LuminusModelVox>new Luminus.models.vox();
 			model.afterload = () => { this.rerender(); };
 			this.model = model;
 			if ( this.src )

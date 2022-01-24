@@ -17,7 +17,7 @@
 		{
 			super();
 
-			const model =  <LuminusModelCube>new Luminus.models.cube();
+			const model = <LuminusModelCube>new Luminus.models.cube();
 			const color = this.color;
 			model.color[ 0 ] = color[ 0 ];
 			model.color[ 1 ] = color[ 1 ];

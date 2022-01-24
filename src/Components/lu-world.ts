@@ -2,8 +2,6 @@
 
 ( ( script, init ) =>
 {
-	/*if ( document.readyState !== 'loading' ) { return init( script ); }
-	document.addEventListener( 'DOMContentLoaded', () => { init( script ); } );*/
 	customElements.whenDefined( ( script.dataset.prefix || 'lu' ) + '-model' ).then( () =>
 	{
 		init( script );
@@ -20,9 +18,13 @@
 		private _complete: boolean;
 		private canvas: HTMLCanvasElement;
 		private lSupport: LuminusSupport;
+
+		private light: Float32Array;
+		private minLight: number;
 		private uProjection: Float32Array;
 		private uView: Float32Array;
 		private uModel: Float32Array;
+		private iModel: Float32Array;
 
 		constructor()
 		{
@@ -34,7 +36,7 @@
 			const style = document.createElement( 'style' );
 			style.innerHTML =
 			[
-				':host { display: block; }',
+				':host { display: block; color: white; }',
 				'canvas { display: block; width: 100%; height: 100%; }',
 			].join( '' );
 
@@ -54,6 +56,7 @@
 				this.render();
 			} );
 
+			// Rerender
 			( () =>
 			{
 				let timer: number;
@@ -128,19 +131,36 @@
 		get centerz() { return parseFloat( this.getAttribute( 'centerz' ) || '' ) || 0; }
 		set centerz( value ) { this.setAttribute( 'centerz', value + '' ); }
 
+		get lightx() { return parseFloat( this.getAttribute( 'lightx' ) || '' ) || 0; }
+		set lightx( value ) { this.setAttribute( 'lightx', value + '' ); }
+
+		get lighty() { return parseFloat( this.getAttribute( 'lighty' ) || '' ) || 0; }
+		set lighty( value ) { this.setAttribute( 'lighty', value + '' ); }
+
+		get lightz() { return parseFloat( this.getAttribute( 'lightz' ) || '' ) || 0; }
+		set lightz( value ) { this.setAttribute( 'lightz', value + '' ); }
+
 		public async init()
 		{
 			Luminus.console.info( 'Start: init lu-world.' );
 			const vertex = `#version 300 es
 in vec4 aVertexPosition;
 in vec4 aVertexColor;
+in vec3 aVertexNormal;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uViewMatrix;
 uniform mat4 uProjectionMatrix;
+uniform vec3 aLightColor;
+uniform float minLight;
+uniform vec3 lightDirection;
+uniform mat4 iModelViewMatrix;
 out lowp vec4 vColor;
 void main(void) {
 	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
-	vColor = aVertexColor;
+
+	vec3 invLight = normalize( iModelViewMatrix * vec4( lightDirection, 0.0 ) ).xyz;
+	float diffuse = minLight + ( 1.0 - minLight ) * clamp( dot( aVertexNormal, invLight ), 0.0, 1.0 );
+	vColor = aVertexColor * vec4( vec3( diffuse ), 1.0 );
 }`;
 			const fragment = `#version 300 es
 in lowp vec4 vColor;
@@ -158,12 +178,15 @@ void main(void) {
 
 			support.enables( support.gl.DEPTH_TEST, support.gl.CULL_FACE );
 
+			this.light = new Float32Array( this.color );
+			this.minLight = 0.3;
+
 			// TODO: frustum
 			this.uProjection = support.orthographic( this.left, this.right, this.bottom, this.top, this.near, this.far );
-
 			this.uView = support.matrix.identity4();
-
 			this.uModel = support.matrix.identity4();
+
+			this.iModel = support.matrix.identity4();
 
 			this._complete = true;
 		}
@@ -188,19 +211,46 @@ void main(void) {
 			gl2.uniformMatrix4fv( this.support.info.uniform.uViewMatrix, false, this.uView );
 			gl2.uniformMatrix4fv( this.support.info.uniform.uModelViewMatrix, false, this.uModel );
 
+			// Light.
+			gl2.uniform1f( this.support.info.uniform.minLight, this.minLight );
+			gl2.uniform3f( this.support.info.uniform.lightDirection, this.lightx, this.lighty, this.lightz);
+			this.light.set( this.color );
+			gl2.uniform3fv( this.support.info.uniform.aLightColor, this.light );
+			gl2.uniformMatrix4fv( this.support.info.uniform.iModelViewMatrix, false, this.iModel );
+
 			this.support.clear();
 
 			for ( const model of this.children )
 			{
 				if ( model instanceof Luminus.model )
 				{
-					Luminus.matrix.translation4( model.x, model.y, model.z,this.uModel );
+					this.support.matrix.translation4( model.x, model.y, model.z, this.uModel );
 					gl2.uniformMatrix4fv( this.support.info.uniform.uModelViewMatrix, false, this.uModel );
+					this.support.matrix.inverse4( this.uModel, this.iModel );
+					gl2.uniformMatrix4fv( this.support.info.uniform.iProjectionMatrix, false, this.iModel );
+
+					if ( model.model.minLight !== undefined )
+					{
+						gl2.uniform1f( this.support.info.uniform.minLight, model.model.minLight );
+					}
+
 					model.render( this.support );
+
+					gl2.uniform1f( this.support.info.uniform.minLight, this.minLight );
 				}
 			}
 
 			gl2.flush();
+		}
+
+		get color(): number[]
+		{
+			return (window.getComputedStyle( this, '' ).color
+				.replace( /\s/g, '' )
+				.replace( /rgba{0,1}\(([0-9\.\,]+)\)/, '$1' ) + ',1'
+			).split( ',' )
+				.slice( 0, 3 )
+				.map( ( v ) => { return parseInt( v ) / 255.0; } );
 		}
 
 		static get observedAttributes() { return [ 'width', 'height' ]; }

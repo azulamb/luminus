@@ -9,6 +9,8 @@
 
 		protected vao: WebGLVertexArrayObject;
 
+		public minLight: number = 1;
+
 		constructor()
 		{
 			super();

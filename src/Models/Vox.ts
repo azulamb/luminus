@@ -205,31 +205,40 @@ interface VoxData
 	function createCube( x: number, y: number, z: number )
 	{
 		return [
-			x,     y + 1, z + 1,
-			x,     y + 1, z,
-			x + 1, y + 1, z + 1,
-			x + 1, y + 1, z,
-			x,     y,     z + 1,
-			x,     y,     z,
-			x + 1, y,     z,
-			x + 1, y,     z + 1,
+			x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1,
+			x, y, z, x, y + 1, z, x + 1, y + 1, z, x + 1, y, z,
+			x, y + 1, z, x, y + 1, z + 1, x + 1, y + 1, z + 1, x + 1, y + 1, z,
+			x, y, z, x + 1, y, z, x + 1, y, z + 1, x, y, z + 1,
+			x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x + 1, y, z + 1,
+			x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z,
+		];
+	}
+
+	function createNormal()
+	{
+		return [
+			0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
+			0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
+			0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
+			0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
+			1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
+			-1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
 		];
 	}
 
 	function createFace( n: number )
 	{
-		n *= 8;
 		return [
-			n + 3, n + 2, n + 6, n + 2, n + 7, n + 6,
-			n + 6, n + 7, n + 4, n + 7, n + 2, n + 4,
-			n + 4, n + 2, n + 0, n + 2, n + 3, n + 0,
-			n + 0, n + 3, n + 1, n + 3, n + 6, n + 1,
-			n + 1, n + 6, n + 5, n + 6, n + 4, n + 5,
-			n + 5, n + 4, n + 1, n + 4, n + 0, n + 1,
+			n, n + 1, n + 2, n, n + 2, n + 3,
+			n + 4, n + 5, n + 6, n + 4, n + 6, n + 7,
+			n + 8, n + 9, n + 10, n + 8, n + 10, n + 11,
+			n + 12, n + 13, n + 14, n + 12, n + 14, n + 15,
+			n + 16, n + 17, n + 18, n + 16, n + 18, n + 19,
+			n + 20, n + 21, n + 22, n + 20, n + 22, n + 23,
 		];
 	}
 
-	class Vox extends Luminus.models.model  implements LuminusModelVox
+	class Vox extends Luminus.models.model implements LuminusModelVox
 	{
 		public loaded?: boolean;
 		public complete?: boolean;
@@ -238,6 +247,7 @@ interface VoxData
 		protected vao: WebGLVertexArrayObject;
 		protected verts: Float32Array;
 		protected colors: Float32Array;
+		protected normals: Float32Array;
 		protected faces: Uint16Array;
 		protected count: number;
 
@@ -282,23 +292,32 @@ interface VoxData
 
 				const verts: number[] = [];
 				const colors: number[] = [];
+				const normals: number[] = [];
 				const faces: number[] = [];
+
 				vox.models.forEach( ( model ) =>
 				{
 					model.xyzi.forEach( ( voxel ) =>
 					{
-						const index = Math.floor( verts.length / 24 );
+						const index = verts.length / 3;
 						verts.push( ... createCube( voxel.y, voxel.z, voxel.x ) );
 						const c = vox.palette[ voxel.c ];
 						const color = [ c[ 0 ] / 255.0, c[ 1 ] / 255.0, c[ 2 ] / 255.0, c[ 3 ] / 255.0 ];
-						colors.push( ... color, ... color, ... color, ... color, ... color, ... color, ... color, ... color );
+						colors.push(
+							... color, ... color, ... color, ... color,
+							... color, ... color, ... color, ... color,
+							... color, ... color, ... color, ... color,
+							... color, ... color, ... color, ... color,
+							... color, ... color, ... color, ... color,
+							... color, ... color, ... color, ... color,
+						);
+						normals.push( ... createNormal() );
 						faces.push( ... createFace( index ) );
 					} );
 				} )
 				this.verts = new Float32Array( verts );
-
 				this.colors = new Float32Array( colors );
-
+				this.normals = new Float32Array( normals );
 				this.faces = new Uint16Array( faces );
 			} );
 		}
@@ -325,12 +344,17 @@ interface VoxData
 			gl2.enableVertexAttribArray( support.info.in.aVertexColor );
 			gl2.vertexAttribPointer( support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0 );
 
+			const normalBuffer = gl2.createBuffer();
+			gl2.bindBuffer( gl2.ARRAY_BUFFER, normalBuffer );
+			gl2.bufferData( gl2.ARRAY_BUFFER, this.normals, gl2.STATIC_DRAW );
+			gl2.enableVertexAttribArray( support.info.in.aVertexNormal );
+			gl2.vertexAttribPointer( support.info.in.aVertexNormal, 3, gl2.FLOAT, false, 0, 0 );
+
 			const indexBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ELEMENT_ARRAY_BUFFER, indexBuffer );
 			gl2.bufferData( gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW );
 
 			support.gl.bindVertexArray( null );
-
 			this.vao = vao;
 			this.count = this.faces.length;
 

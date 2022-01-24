@@ -70,7 +70,7 @@ slider-input { width: 400px; }
 
 		this.v = document.createElement( 'input' );
 		this.v.type = 'number';
-		this.s.step = '0.1';
+		this.v.step = '0.1';
 		this.v.addEventListener( 'change', ( e ) => { this.s.value = this.v.value; onChange( e ); } );
 
 		const contents = document.createElement( 'div' );
@@ -113,19 +113,23 @@ slider-input { width: 400px; }
 	<lu-world
 		id="world"
 		width="600" height="400"
-		style="background:black;width:600px;height:400px;"
 		top="20" bottom="-20" left="-30" right="30" near="-10" far="100"
 		eyex="10" eyey="10" eyez="10"
 		upx="0" upy="1" upz="0"
 		centerx="0" centery="0" centerz="0"
+		lightx="0.5" lighty="1" lightz="0.2"
+		style="background:black;width:600px;height:400px;color:white;"
 	>
 		<lu-axis></lu-axis>
-		<lu-vox id="meet" src="sample.vox" x="-5" y="-8" z="-9"></lu-vox>
+		<lu-vox id="meet" src="./sample.vox" x="-5" y="-8" z="-9"></lu-vox>
 		<lu-cube id="cube"></lu-cube>
 	</lu-world>
 	<slider-input target="world" edit="eyex" min="-10" max="10">Camera-x</slider-input>
 	<slider-input target="world" edit="eyey" min="-10" max="10">Camera-y</slider-input>
 	<slider-input target="world" edit="eyez" min="-10" max="10">Camera-z</slider-input>
+	<slider-input target="world" edit="lightx" min="-1" max="1">Light-x</slider-input>
+	<slider-input target="world" edit="lighty" min="-1" max="1">Light-y</slider-input>
+	<slider-input target="world" edit="lightz" min="-1" max="1">Light-z</slider-input>
 	<slider-input target="cube" edit="x" min="-10" max="10">Cube-x</slider-input>
 	<slider-input target="cube" edit="y" min="-10" max="10">Cube-y</slider-input>
 	<slider-input target="cube" edit="z" min="-10" max="10">Cube-z</slider-input>

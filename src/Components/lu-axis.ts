@@ -17,7 +17,7 @@
 		{
 			super();
 
-			const model =  <LuminusModelAxis>new Luminus.models.axis();
+			const model = <LuminusModelAxis>new Luminus.models.axis();
 			this.model = model;
 
 			if ( this.hasAttribute( 'length' ) )
