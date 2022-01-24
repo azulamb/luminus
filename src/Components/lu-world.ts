@@ -20,7 +20,7 @@
 		private lSupport: LuminusSupport;
 
 		private light: Float32Array;
-		private minLight: number;
+		private lMin: number;
 		private uProjection: Float32Array;
 		private uView: Float32Array;
 		private uModel: Float32Array;
@@ -144,29 +144,29 @@
 		{
 			Luminus.console.info( 'Start: init lu-world.' );
 			const vertex = `#version 300 es
-in vec4 aVertexPosition;
-in vec4 aVertexColor;
-in vec3 aVertexNormal;
-uniform mat4 uModelViewMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform vec3 aLightColor;
-uniform float minLight;
-uniform vec3 lightDirection;
-uniform mat4 iModelViewMatrix;
-out lowp vec4 vColor;
+in vec4 vPosition;
+in vec4 vColor;
+in vec3 vNormal;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform vec3 lColor;
+uniform float lMin;
+uniform vec3 lDirection;
+uniform mat4 iModel;
+out lowp vec4 oColor;
 void main(void) {
-	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
+	gl_Position = uProjection * uView * uModel * vPosition;
 
-	vec3 invLight = normalize( iModelViewMatrix * vec4( lightDirection, 0.0 ) ).xyz;
-	float diffuse = minLight + ( 1.0 - minLight ) * clamp( dot( aVertexNormal, invLight ), 0.0, 1.0 );
-	vColor = aVertexColor * vec4( vec3( diffuse ), 1.0 );
+	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
+	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( vNormal, invLight ), 0.0, 1.0 );
+	oColor = vColor * vec4( vec3( diffuse ), 1.0 );
 }`;
 			const fragment = `#version 300 es
-in lowp vec4 vColor;
+in lowp vec4 oColor;
 out lowp vec4 outColor;
 void main(void) {
-	outColor = vColor;
+	outColor = oColor;
 }`;
 
 			const support = Luminus.createSupport( <WebGL2RenderingContext>this.canvas.getContext("webgl2") );
@@ -179,7 +179,7 @@ void main(void) {
 			support.enables( support.gl.DEPTH_TEST, support.gl.CULL_FACE );
 
 			this.light = new Float32Array( this.color );
-			this.minLight = 0.3;
+			this.lMin = 0.3;
 
 			// TODO: frustum
 			this.uProjection = support.orthographic( this.left, this.right, this.bottom, this.top, this.near, this.far );
@@ -207,16 +207,16 @@ void main(void) {
 
 			gl2.useProgram( this.support.info.program );
 
-			gl2.uniformMatrix4fv( this.support.info.uniform.uProjectionMatrix, false, this.uProjection );
-			gl2.uniformMatrix4fv( this.support.info.uniform.uViewMatrix, false, this.uView );
-			gl2.uniformMatrix4fv( this.support.info.uniform.uModelViewMatrix, false, this.uModel );
+			gl2.uniformMatrix4fv( this.support.info.uniform.uProjection, false, this.uProjection );
+			gl2.uniformMatrix4fv( this.support.info.uniform.uView, false, this.uView );
+			gl2.uniformMatrix4fv( this.support.info.uniform.uModel, false, this.uModel );
 
 			// Light.
-			gl2.uniform1f( this.support.info.uniform.minLight, this.minLight );
-			gl2.uniform3f( this.support.info.uniform.lightDirection, this.lightx, this.lighty, this.lightz);
+			gl2.uniform1f( this.support.info.uniform.lMin, this.lMin );
+			gl2.uniform3f( this.support.info.uniform.lDirection, this.lightx, this.lighty, this.lightz);
 			this.light.set( this.color );
-			gl2.uniform3fv( this.support.info.uniform.aLightColor, this.light );
-			gl2.uniformMatrix4fv( this.support.info.uniform.iModelViewMatrix, false, this.iModel );
+			gl2.uniform3fv( this.support.info.uniform.lColor, this.light );
+			gl2.uniformMatrix4fv( this.support.info.uniform.iModel, false, this.iModel );
 
 			this.support.clear();
 
@@ -225,18 +225,18 @@ void main(void) {
 				if ( model instanceof Luminus.model )
 				{
 					this.support.matrix.translation4( model.x, model.y, model.z, this.uModel );
-					gl2.uniformMatrix4fv( this.support.info.uniform.uModelViewMatrix, false, this.uModel );
+					gl2.uniformMatrix4fv( this.support.info.uniform.uModel, false, this.uModel );
 					this.support.matrix.inverse4( this.uModel, this.iModel );
 					gl2.uniformMatrix4fv( this.support.info.uniform.iProjectionMatrix, false, this.iModel );
 
-					if ( model.model.minLight !== undefined )
+					if ( model.model.lMin !== undefined )
 					{
-						gl2.uniform1f( this.support.info.uniform.minLight, model.model.minLight );
+						gl2.uniform1f( this.support.info.uniform.lMin, model.model.lMin );
 					}
 
 					model.render( this.support );
 
-					gl2.uniform1f( this.support.info.uniform.minLight, this.minLight );
+					gl2.uniform1f( this.support.info.uniform.lMin, this.lMin );
 				}
 			}
 

@@ -5,24 +5,30 @@
 <title>Luminus</title>
 <script src="./luminus.js"></script>
 <script type="x-shader/x-vertex" id="_vertex">#version 300 es
-
-in vec4 aVertexPosition;
-in vec4 aVertexColor;
-uniform mat4 uModelViewMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-out lowp vec4 vColor;
+in vec4 vPosition;
+in vec4 vColor;
+in vec3 vNormal;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform vec3 lColor;
+uniform float lMin;
+uniform vec3 lDirection;
+uniform mat4 iModel;
+out lowp vec4 oColor;
 void main(void) {
-	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
-	vColor = aVertexColor;
+	gl_Position = uProjection * uView * uModel * vPosition;
+
+	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
+	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( vNormal, invLight ), 0.0, 1.0 );
+	oColor = vColor * vec4( vec3( diffuse ), 1.0 );
 }
 </script>
 <script type="x-shader/x-fragment" id="_fragment">#version 300 es
-
-in lowp vec4 vColor;
+in lowp vec4 oColor;
 out lowp vec4 outColor;
 void main(void) {
-	outColor = vColor;
+	outColor = oColor;
 }
 </script>
 <script>

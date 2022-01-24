@@ -9,7 +9,7 @@
 
 		protected vao: WebGLVertexArrayObject;
 
-		public minLight: number = 1;
+		public lMin: number = 1;
 
 		constructor()
 		{
@@ -42,8 +42,8 @@
 				0, 0, 0, 0, length, 0,
 				0, 0, 0, 0, 0, length,
 			] ), gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.aVertexPosition );
-			gl2.vertexAttribPointer( support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.info.in.vPosition );
+			gl2.vertexAttribPointer( support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0 );
 
 			const colorBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ARRAY_BUFFER, colorBuffer );
@@ -52,8 +52,8 @@
 				0, 1, 0, 1, 0, 1, 0, 1,
 				0, 0, 1, 1, 0, 0, 1, 1,
 			] ), gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.aVertexColor );
-			gl2.vertexAttribPointer( support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.info.in.vColor );
+			gl2.vertexAttribPointer( support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0 );
 
 			support.gl.bindVertexArray( null );
 

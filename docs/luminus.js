@@ -657,36 +657,36 @@ Luminus.version = '0.0.1';
         async init() {
             Luminus.console.info('Start: init lu-world.');
             const vertex = `#version 300 es
-in vec4 aVertexPosition;
-in vec4 aVertexColor;
-in vec3 aVertexNormal;
-uniform mat4 uModelViewMatrix;
-uniform mat4 uViewMatrix;
-uniform mat4 uProjectionMatrix;
-uniform vec3 aLightColor;
-uniform float minLight;
-uniform vec3 lightDirection;
-uniform mat4 iModelViewMatrix;
-out lowp vec4 vColor;
+in vec4 vPosition;
+in vec4 vColor;
+in vec3 vNormal;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform vec3 lColor;
+uniform float lMin;
+uniform vec3 lDirection;
+uniform mat4 iModel;
+out lowp vec4 oColor;
 void main(void) {
-	gl_Position = uProjectionMatrix * uViewMatrix * uModelViewMatrix * aVertexPosition;
+	gl_Position = uProjection * uView * uModel * vPosition;
 
-	vec3 invLight = normalize( iModelViewMatrix * vec4( lightDirection, 0.0 ) ).xyz;
-	float diffuse = minLight + ( 1.0 - minLight ) * clamp( dot( aVertexNormal, invLight ), 0.0, 1.0 );
-	vColor = aVertexColor * vec4( vec3( diffuse ), 1.0 );
+	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
+	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( vNormal, invLight ), 0.0, 1.0 );
+	oColor = vColor * vec4( vec3( diffuse ), 1.0 );
 }`;
             const fragment = `#version 300 es
-in lowp vec4 vColor;
+in lowp vec4 oColor;
 out lowp vec4 outColor;
 void main(void) {
-	outColor = vColor;
+	outColor = oColor;
 }`;
             const support = Luminus.createSupport(this.canvas.getContext("webgl2"));
             await support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
             this.lSupport = support;
             support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
             this.light = new Float32Array(this.color);
-            this.minLight = 0.3;
+            this.lMin = 0.3;
             this.uProjection = support.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
             this.uView = support.matrix.identity4();
             this.uModel = support.matrix.identity4();
@@ -701,26 +701,26 @@ void main(void) {
             const gl2 = this.support.gl;
             this.support.matrix.lookAt([this.eyex, this.eyey, this.eyez], [this.centerx, this.centery, this.centerz], [this.upx, this.upy, this.upz], this.uView);
             gl2.useProgram(this.support.info.program);
-            gl2.uniformMatrix4fv(this.support.info.uniform.uProjectionMatrix, false, this.uProjection);
-            gl2.uniformMatrix4fv(this.support.info.uniform.uViewMatrix, false, this.uView);
-            gl2.uniformMatrix4fv(this.support.info.uniform.uModelViewMatrix, false, this.uModel);
-            gl2.uniform1f(this.support.info.uniform.minLight, this.minLight);
-            gl2.uniform3f(this.support.info.uniform.lightDirection, this.lightx, this.lighty, this.lightz);
+            gl2.uniformMatrix4fv(this.support.info.uniform.uProjection, false, this.uProjection);
+            gl2.uniformMatrix4fv(this.support.info.uniform.uView, false, this.uView);
+            gl2.uniformMatrix4fv(this.support.info.uniform.uModel, false, this.uModel);
+            gl2.uniform1f(this.support.info.uniform.lMin, this.lMin);
+            gl2.uniform3f(this.support.info.uniform.lDirection, this.lightx, this.lighty, this.lightz);
             this.light.set(this.color);
-            gl2.uniform3fv(this.support.info.uniform.aLightColor, this.light);
-            gl2.uniformMatrix4fv(this.support.info.uniform.iModelViewMatrix, false, this.iModel);
+            gl2.uniform3fv(this.support.info.uniform.lColor, this.light);
+            gl2.uniformMatrix4fv(this.support.info.uniform.iModel, false, this.iModel);
             this.support.clear();
             for (const model of this.children) {
                 if (model instanceof Luminus.model) {
                     this.support.matrix.translation4(model.x, model.y, model.z, this.uModel);
-                    gl2.uniformMatrix4fv(this.support.info.uniform.uModelViewMatrix, false, this.uModel);
+                    gl2.uniformMatrix4fv(this.support.info.uniform.uModel, false, this.uModel);
                     this.support.matrix.inverse4(this.uModel, this.iModel);
                     gl2.uniformMatrix4fv(this.support.info.uniform.iProjectionMatrix, false, this.iModel);
-                    if (model.model.minLight !== undefined) {
-                        gl2.uniform1f(this.support.info.uniform.minLight, model.model.minLight);
+                    if (model.model.lMin !== undefined) {
+                        gl2.uniform1f(this.support.info.uniform.lMin, model.model.lMin);
                     }
                     model.render(this.support);
-                    gl2.uniform1f(this.support.info.uniform.minLight, this.minLight);
+                    gl2.uniform1f(this.support.info.uniform.lMin, this.lMin);
                 }
             }
             gl2.flush();
@@ -753,7 +753,7 @@ void main(void) {
         constructor() {
             super();
             this.loaded = true;
-            this.minLight = 1;
+            this.lMin = 1;
             this._length = 10;
         }
         get length() { return this._length; }
@@ -776,8 +776,8 @@ void main(void) {
                 0, 0, 0, 0, length, 0,
                 0, 0, 0, 0, 0, length,
             ]), gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexPosition);
-            gl2.vertexAttribPointer(support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vPosition);
+            gl2.vertexAttribPointer(support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
@@ -785,8 +785,8 @@ void main(void) {
                 0, 1, 0, 1, 0, 1, 0, 1,
                 0, 0, 1, 1, 0, 0, 1, 1,
             ]), gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexColor);
-            gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vColor);
+            gl2.vertexAttribPointer(support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0);
             support.gl.bindVertexArray(null);
             this.vao = vao;
             this._change = false;
@@ -853,18 +853,18 @@ void main(void) {
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, verts, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexPosition);
-            gl2.vertexAttribPointer(support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vPosition);
+            gl2.vertexAttribPointer(support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, colors, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexColor);
-            gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vColor);
+            gl2.vertexAttribPointer(support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0);
             const normalBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, normalBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, normals, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexNormal);
-            gl2.vertexAttribPointer(support.info.in.aVertexNormal, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vNormal);
+            gl2.vertexAttribPointer(support.info.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
             const indexBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
             gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, faces, gl2.STATIC_DRAW);
@@ -1104,18 +1104,18 @@ void main(void) {
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexPosition);
-            gl2.vertexAttribPointer(support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vPosition);
+            gl2.vertexAttribPointer(support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexColor);
-            gl2.vertexAttribPointer(support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vColor);
+            gl2.vertexAttribPointer(support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0);
             const normalBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, normalBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, this.normals, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.aVertexNormal);
-            gl2.vertexAttribPointer(support.info.in.aVertexNormal, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.info.in.vNormal);
+            gl2.vertexAttribPointer(support.info.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
             const indexBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
             gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);

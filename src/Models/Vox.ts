@@ -335,20 +335,20 @@ interface VoxData
 			const positionBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ARRAY_BUFFER, positionBuffer );
 			gl2.bufferData( gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.aVertexPosition );
-			gl2.vertexAttribPointer( support.info.in.aVertexPosition, 3, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.info.in.vPosition );
+			gl2.vertexAttribPointer( support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0 );
 
 			const colorBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ARRAY_BUFFER, colorBuffer );
 			gl2.bufferData( gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.aVertexColor );
-			gl2.vertexAttribPointer( support.info.in.aVertexColor, 4, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.info.in.vColor );
+			gl2.vertexAttribPointer( support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0 );
 
 			const normalBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ARRAY_BUFFER, normalBuffer );
 			gl2.bufferData( gl2.ARRAY_BUFFER, this.normals, gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.aVertexNormal );
-			gl2.vertexAttribPointer( support.info.in.aVertexNormal, 3, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.info.in.vNormal );
+			gl2.vertexAttribPointer( support.info.in.vNormal, 3, gl2.FLOAT, false, 0, 0 );
 
 			const indexBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ELEMENT_ARRAY_BUFFER, indexBuffer );

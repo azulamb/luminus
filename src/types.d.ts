@@ -78,7 +78,7 @@ interface LuminusModel<T>
 	afterload?: () => unknown;
 
 	// Overwrite
-	minLight?: number;
+	lMin?: number;
 	onload( result: T ): Promise<unknown>;
 	onprepare( support: LuminusSupport ): Promise<unknown>;
 	onrender( support: LuminusSupport ): void;
