@@ -30,6 +30,14 @@ Luminus is 3d webcomponents. (Use WebGL 2)
 </html>
 ```
 
+## Tools
+
+* vox
+  * MagicaVoxel
+    * https://ephtracy.github.io/
+  * Minify
+    * https://azulamb.github.io/luminus/voxminify.html
+
 ## TODO
 
 * Add minify.
