@@ -4,11 +4,13 @@
 	{
 		public gl: WebGL2RenderingContext;
 		public info: LuminusProgramInfo;
+		public texture: WebGLTexture[];
 		public matrix: Matrix;
 
 		constructor( gl2: WebGL2RenderingContext )
 		{
 			this.gl = gl2;
+			this.texture = [];
 			this.matrix = Luminus.matrix;
 			this.info = Luminus.createProgram( this );
 		}
@@ -27,7 +29,12 @@
 		{
 			await this.info.init();
 
-			await this.info.initShader( vertex, fragment );
+			await Promise.all(
+			[
+				this.info.initShader( vertex, fragment ),
+				// Load white 1x1 texture.
+				this.loadTexture( 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P4////fwAJ+wP9BUNFygAAAABJRU5ErkJggg==' ),
+			] );
 
 			this.info.loadPosition();
 
@@ -62,6 +69,49 @@
 			m[ 15 ] = 1;
 
 			return m;
+		}
+
+		public loadTexture( image: string | HTMLImageElement, num?: number )
+		{
+			const img = typeof image === 'string' ? document.createElement( 'img' ) : image;
+			const index = num === undefined ? this.texture.length : num;
+
+			if ( !this.texture[ index ] )
+			{
+				this.texture[ index ] = <any>null;
+			}
+
+			return ( img.complete && img.src ? Promise.resolve( img ) : new Promise<HTMLImageElement>( ( resolve, reject ) =>
+			{
+				img.onload = () => { resolve( img ); }
+				img.onerror = reject;
+				img.onabort = reject;
+				if ( typeof image === 'string' )
+				{
+					img.src = image;
+				}
+			} ) ).then( ( img ) =>
+			{
+				const gl = this.gl;
+				const texture = gl.createTexture();
+				if ( !texture ) { throw new Error( 'Failure createTexture.'); }
+
+				gl.bindTexture( gl.TEXTURE_2D, texture );
+				gl.texImage2D( gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img );
+				gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR );
+				gl.texParameteri( gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST );
+				gl.generateMipmap( gl.TEXTURE_2D );
+				gl.bindTexture( gl.TEXTURE_2D, null );
+
+				this.texture[ index ] = texture;
+
+				return index;
+			} );
+		}
+
+		public useTexture( num: number )
+		{
+			this.gl.bindTexture( this.gl.TEXTURE_2D, this.texture[ num ] || null );
 		}
 	}
 

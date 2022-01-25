@@ -33,3 +33,4 @@ Luminus is 3d webcomponents. (Use WebGL 2)
 ## TODO
 
 * Add minify.
+* Billboard

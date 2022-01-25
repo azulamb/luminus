@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<title>Vox minify</title>
+<script src="./luminus.js"></script>
+<script>
+window.addEventListener('DOMContentLoaded', () =>
+{
+	const vox = document.getElementById( 'vox' );
+	const dounload = document.getElementById( 'download' );
+	let FILE = null;
+	InitDrop( document.body, ( file ) =>
+	{
+		vox.import( file ).then( () =>
+		{
+			download.classList.add( 'enable' );
+			FILE = file;
+		} );
+	} );
+	download.addEventListener( 'click', () =>
+	{
+		if ( !FILE ) { return; }
+
+		const a = document.createElement( 'a' );
+		a.download = FILE.name.replace( /^(.+)\.[^\.]+$/, '$1.vox' );
+		const blob = new Blob( [ vox.export() ], { type: 'application/octet-stream' } );
+		a.href = URL.createObjectURL( blob );
+		a.click();
+	} );
+} );
+function InitDrop( parent, onDrop )
+{
+	parent.addEventListener( 'dragover', ( e ) => { e.stopPropagation(); e.preventDefault(); }, false );
+	parent.addEventListener( 'dragleave', ( e ) => { e.stopPropagation(); e.preventDefault(); }, false );
+	parent.addEventListener( 'drop', ( e ) =>
+	{
+		e.stopPropagation();
+		e.preventDefault();
+		const files = e.dataTransfer.files;
+		onDrop( files[ 0 ] );
+	}, false);
+}
+</script>
+<style>
+html, body { margin: 0; padding: 0; }
+body { display: grid; grid-template-columns: 1fr 100vmin; }
+body > div { position: relative; }
+.preview button { position: absolute; font-size: 2rem; letter-spacing: 0.2rem; bottom: 0.5rem; right: 0.5rem; padding: 0.5rem 2rem; border: none; border-radius: 0.2rem; }
+.preview button.enable { cursor: pointer; background-color: #53c8e7; }
+</style>
+</head>
+<body>
+	<div></div>
+	<div class="preview">
+		<lu-world
+			width="800" height="800"
+			style="background:black;"
+			vertex="vertex" fragment="fragment"
+			top="50" bottom="-50" left="-50" right="50" near="-20" far="200"
+			eyex="5" eyey="5" eyez="5"
+			upx="0" upy="1" upz="0"
+			centerx="0" centery="0" centerz="0"
+			lightx="0.5" lighty="1" lightz="0"
+		>
+			<lu-axis length="40"></lu-axis>
+			<lu-vox id="vox"></lu-vox>
+		</lu-world>
+		<button id="download">Download</button>
+	</div>
+</body>
+</html>

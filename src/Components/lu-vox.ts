@@ -44,7 +44,24 @@
 			this.model.load( fetch( url, init ) ).then( () => { this.rerender(); } );
 		}
 
-		public toVox()
+		public import( file: File )
+		{
+			return new Promise<void>( ( resolve, reject ) =>
+			{
+				const reader = new FileReader();
+				reader.onload = () =>
+				{
+					const data = <ArrayBuffer>reader.result;
+					const response = new Response( data );
+					this.model.load( Promise.resolve( response ) ).then( () => { this.rerender(); resolve(); } );
+				};
+				reader.onerror = reject;
+				reader.onabort = reject;
+				reader.readAsArrayBuffer( file );	
+			} ).then( () => { return this; } );
+		}
+
+		public export()
 		{
 			return this.model.export();
 		}

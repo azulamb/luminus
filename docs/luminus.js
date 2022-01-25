@@ -217,6 +217,7 @@ Luminus.version = '0.0.1';
     class Support {
         constructor(gl2) {
             this.gl = gl2;
+            this.texture = [];
             this.matrix = Luminus.matrix;
             this.info = Luminus.createProgram(this);
         }
@@ -228,7 +229,10 @@ Luminus.version = '0.0.1';
         }
         async init(vertex, fragment) {
             await this.info.init();
-            await this.info.initShader(vertex, fragment);
+            await Promise.all([
+                this.info.initShader(vertex, fragment),
+                this.loadTexture('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P4////fwAJ+wP9BUNFygAAAABJRU5ErkJggg=='),
+            ]);
             this.info.loadPosition();
             this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
             this.gl.clearDepth(1.0);
@@ -253,6 +257,38 @@ Luminus.version = '0.0.1';
             m[14] = (far + near) * nf;
             m[15] = 1;
             return m;
+        }
+        loadTexture(image, num) {
+            const img = typeof image === 'string' ? document.createElement('img') : image;
+            const index = num === undefined ? this.texture.length : num;
+            if (!this.texture[index]) {
+                this.texture[index] = null;
+            }
+            return (img.complete && img.src ? Promise.resolve(img) : new Promise((resolve, reject) => {
+                img.onload = () => { resolve(img); };
+                img.onerror = reject;
+                img.onabort = reject;
+                if (typeof image === 'string') {
+                    img.src = image;
+                }
+            })).then((img) => {
+                const gl = this.gl;
+                const texture = gl.createTexture();
+                if (!texture) {
+                    throw new Error('Failure createTexture.');
+                }
+                gl.bindTexture(gl.TEXTURE_2D, texture);
+                gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, img);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+                gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_NEAREST);
+                gl.generateMipmap(gl.TEXTURE_2D);
+                gl.bindTexture(gl.TEXTURE_2D, null);
+                this.texture[index] = texture;
+                return index;
+            });
+        }
+        useTexture(num) {
+            this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture[num] || null);
         }
     }
     Luminus.createSupport = (gl2) => { return new Support(gl2); };
@@ -554,7 +590,20 @@ Luminus.version = '0.0.1';
             }
             this.model.load(fetch(url, init)).then(() => { this.rerender(); });
         }
-        toVox() {
+        import(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const data = reader.result;
+                    const response = new Response(data);
+                    this.model.load(Promise.resolve(response)).then(() => { this.rerender(); resolve(); });
+                };
+                reader.onerror = reject;
+                reader.onabort = reject;
+                reader.readAsArrayBuffer(file);
+            }).then(() => { return this; });
+        }
+        export() {
             return this.model.export();
         }
         static get observedAttributes() { return ['src']; }

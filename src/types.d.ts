@@ -47,8 +47,9 @@ interface LuminusModelVoxElement extends LuminusModelElement
 {
 	model: LuminusModelVox;
 	src: string;
+	import( file: File ): Promise<this>;
 	// Export minimize vox.
-	toVox(): Uint8Array;
+	export(): Uint8Array;
 }
 
 /**
@@ -120,15 +121,20 @@ interface LuminusSupport
 {
 	gl: WebGL2RenderingContext;
 	info: LuminusProgramInfo;
+	texture: WebGLTexture[];
 	matrix: Matrix;
 
 	enables( ... enables: number[] ): this;
 
 	init( vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement ): Promise<WebGLProgram>;
 
+	// Screen
 	clear( mask?: number ): this;
-
 	orthographic( left: number, right: number, bottom: number, top: number, near: number, far: number ): Float32Array;
+
+	// Texture
+	loadTexture( image: string | HTMLImageElement, num?: number ): Promise<number>;
+	useTexture( num: number ): void;
 }
 
 interface LuminusProgramInfo
