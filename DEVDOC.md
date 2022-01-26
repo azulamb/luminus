@@ -51,12 +51,9 @@ TODO: 再度見直す
 ## 描画について
 
 * `lu-world` 初期化後に一度 `lu-world::render()` の実行
-  * `lu-model::render()` の実行
-    * 描画可能なら描画
-    * 読み込み開始していないなら `LuminusModel::load()` の後 `LuminusModel::prepare()` の後 `LuminusModel::render()` を実行
-    * 読み込み準備未完了なら `LuminusModel::prepare()` の後 `LuminusModel::render()` を実行
 * `lu-world::render()` の実行
 * `li-model::rerender()` の実行
   * `rerender` イベントの発行
   * `lu-world` でイベントの補足
   * `lu-world::render()` の実行
+    * 他の再描画要請の可能性もあるので描画処理はタイマーを仕掛けている

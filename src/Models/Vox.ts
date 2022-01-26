@@ -202,42 +202,6 @@ interface VoxData
 		}
 	}
 
-	function createCube( x: number, y: number, z: number )
-	{
-		return [
-			x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1,
-			x, y, z, x, y + 1, z, x + 1, y + 1, z, x + 1, y, z,
-			x, y + 1, z, x, y + 1, z + 1, x + 1, y + 1, z + 1, x + 1, y + 1, z,
-			x, y, z, x + 1, y, z, x + 1, y, z + 1, x, y, z + 1,
-			x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x + 1, y, z + 1,
-			x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z,
-		];
-	}
-
-	function createNormal()
-	{
-		return [
-			0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-			0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-			0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-			0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-			1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-			-1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
-		];
-	}
-
-	function createFace( n: number )
-	{
-		return [
-			n, n + 1, n + 2, n, n + 2, n + 3,
-			n + 4, n + 5, n + 6, n + 4, n + 6, n + 7,
-			n + 8, n + 9, n + 10, n + 8, n + 10, n + 11,
-			n + 12, n + 13, n + 14, n + 12, n + 14, n + 15,
-			n + 16, n + 17, n + 18, n + 16, n + 18, n + 19,
-			n + 20, n + 21, n + 22, n + 20, n + 22, n + 23,
-		];
-	}
-
 	class Vox extends Luminus.models.model implements LuminusModelVox
 	{
 		public loaded?: boolean;
@@ -295,26 +259,83 @@ interface VoxData
 				const normals: number[] = [];
 				const faces: number[] = [];
 
+				const tmpFacef: ( {
+					v: number[];
+					c: number;
+					n: number[];
+				} | null )[] = [];
 				vox.models.forEach( ( model ) =>
 				{
 					model.xyzi.forEach( ( voxel ) =>
 					{
-						const index = verts.length / 3;
-						verts.push( ... createCube( voxel.y, voxel.z, voxel.x ) );
-						const c = vox.palette[ voxel.c ];
-						const color = [ c[ 0 ] / 255.0, c[ 1 ] / 255.0, c[ 2 ] / 255.0, c[ 3 ] / 255.0 ];
-						colors.push(
-							... color, ... color, ... color, ... color,
-							... color, ... color, ... color, ... color,
-							... color, ... color, ... color, ... color,
-							... color, ... color, ... color, ... color,
-							... color, ... color, ... color, ... color,
-							... color, ... color, ... color, ... color,
+						const x = voxel.y;
+						const y = voxel.z;
+						const z = voxel.x;
+						tmpFacef.push(
+							{
+								v: [ x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1 ],
+								c: voxel.c,
+								n: [ 0, 0, 1 ],
+							},
+							{
+								v: [ x, y, z, x, y + 1, z, x + 1, y + 1, z, x + 1, y, z ],
+								c: voxel.c,
+								n: [ 0, 0, -1 ],
+							},
+							{
+								v: [ x, y + 1, z, x, y + 1, z + 1, x + 1, y + 1, z + 1, x + 1, y + 1, z ],
+								c: voxel.c,
+								n: [ 0, 1, 0 ],
+							},
+							{
+								v: [ x, y, z, x + 1, y, z, x + 1, y, z + 1, x, y, z + 1 ],
+								c: voxel.c,
+								n: [ 0, -1, 0 ],
+							},
+							{
+								v: [ x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x + 1, y, z + 1 ],
+								c: voxel.c,
+								n: [ 1, 0, 0 ],
+							},
+							{
+								v: [ x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z ],
+								c: voxel.c,
+								n: [ -1, 0, 0 ],
+							},
 						);
-						normals.push( ... createNormal() );
-						faces.push( ... createFace( index ) );
 					} );
-				} )
+				} );
+
+				// Remove facing faces.
+				tmpFacef.filter( ( face, index ) =>
+				{
+					if ( !face ) { return false; }
+					for ( let i = index + 1 ; i < tmpFacef.length ; ++i )
+					{
+						const r = tmpFacef[ i ];
+						if ( !r || face.c !== r.c ) { continue; }
+						if (
+							face.v[ 0 ] === r.v[ 0 ] && face.v[ 1 ] === r.v[ 1 ] && face.v[ 2 ] === r.v[ 2 ] &&
+							face.v[ 3 ] === r.v[ 9 ] && face.v[ 4 ] === r.v[ 10 ] && face.v[ 5 ] === r.v[ 11 ] &&
+							face.v[ 6 ] === r.v[ 6 ] && face.v[ 7 ] === r.v[ 7 ] && face.v[ 8 ] === r.v[ 8 ] &&
+							face.v[ 9 ] === r.v[ 3 ] && face.v[ 10 ] === r.v[ 4 ] && face.v[ 11 ] === r.v[ 5 ]
+						) {
+							tmpFacef[ index ] = tmpFacef[ i ] = null;
+							return false;
+						}
+					}
+					return true;
+				} ).forEach( ( face: { v: number[], c: number, n: number[] } ) =>
+				{
+					const n = verts.length / 3;
+					const c = vox.palette[ face.c ];
+					const color = [ c[ 0 ] / 255.0, c[ 1 ] / 255.0, c[ 2 ] / 255.0, c[ 3 ] / 255.0 ];
+					verts.push( ... face.v );
+					colors.push( ... color, ... color, ... color, ... color );
+					normals.push( ... face.n, ... face.n, ... face.n, ... face.n );
+					faces.push( n, n + 1, n + 2, n, n + 2, n + 3 );
+				} );
+
 				this.verts = new Float32Array( verts );
 				this.colors = new Float32Array( colors );
 				this.normals = new Float32Array( normals );

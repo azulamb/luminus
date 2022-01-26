@@ -633,7 +633,7 @@ Luminus.version = '0.0.1';
             const style = document.createElement('style');
             style.innerHTML =
                 [
-                    ':host { display: block; background: black; --ambient: rgba( 255, 255, 255, 0 ); color: white; }',
+                    ':host { display: block; background: black; --light: white; --ambient: rgba( 255, 255, 255, 0 ); }',
                     'canvas { display: block; width: 100%; height: 100%; }',
                 ].join('');
             this.canvas = document.createElement('canvas');
@@ -735,8 +735,8 @@ void main(void) {
             await support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
             this.lSupport = support;
             support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
-            this.light = new Float32Array(this.color);
-            this.ambient = new Float32Array(this.ambientColor);
+            this.lColor = new Float32Array(this.lightColor);
+            this.aColor = new Float32Array(this.ambientColor);
             this.uProjection = support.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
             this.uView = support.matrix.identity4();
             this.uModel = support.matrix.identity4();
@@ -755,10 +755,10 @@ void main(void) {
             gl2.uniformMatrix4fv(this.support.info.uniform.uView, false, this.uView);
             gl2.uniformMatrix4fv(this.support.info.uniform.uModel, false, this.uModel);
             gl2.uniform3f(this.support.info.uniform.lDirection, this.lightx, this.lighty, this.lightz);
-            this.light.set(this.color);
-            gl2.uniform3fv(this.support.info.uniform.lColor, this.light);
-            this.ambient.set(this.ambientColor);
-            gl2.uniform3fv(this.support.info.uniform.aColor, this.ambient);
+            this.lColor.set(this.lightColor);
+            gl2.uniform3fv(this.support.info.uniform.lColor, this.lColor);
+            this.aColor.set(this.ambientColor);
+            gl2.uniform3fv(this.support.info.uniform.aColor, this.aColor);
             gl2.uniformMatrix4fv(this.support.info.uniform.iModel, false, this.iModel);
             this.support.clear();
             for (const model of this.children) {
@@ -781,8 +781,8 @@ void main(void) {
                 .map((v, i, a) => { return parseInt(v) / 255.0 * parseFloat(a[3]); })
                 .slice(0, 3);
         }
-        get color() {
-            return (window.getComputedStyle(this, '').color
+        get lightColor() {
+            return (window.getComputedStyle(this, '').getPropertyValue('--light')
                 .replace(/\s/g, '')
                 .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
                 .slice(0, 3)
@@ -1067,36 +1067,6 @@ void main(void) {
             return v[0] | (v[1] << 8) + (v[2] << 16) + (v[3] << 24);
         }
     }
-    function createCube(x, y, z) {
-        return [
-            x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1,
-            x, y, z, x, y + 1, z, x + 1, y + 1, z, x + 1, y, z,
-            x, y + 1, z, x, y + 1, z + 1, x + 1, y + 1, z + 1, x + 1, y + 1, z,
-            x, y, z, x + 1, y, z, x + 1, y, z + 1, x, y, z + 1,
-            x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x + 1, y, z + 1,
-            x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z,
-        ];
-    }
-    function createNormal() {
-        return [
-            0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-            0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-            0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-            0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-            1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-            -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
-        ];
-    }
-    function createFace(n) {
-        return [
-            n, n + 1, n + 2, n, n + 2, n + 3,
-            n + 4, n + 5, n + 6, n + 4, n + 6, n + 7,
-            n + 8, n + 9, n + 10, n + 8, n + 10, n + 11,
-            n + 12, n + 13, n + 14, n + 12, n + 14, n + 15,
-            n + 16, n + 17, n + 18, n + 16, n + 18, n + 19,
-            n + 20, n + 21, n + 22, n + 20, n + 22, n + 23,
-        ];
-    }
     class Vox extends Luminus.models.model {
         constructor() {
             super(...arguments);
@@ -1132,16 +1102,65 @@ void main(void) {
                 const colors = [];
                 const normals = [];
                 const faces = [];
+                const tmpFacef = [];
                 vox.models.forEach((model) => {
                     model.xyzi.forEach((voxel) => {
-                        const index = verts.length / 3;
-                        verts.push(...createCube(voxel.y, voxel.z, voxel.x));
-                        const c = vox.palette[voxel.c];
-                        const color = [c[0] / 255.0, c[1] / 255.0, c[2] / 255.0, c[3] / 255.0];
-                        colors.push(...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color, ...color);
-                        normals.push(...createNormal());
-                        faces.push(...createFace(index));
+                        const x = voxel.y;
+                        const y = voxel.z;
+                        const z = voxel.x;
+                        tmpFacef.push({
+                            v: [x, y, z + 1, x + 1, y, z + 1, x + 1, y + 1, z + 1, x, y + 1, z + 1],
+                            c: voxel.c,
+                            n: [0, 0, 1],
+                        }, {
+                            v: [x, y, z, x, y + 1, z, x + 1, y + 1, z, x + 1, y, z],
+                            c: voxel.c,
+                            n: [0, 0, -1],
+                        }, {
+                            v: [x, y + 1, z, x, y + 1, z + 1, x + 1, y + 1, z + 1, x + 1, y + 1, z],
+                            c: voxel.c,
+                            n: [0, 1, 0],
+                        }, {
+                            v: [x, y, z, x + 1, y, z, x + 1, y, z + 1, x, y, z + 1],
+                            c: voxel.c,
+                            n: [0, -1, 0],
+                        }, {
+                            v: [x + 1, y, z, x + 1, y + 1, z, x + 1, y + 1, z + 1, x + 1, y, z + 1],
+                            c: voxel.c,
+                            n: [1, 0, 0],
+                        }, {
+                            v: [x, y, z, x, y, z + 1, x, y + 1, z + 1, x, y + 1, z],
+                            c: voxel.c,
+                            n: [-1, 0, 0],
+                        });
                     });
+                });
+                tmpFacef.filter((face, index) => {
+                    if (!face) {
+                        return false;
+                    }
+                    for (let i = index + 1; i < tmpFacef.length; ++i) {
+                        const r = tmpFacef[i];
+                        if (!r || face.c !== r.c) {
+                            continue;
+                        }
+                        if (face.v[0] === r.v[0] && face.v[1] === r.v[1] && face.v[2] === r.v[2] &&
+                            face.v[3] === r.v[9] && face.v[4] === r.v[10] && face.v[5] === r.v[11] &&
+                            face.v[6] === r.v[6] && face.v[7] === r.v[7] && face.v[8] === r.v[8] &&
+                            face.v[9] === r.v[3] && face.v[10] === r.v[4] && face.v[11] === r.v[5]) {
+                            tmpFacef[index] = tmpFacef[i] = null;
+                            return false;
+                        }
+                    }
+                    return true;
+                }).forEach((face) => {
+                    const n = verts.length / 3;
+                    const c = vox.palette[face.c];
+                    const color = [c[0] / 255.0, c[1] / 255.0, c[2] / 255.0, c[3] / 255.0];
+                    verts.push(...face.v);
+                    colors.push(...color, ...color, ...color, ...color);
+                    normals.push(...face.n, ...face.n, ...face.n, ...face.n);
+                    faces.push(n, n + 1, n + 2, n, n + 2, n + 3);
                 });
                 this.verts = new Float32Array(verts);
                 this.colors = new Float32Array(colors);
