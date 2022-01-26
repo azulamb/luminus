@@ -1,3 +1,11 @@
+/**
+ * MagicalVoxel model
+ * MagicalVoxel is Z-up right-handed system.
+ * Luminus is Y-up right-handed system.
+ * This component convert position.
+ *   ( x, y, z ) => ( y, z, x )
+ */
+
 ( ( script, init ) =>
 {
 	customElements.whenDefined( ( script.dataset.prefix || 'lu' ) + '-world' ).then( () =>

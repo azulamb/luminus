@@ -19,8 +19,10 @@
 		private canvas: HTMLCanvasElement;
 		private lSupport: LuminusSupport;
 
-		private light: Float32Array;
-		private lMin: number;
+		// Light
+		private lColor: Float32Array;
+		private aColor: Float32Array;
+		// Matrix
 		private uProjection: Float32Array;
 		private uView: Float32Array;
 		private uModel: Float32Array;
@@ -36,7 +38,7 @@
 			const style = document.createElement( 'style' );
 			style.innerHTML =
 			[
-				':host { display: block; color: white; }',
+				':host { display: block; background: black; --light: white; --ambient: rgba( 255, 255, 255, 0 ); }',
 				'canvas { display: block; width: 100%; height: 100%; }',
 			].join( '' );
 
@@ -151,6 +153,7 @@ uniform mat4 uModel;
 uniform mat4 uView;
 uniform mat4 uProjection;
 uniform vec3 lColor;
+uniform vec3 aColor;
 uniform float lMin;
 uniform vec3 lDirection;
 uniform mat4 iModel;
@@ -160,7 +163,7 @@ void main(void) {
 
 	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
 	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( vNormal, invLight ), 0.0, 1.0 );
-	oColor = vColor * vec4( vec3( diffuse ), 1.0 );
+	oColor = vColor * vec4( vec3( diffuse ), 1.0 ) + vec4( aColor.xyz, 0 ) * vColor.w;
 }`;
 			const fragment = `#version 300 es
 in lowp vec4 oColor;
@@ -178,8 +181,8 @@ void main(void) {
 
 			support.enables( support.gl.DEPTH_TEST, support.gl.CULL_FACE );
 
-			this.light = new Float32Array( this.color );
-			this.lMin = 0.3;
+			this.lColor = new Float32Array( this.lightColor );
+			this.aColor = new Float32Array( this.ambientColor );
 
 			// TODO: frustum
 			this.uProjection = support.orthographic( this.left, this.right, this.bottom, this.top, this.near, this.far );
@@ -205,6 +208,7 @@ void main(void) {
 				this.uView
 			);
 
+			// TODO: move Support.
 			gl2.useProgram( this.support.info.program );
 
 			gl2.uniformMatrix4fv( this.support.info.uniform.uProjection, false, this.uProjection );
@@ -212,10 +216,11 @@ void main(void) {
 			gl2.uniformMatrix4fv( this.support.info.uniform.uModel, false, this.uModel );
 
 			// Light.
-			gl2.uniform1f( this.support.info.uniform.lMin, this.lMin );
 			gl2.uniform3f( this.support.info.uniform.lDirection, this.lightx, this.lighty, this.lightz);
-			this.light.set( this.color );
-			gl2.uniform3fv( this.support.info.uniform.lColor, this.light );
+			this.lColor.set( this.lightColor );
+			gl2.uniform3fv( this.support.info.uniform.lColor, this.lColor );
+			this.aColor.set( this.ambientColor );
+			gl2.uniform3fv( this.support.info.uniform.aColor, this.aColor );
 			gl2.uniformMatrix4fv( this.support.info.uniform.iModel, false, this.iModel );
 
 			this.support.clear();
@@ -228,24 +233,29 @@ void main(void) {
 					gl2.uniformMatrix4fv( this.support.info.uniform.uModel, false, this.uModel );
 					this.support.matrix.inverse4( this.uModel, this.iModel );
 					gl2.uniformMatrix4fv( this.support.info.uniform.iProjectionMatrix, false, this.iModel );
-
-					if ( model.model.lMin !== undefined )
-					{
-						gl2.uniform1f( this.support.info.uniform.lMin, model.model.lMin );
-					}
+					gl2.uniform1f( this.support.info.uniform.lMin, model.model.lMin === undefined ? 0.3 : model.model.lMin );
 
 					model.render( this.support );
-
-					gl2.uniform1f( this.support.info.uniform.lMin, this.lMin );
 				}
 			}
 
 			gl2.flush();
 		}
 
-		get color(): number[]
+		get ambientColor(): number[]
 		{
-			return (window.getComputedStyle( this, '' ).color
+			return (window.getComputedStyle( this, '' ).getPropertyValue( '--ambient' )
+				.replace( /\s/g, '' )
+				.replace( /rgba{0,1}\(([0-9\.\,]+)\)/, '$1' ) + ',1'
+			).split( ',' )
+				.slice( 0, 4 )
+				.map( ( v, i, a ) => { return parseInt( v ) / 255.0 * parseFloat( a[ 3 ] ); } )
+				.slice( 0, 3 );
+		}
+
+		get lightColor(): number[]
+		{
+			return (window.getComputedStyle( this, '' ).getPropertyValue( '--light' )
 				.replace( /\s/g, '' )
 				.replace( /rgba{0,1}\(([0-9\.\,]+)\)/, '$1' ) + ',1'
 			).split( ',' )

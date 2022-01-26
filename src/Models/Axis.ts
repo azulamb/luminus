@@ -2,14 +2,13 @@
 {
 	class Axis extends Luminus.models.model implements LuminusModelAxis
 	{
+		public lMin: number = 1;
 		public loaded?: boolean = true;
 		public complete?: boolean;
 		private _length: number;
 		private _change: boolean;
 
 		protected vao: WebGLVertexArrayObject;
-
-		public lMin: number = 1;
 
 		constructor()
 		{
