@@ -113,7 +113,7 @@ slider-input { width: 400px; }
 	<lu-world
 		id="world"
 		width="600" height="400"
-		top="20" bottom="-20" left="-30" right="30" near="-10" far="100"
+		top="20" bottom="-20" left="-30" right="30" near="-100" far="100"
 		eyex="10" eyey="10" eyez="10"
 		upx="0" upy="1" upz="0"
 		centerx="0" centery="0" centerz="0"
@@ -121,7 +121,17 @@ slider-input { width: 400px; }
 		style="width:600px;height:400px;"
 	>
 		<lu-axis></lu-axis>
-		<lu-vox id="meet" src="./sample.vox" x="-5" y="-8" z="-9"></lu-vox>
+		<!--<lu-vox src="./cube.vox" x="2" y="0" z="2" roll="0" pitch="-45" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
+		<lu-vox src="./cube.vox" x="8" y="0" z="0" roll="0" pitch="-45" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
+		<lu-vox src="./cube.vox" x="0" y="8" z="0" roll="0" pitch="-45" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
+		<lu-vox src="./cube.vox" x="0" y="0" z="8" roll="0" pitch="45" yaw="0" cx="0" cy="0" cz="1" xaxis="0" yaxis="0" zaxis="90"></lu-vox>
+		<lu-vox src="./cube.vox" x="8" y="0" z="0" roll="0" pitch="0" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
+		-->
+		<!--<lu-vox id="meet" src="./sample.vox" x="0" y="0" z="12" cx="-1" cy="-3" cz="2.5"></lu-vox>-->
+		<lu-vox id="meet" src="./sample.vox" x="0" y="0" z="12" cx="-1" cy="-3" cz="2.5" pitch="0"></lu-vox>
+		<lu-vox id="meet" src="./sample.vox" x="12" y="0" z="0" cx="-1" cy="-3" cz="2.5" pitch="90"></lu-vox>
+		<!--<lu-vox id="meet" src="./sample.vox" x="0" y="-2" z="8"></lu-vox>
+		<lu-vox id="meet" src="./sample.vox" x="8" y="-2" z="0" pitch="90"></lu-vox>-->
 		<lu-cube id="cube"></lu-cube>
 	</lu-world>
 	<slider-input target="world" edit="eyex" min="-10" max="10">Camera-x</slider-input>

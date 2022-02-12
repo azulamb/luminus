@@ -50,6 +50,24 @@
 			};
 		}
 
+		get cx() { return parseFloat( this.getAttribute( 'cx' ) || '0' ) || 0; }
+		set cx( value ) { this.setAttribute( 'cx', value + '' ); }
+
+		get cy() { return parseFloat( this.getAttribute( 'cy' ) || '0' ) || 0; }
+		set cy( value ) { this.setAttribute( 'cy', value + '' ); }
+
+		get cz() { return parseFloat( this.getAttribute( 'cz' ) || '0' ) || 0; }
+		set cz( value ) { this.setAttribute( 'cz', value + '' ); }
+
+		get xaxis() { return parseFloat( this.getAttribute( 'xaxis' ) || '0' ) || 0; }
+		set xaxis( value ) { this.setAttribute( 'xaxis', value + '' ); }
+
+		get yaxis() { return parseFloat( this.getAttribute( 'yaxis' ) || '0' ) || 0; }
+		set yaxis( value ) { this.setAttribute( 'yaxis', value + '' ); }
+
+		get zaxis() { return parseFloat( this.getAttribute( 'zaxis' ) || '0' ) || 0; }
+		set zaxis( value ) { this.setAttribute( 'zaxis', value + '' ); }
+
 		get x() { return parseFloat( this.getAttribute( 'x' ) || '0' ) || 0; }
 		set x( value ) { this.setAttribute( 'x', value + '' ); }
 
@@ -58,6 +76,15 @@
 
 		get z() { return parseFloat( this.getAttribute( 'z' ) || '0' ) || 0; }
 		set z( value ) { this.setAttribute( 'z', value + '' ); }
+
+		get roll() { return parseFloat( this.getAttribute( 'roll' ) || '0' ) || 0; }
+		set roll( value ) { this.setAttribute( 'roll', value + '' ); }
+
+		get pitch() { return parseFloat( this.getAttribute( 'pitch' ) || '0' ) || 0; }
+		set pitch( value ) { this.setAttribute( 'pitch', value + '' ); }
+
+		get yaw() { return parseFloat( this.getAttribute( 'yaw' ) || '0' ) || 0; }
+		set yaw( value ) { this.setAttribute( 'yaw', value + '' ); }
 
 		get complete() { return this.model && this.model.complete === true; }
 

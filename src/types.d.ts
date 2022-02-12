@@ -26,12 +26,30 @@ interface LuminusModelElement extends HTMLElement
 	model: LuminusModel<unknown>;
 	readonly complete: boolean;
 	readonly support: LuminusSupport | undefined;
+	// Model center x
+	cx: number;
+	// Model center y
+	cy: number;
+	// Model center z
+	cz: number;
+	// Rotation x axis
+	xaxis: number;
+	// Rotation y axis
+	yaxis: number;
+	// Rotation z axis
+	zaxis: number;
 	// Translate x
 	x: number;
 	// Translate y
 	y: number;
 	// Translate z
 	z: number;
+	// Rotation x axis
+	roll: number;
+	// Rotation y axis
+	pitch: number;
+	// Rotation z axis
+	yaw: number;
 	initStyle(): HTMLStyleElement;
 	render( support: LuminusSupport ): void;
 	rerender(): void;
@@ -110,11 +128,13 @@ interface Matrix
 	create4(): Float32Array;
 	identity4( m?: Float32Array ): Float32Array;
 	translation4( x: number, y: number, z: number, m?: Float32Array ): Float32Array;
+	rotation4( roll: number, pitch: number, yaw: number, m?: Float32Array ): Float32Array,
 	scaling4( x: number, y: number, z: number, m?: Float32Array ): Float32Array;
 	lookAt( eye: number[], center: number[], up: number[], m?: Float32Array ): Float32Array;
 	// calc
 	multiply4( a: Float32Array, b: Float32Array, m?: Float32Array ): Float32Array;
 	inverse4( a: Float32Array, m?: Float32Array ): Float32Array;
+	transpose4( a: Float32Array, m?: Float32Array ): Float32Array;
 }
 
 interface LuminusSupport

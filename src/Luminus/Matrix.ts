@@ -14,15 +14,9 @@
 		if ( !m ) { m = create4(); }
 
 		let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
-		let eyex = eye[ 0 ];
-		let eyey = eye[ 1 ];
-		let eyez = eye[ 2 ];
-		let upx = up[ 0 ];
-		let upy = up[ 1 ];
-		let upz = up[ 2 ];
-		let centerx = center[ 0 ];
-		let centery = center[ 1 ];
-		let centerz = center[ 2 ];
+		const eyex = eye[ 0 ], eyey = eye[ 1 ], eyez = eye[ 2 ];
+		const upx = up[ 0 ], upy = up[ 1 ], upz = up[ 2 ];
+		const centerx = center[ 0 ], centery = center[ 1 ], centerz = center[ 2 ];
 
 		if (
 			Math.abs(eyex - centerx) < 0.000001 &&
@@ -128,27 +122,103 @@
 
 	function multiply4( a: Float32Array, b: Float32Array, m?: Float32Array )
 	{
-		if ( !m ) { m = create4(); }
+		if ( !m ) { m = b.length < 16 ? new Float32Array( 4 ) : create4(); }
+		const A = a[ 0 ], B = a[ 1 ], C = a[ 2 ], D = a[ 3 ],
+			E = a[ 4 ], F = a[ 5 ], G = a[ 6 ], H = a[ 7 ],
+			I = a[ 8 ], J = a[ 9 ], K = a[ 10 ], L = a[ 11 ],
+			M = a[ 12 ], N = a[ 13 ], O = a[ 14 ], P = a[ 15 ];
 
-		m[ 0 ] = b[ 0 ] * a[ 0 ] + b[ 1 ] * a[ 4 ] + b[ 2 ] * a[ 8 ] + b[ 3 ] * a[ 12 ];
-		m[ 1 ] = b[ 0 ] * a[ 1 ] + b[ 1 ] * a[ 5 ] + b[ 2 ] * a[ 9 ] + b[ 3 ] * a[ 13 ];
-		m[ 2 ] = b[ 0 ] * a[ 2 ] + b[ 1 ] * a[ 6 ] + b[ 2 ] * a[ 10 ] + b[ 3 ] * a[ 14 ];
-		m[ 3 ] = b[ 0 ] * a[ 3 ] + b[ 1 ] * a[ 7 ] + b[ 2 ] * a[ 11 ] + b[ 3 ] * a[ 15 ];
-		m[ 4 ] = b[ 4 ] * a[ 0 ] + b[ 5 ] * a[ 4 ] + b[ 6 ] * a[ 8 ] + b[ 7 ] * a[ 12 ];
-		m[ 5 ] = b[ 4 ] * a[ 1 ] + b[ 5 ] * a[ 5 ] + b[ 6 ] * a[ 9 ] + b[ 7 ] * a[ 13 ];
-		m[ 6 ] = b[ 4 ] * a[ 2 ] + b[ 5 ] * a[ 6 ] + b[ 6 ] * a[ 10 ] + b[ 7 ] * a[ 14 ];
-		m[ 7 ] = b[ 4 ] * a[ 3 ] + b[ 5 ] * a[ 7 ] + b[ 6 ] * a[ 11 ] + b[ 7 ] * a[ 15 ];
-		m[ 8 ] = b[ 8 ] * a[ 0 ] + b[ 9 ] * a[ 4 ] + b[ 10 ] * a[ 8 ] + b[ 11 ] * a[ 12 ];
-		m[ 9 ] = b[ 8 ] * a[ 1 ] + b[ 9 ] * a[ 5 ] + b[ 10 ] * a[ 9 ] + b[ 11 ] * a[ 13 ];
-		m[ 10 ] = b[ 8 ] * a[ 2 ] + b[ 9 ] * a[ 6 ] + b[ 10 ] * a[ 10 ] + b[ 11 ] * a[ 14 ];
-		m[ 11 ] = b[ 8 ] * a[ 3 ] + b[ 9 ] * a[ 7 ] + b[ 10 ] * a[ 11 ] + b[ 11 ] * a[ 15 ];
-		m[ 12 ] = b[ 12 ] * a[ 0 ] + b[ 13 ] * a[ 4 ] + b[ 14 ] * a[ 8 ] + b[ 15 ] * a[ 12 ];
-		m[ 13 ] = b[ 12 ] * a[ 1 ] + b[ 13 ] * a[ 5 ] + b[ 14 ] * a[ 9 ] + b[ 15 ] * a[ 13 ];
-		m[ 14 ] = b[ 12 ] * a[ 2 ] + b[ 13 ] * a[ 6 ] + b[ 14 ] * a[ 10 ] + b[ 15 ] * a[ 14 ];
-		m[ 15 ] = b[ 12 ] * a[ 3 ] + b[ 13 ] * a[ 7 ] + b[ 14 ] * a[ 11 ] + b[ 15 ] * a[ 15 ];
+		[ m[ 0 ], m[ 1 ], m[ 2 ], m[ 3 ] ] =
+		[
+			b[ 0 ] * A + b[ 1 ] * E + b[ 2 ] * I + b[ 3 ] * M,
+			b[ 0 ] * B + b[ 1 ] * F + b[ 2 ] * J + b[ 3 ] * N,
+			b[ 0 ] * C + b[ 1 ] * G + b[ 2 ] * K + b[ 3 ] * O,
+			b[ 0 ] * D + b[ 1 ] * H + b[ 2 ] * L + b[ 3 ] * P,
+		];
+		if ( 4 < m.length )
+		{
+			[ m[ 4 ], m[ 5 ], m[ 6 ], m[ 7 ] ] =
+			[
+				b[ 4 ] * A + b[ 5 ] * E + b[ 6 ] * I + b[ 7 ] * M,
+				b[ 4 ] * B + b[ 5 ] * F + b[ 6 ] * J + b[ 7 ] * N,
+				b[ 4 ] * C + b[ 5 ] * G + b[ 6 ] * K + b[ 7 ] * O,
+				b[ 4 ] * D + b[ 5 ] * H + b[ 6 ] * L + b[ 7 ] * P,	
+			];
+			[ m[ 8 ], m[ 9 ], m[ 10 ], m[ 11 ] ] =
+			[
+				b[ 8 ] * A + b[ 9 ] * E + b[ 10 ] * I + b[ 11 ] * M,
+				b[ 8 ] * B + b[ 9 ] * F + b[ 10 ] * J + b[ 11 ] * N,
+				b[ 8 ] * C + b[ 9 ] * G + b[ 10 ] * K + b[ 11 ] * O,
+				b[ 8 ] * D + b[ 9 ] * H + b[ 10 ] * L + b[ 11 ] * P,
+			];
+			[ m[ 12 ], m[ 13 ], m[ 14 ], m[ 15 ] ] =
+			[
+				b[ 12 ] * A + b[ 13 ] * E + b[ 14 ] * I + b[ 15 ] * M,
+				b[ 12 ] * B + b[ 13 ] * F + b[ 14 ] * J + b[ 15 ] * N,
+				b[ 12 ] * C + b[ 13 ] * G + b[ 14 ] * K + b[ 15 ] * O,
+				b[ 12 ] * D + b[ 13 ] * H + b[ 14 ] * L + b[ 15 ] * P,
+			];
+		}
 
 		return m;
 	};
+
+	function quaternion( roll: number, pitch: number, yaw: number, m?: Float32Array )
+	{
+		if ( !m ) { m = new Float32Array( 4 ); }
+		roll = roll / 180 * Math.PI;
+		pitch = pitch / 180 * Math.PI;
+		yaw = yaw / 180 * Math.PI;
+		const cosRoll = Math.cos( roll / 2.0 );
+		const sinRoll = Math.sin( roll / 2.0 );
+		const cosPitch = Math.cos( pitch / 2.0);
+		const sinPitch = Math.sin( pitch / 2.0);
+		const cosYaw = Math.cos( yaw / 2.0 );
+		const sinYaw = Math.sin( yaw / 2.0 );
+		m[ 0 ] = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
+		m[ 1 ] = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
+		m[ 2 ] = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+		m[ 3 ] = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+		return m;
+	}
+
+	function rotation4( roll: number, pitch: number, yaw: number, m?: Float32Array )
+	{
+		if ( !m ) { m = create4(); }
+
+		const a = yaw / 180 * Math.PI;
+		const b = pitch / 180 * Math.PI;
+		const c = roll / 180 * Math.PI;
+		const cosa = Math.cos( a );
+		const sina = Math.sin( a );
+		const cosb = Math.cos( b );
+		const sinb = Math.sin( b );
+		const cosc = Math.cos( c );
+		const sinc = Math.sin( c );
+
+		/*m[ 0 ] = cosa * cosb * cosc - sina * sinc;
+		m[ 1 ] = - cosa * cosb * sinc - sina * cosc;
+		m[ 2 ] = cosa * sinb;
+		m[ 4 ] = sina * cosb * cosc + cosa * sinc;
+		m[ 5 ] = - sina * cosb * sinc + cosa * cosc;
+		m[ 6 ] = sina * sinb;
+		m[ 8 ] = - sinb * cosc;
+		m[ 9 ] = sinb * sinc;
+		m[ 10 ] = cosb;*/
+		m[ 0 ] = cosa * cosb;
+		m[ 1 ] = cosa * sinb * sinc - sina * cosc;
+		m[ 2 ] = cosa * sinb * cosc + sina * sinc;
+		m[ 4 ] = sina * cosb;
+		m[ 5 ] = sina * sinb * sinc + cosa * cosc;
+		m[ 6 ] = sina * sinb * cosc - cosa * sinc;
+		m[ 8 ] = -sinb;
+		m[ 9 ] = cosb * sinc;
+		m[ 10 ] = cosb * cosc;
+		m[ 3 ] = m[ 7 ] = m[ 11 ] = m[ 12 ] = m[ 13 ] = m[ 14 ] = 0;
+		m[ 15 ] = 1;
+
+		return m;
+	}
 
 	function inverse4( a: Float32Array, m?: Float32Array )
 	{
@@ -186,26 +256,53 @@
 
 		const id = 1.0 / d;
 
-		m[ 0 ] = id * ( a[ 5 ] * a[ 10 ] * a[ 15 ] + a[ 6 ] * a[ 11 ] * a[ 13 ] + a[ 7 ] * a[ 9 ] * a[ 14 ] - a[ 5 ] * a[ 11 ] * a[ 14 ] - a[ 6 ] * a[ 9 ] * a[ 15 ] - a[ 7 ] * a[ 10 ] * a[ 13 ] );
-		m[ 1 ] = id * ( a[ 1 ] * a[ 11 ] * a[ 14 ] + a[ 2 ] * a[ 9 ] * a[ 15 ] + a[ 3 ] * a[ 10 ] * a[ 13 ] - a[ 1 ] * a[ 10 ] * a[ 15 ] - a[ 2 ] * a[ 11 ] * a[ 13 ] - a[ 3 ] * a[ 9 ] * a[ 14 ] );
-		m[ 2 ] = id * ( a[ 1 ] * a[ 6 ] * a[ 15 ] + a[ 2 ] * a[ 7 ] * a[ 13 ] + a[ 3 ] * a[ 5 ] * a[ 14 ] - a[ 1 ] * a[ 7 ] * a[ 14 ] - a[ 2 ] * a[ 5 ] * a[ 15 ] - a[ 3 ] * a[ 6 ] * a[ 13 ] );
-		m[ 3 ] = id * ( a[ 1 ] * a[ 7 ] * a[ 10 ] + a[ 2 ] * a[ 5 ] * a[ 11 ] + a[ 3 ] * a[ 6 ] * a[ 9 ] - a[ 1 ] * a[ 6 ] * a[ 11 ] - a[ 2 ] * a[ 7 ] * a[ 9 ] - a[ 3 ] * a[ 5 ] * a[ 10 ] );
+		[
+			m[ 0 ], m[ 1 ], m[ 2 ], m[ 3 ],
+			m[ 4 ], m[ 5 ], m[ 6 ], m[ 7 ],
+			m[ 8 ], m[ 9 ], m[ 10 ], m[ 11 ],
+			m[ 12 ], m[ 13 ], m[ 14 ], m[ 15 ],
+		] =
+		[
+			id * ( a[ 5 ] * a[ 10 ] * a[ 15 ] + a[ 6 ] * a[ 11 ] * a[ 13 ] + a[ 7 ] * a[ 9 ] * a[ 14 ] - a[ 5 ] * a[ 11 ] * a[ 14 ] - a[ 6 ] * a[ 9 ] * a[ 15 ] - a[ 7 ] * a[ 10 ] * a[ 13 ] ),
+			id * ( a[ 1 ] * a[ 11 ] * a[ 14 ] + a[ 2 ] * a[ 9 ] * a[ 15 ] + a[ 3 ] * a[ 10 ] * a[ 13 ] - a[ 1 ] * a[ 10 ] * a[ 15 ] - a[ 2 ] * a[ 11 ] * a[ 13 ] - a[ 3 ] * a[ 9 ] * a[ 14 ] ),
+			id * ( a[ 1 ] * a[ 6 ] * a[ 15 ] + a[ 2 ] * a[ 7 ] * a[ 13 ] + a[ 3 ] * a[ 5 ] * a[ 14 ] - a[ 1 ] * a[ 7 ] * a[ 14 ] - a[ 2 ] * a[ 5 ] * a[ 15 ] - a[ 3 ] * a[ 6 ] * a[ 13 ] ),
+			id * ( a[ 1 ] * a[ 7 ] * a[ 10 ] + a[ 2 ] * a[ 5 ] * a[ 11 ] + a[ 3 ] * a[ 6 ] * a[ 9 ] - a[ 1 ] * a[ 6 ] * a[ 11 ] - a[ 2 ] * a[ 7 ] * a[ 9 ] - a[ 3 ] * a[ 5 ] * a[ 10 ] ),
 
-		m[ 4 ] = id * ( a[ 4 ] * a[ 11 ] * a[ 14 ] + a[ 6 ] * a[ 8 ] * a[ 15 ] + a[ 7 ] * a[ 10 ] * a[ 12 ] - a[ 4 ] * a[ 10 ] * a[ 15 ] - a[ 6 ] * a[ 11 ] * a[ 12 ] - a[ 7 ] * a[ 8 ] * a[ 14 ] );
-		m[ 5 ] = id * ( a[ 0 ] * a[ 10 ] * a[ 15 ] + a[ 2 ] * a[ 11 ] * a[ 12 ] + a[ 3 ] * a[ 8 ] * a[ 14 ] - a[ 0 ] * a[ 11 ] * a[ 14 ] - a[ 2 ] * a[ 8 ] * a[ 15 ] - a[ 3 ] * a[ 10 ] * a[ 12 ] );
-		m[ 6 ] = id * ( a[ 0 ] * a[ 7 ] * a[ 14 ] + a[ 2 ] * a[ 4 ] * a[ 15 ] + a[ 3 ] * a[ 6 ] * a[ 12 ] - a[ 0 ] * a[ 6 ] * a[ 15 ] - a[ 2 ] * a[ 7 ] * a[ 12 ] - a[ 3 ] * a[ 4 ] * a[ 14 ] );
-		m[ 7 ] = id * ( a[ 0 ] * a[ 6 ] * a[ 11 ] + a[ 2 ] * a[ 7 ] * a[ 8 ] + a[ 3 ] * a[ 4 ] * a[ 10 ] - a[ 0 ] * a[ 7 ] * a[ 10 ] - a[ 2 ] * a[ 4 ] * a[ 11 ] - a[ 3 ] * a[ 6 ] * a[ 8 ] );
+			id * ( a[ 4 ] * a[ 11 ] * a[ 14 ] + a[ 6 ] * a[ 8 ] * a[ 15 ] + a[ 7 ] * a[ 10 ] * a[ 12 ] - a[ 4 ] * a[ 10 ] * a[ 15 ] - a[ 6 ] * a[ 11 ] * a[ 12 ] - a[ 7 ] * a[ 8 ] * a[ 14 ] ),
+			id * ( a[ 0 ] * a[ 10 ] * a[ 15 ] + a[ 2 ] * a[ 11 ] * a[ 12 ] + a[ 3 ] * a[ 8 ] * a[ 14 ] - a[ 0 ] * a[ 11 ] * a[ 14 ] - a[ 2 ] * a[ 8 ] * a[ 15 ] - a[ 3 ] * a[ 10 ] * a[ 12 ] ),
+			id * ( a[ 0 ] * a[ 7 ] * a[ 14 ] + a[ 2 ] * a[ 4 ] * a[ 15 ] + a[ 3 ] * a[ 6 ] * a[ 12 ] - a[ 0 ] * a[ 6 ] * a[ 15 ] - a[ 2 ] * a[ 7 ] * a[ 12 ] - a[ 3 ] * a[ 4 ] * a[ 14 ] ),
+			id * ( a[ 0 ] * a[ 6 ] * a[ 11 ] + a[ 2 ] * a[ 7 ] * a[ 8 ] + a[ 3 ] * a[ 4 ] * a[ 10 ] - a[ 0 ] * a[ 7 ] * a[ 10 ] - a[ 2 ] * a[ 4 ] * a[ 11 ] - a[ 3 ] * a[ 6 ] * a[ 8 ] ),
 
-		m[ 8 ] = id * ( a[ 4 ] * a[ 9 ] * a[ 15 ] + a[ 5 ] * a[ 11 ] * a[ 12 ] + a[ 7 ] * a[ 8 ] * a[ 13 ] - a[ 4 ] * a[ 11 ] * a[ 13 ] - a[ 5 ] * a[ 8 ] * a[ 15 ] - a[ 7 ] * a[ 9 ] * a[ 12 ] );
-		m[ 9 ] = id * ( a[ 0 ] * a[ 11 ] * a[ 13 ] + a[ 1 ] * a[ 8 ] * a[ 15 ] + a[ 3 ] * a[ 9 ] * a[ 12 ] - a[ 0 ] * a[ 9 ] * a[ 15 ] - a[ 1 ] * a[ 11 ] * a[ 12 ] - a[ 3 ] * a[ 8 ] * a[ 13 ] );
-		m[ 10 ] = id * ( a[ 0 ] * a[ 5 ] * a[ 15 ] + a[ 1 ] * a[ 7 ] * a[ 12 ] + a[ 3 ] * a[ 4 ] * a[ 13 ] - a[ 0 ] * a[ 7 ] * a[ 13 ] - a[ 1 ] * a[ 4 ] * a[ 15 ] - a[ 3 ] * a[ 5 ] * a[ 12 ] );
-		m[ 11 ] = id * ( a[ 0 ] * a[ 7 ] * a[ 9 ] + a[ 1 ] * a[ 4 ] * a[ 11 ] + a[ 3 ] * a[ 5 ] * a[ 8 ] - a[ 0 ] * a[ 5 ] * a[ 11 ] - a[ 1 ] * a[ 7 ] * a[ 8 ] - a[ 3 ] * a[ 4 ] * a[ 9 ] );
+			id * ( a[ 4 ] * a[ 9 ] * a[ 15 ] + a[ 5 ] * a[ 11 ] * a[ 12 ] + a[ 7 ] * a[ 8 ] * a[ 13 ] - a[ 4 ] * a[ 11 ] * a[ 13 ] - a[ 5 ] * a[ 8 ] * a[ 15 ] - a[ 7 ] * a[ 9 ] * a[ 12 ] ),
+			id * ( a[ 0 ] * a[ 11 ] * a[ 13 ] + a[ 1 ] * a[ 8 ] * a[ 15 ] + a[ 3 ] * a[ 9 ] * a[ 12 ] - a[ 0 ] * a[ 9 ] * a[ 15 ] - a[ 1 ] * a[ 11 ] * a[ 12 ] - a[ 3 ] * a[ 8 ] * a[ 13 ] ),
+			id * ( a[ 0 ] * a[ 5 ] * a[ 15 ] + a[ 1 ] * a[ 7 ] * a[ 12 ] + a[ 3 ] * a[ 4 ] * a[ 13 ] - a[ 0 ] * a[ 7 ] * a[ 13 ] - a[ 1 ] * a[ 4 ] * a[ 15 ] - a[ 3 ] * a[ 5 ] * a[ 12 ] ),
+			id * ( a[ 0 ] * a[ 7 ] * a[ 9 ] + a[ 1 ] * a[ 4 ] * a[ 11 ] + a[ 3 ] * a[ 5 ] * a[ 8 ] - a[ 0 ] * a[ 5 ] * a[ 11 ] - a[ 1 ] * a[ 7 ] * a[ 8 ] - a[ 3 ] * a[ 4 ] * a[ 9 ] ),
 
-		m[ 12 ] = id * ( a[ 4 ] * a[ 10 ] * a[ 13 ] + a[ 5 ] * a[ 8 ] * a[ 14 ] + a[ 6 ] * a[ 9 ] * a[ 12 ] - a[ 4 ] * a[ 9 ] * a[ 14 ] - a[ 5 ] * a[ 10 ] * a[ 12 ] - a[ 6 ] * a[ 8 ] * a[ 13 ] );
-		m[ 13 ] = id * ( a[ 0 ] * a[ 9 ] * a[ 14 ] + a[ 1 ] * a[ 10 ] * a[ 12 ] + a[ 2 ] * a[ 8 ] * a[ 13 ] - a[ 0 ] * a[ 10 ] * a[ 13 ] - a[ 1 ] * a[ 8 ] * a[ 14 ] - a[ 2 ] * a[ 9 ] * a[ 12 ] );
-		m[ 14 ] = id * ( a[ 0 ] * a[ 6 ] * a[ 13 ] + a[ 1 ] * a[ 4 ] * a[ 14 ] + a[ 2 ] * a[ 5 ] * a[ 12 ] - a[ 0 ] * a[ 5 ] * a[ 14 ] - a[ 1 ] * a[ 6 ] * a[ 12 ] - a[ 2 ] * a[ 4 ] * a[ 13 ] );
-		m[ 15 ] = id * ( a[ 0 ] * a[ 5 ] * a[ 10 ] + a[ 1 ] * a[ 6 ] * a[ 8 ] + a[ 2 ] * a[ 4 ] * a[ 9 ] - a[ 0 ] * a[ 6 ] * a[ 9 ] - a[ 1 ] * a[ 4 ] * a[ 10 ] - a[ 2 ] * a[ 5 ] * a[ 8 ] );
+			id * ( a[ 4 ] * a[ 10 ] * a[ 13 ] + a[ 5 ] * a[ 8 ] * a[ 14 ] + a[ 6 ] * a[ 9 ] * a[ 12 ] - a[ 4 ] * a[ 9 ] * a[ 14 ] - a[ 5 ] * a[ 10 ] * a[ 12 ] - a[ 6 ] * a[ 8 ] * a[ 13 ] ),
+			id * ( a[ 0 ] * a[ 9 ] * a[ 14 ] + a[ 1 ] * a[ 10 ] * a[ 12 ] + a[ 2 ] * a[ 8 ] * a[ 13 ] - a[ 0 ] * a[ 10 ] * a[ 13 ] - a[ 1 ] * a[ 8 ] * a[ 14 ] - a[ 2 ] * a[ 9 ] * a[ 12 ] ),
+			id * ( a[ 0 ] * a[ 6 ] * a[ 13 ] + a[ 1 ] * a[ 4 ] * a[ 14 ] + a[ 2 ] * a[ 5 ] * a[ 12 ] - a[ 0 ] * a[ 5 ] * a[ 14 ] - a[ 1 ] * a[ 6 ] * a[ 12 ] - a[ 2 ] * a[ 4 ] * a[ 13 ] ),
+			id * ( a[ 0 ] * a[ 5 ] * a[ 10 ] + a[ 1 ] * a[ 6 ] * a[ 8 ] + a[ 2 ] * a[ 4 ] * a[ 9 ] - a[ 0 ] * a[ 6 ] * a[ 9 ] - a[ 1 ] * a[ 4 ] * a[ 10 ] - a[ 2 ] * a[ 5 ] * a[ 8 ] ),
+		];
 
+		return m;
+	}
+
+	function transpose4( a: Float32Array, m?: Float32Array )
+	{
+		if ( !m ) { m = create4(); }
+
+		[
+			m[ 1 ], m[ 2 ], m[ 3 ],
+			m[ 4 ], m[ 6 ], m[ 7 ],
+			m[ 8 ], m[ 9 ], m[ 11 ],
+			m[ 12 ], m[ 13 ], m[ 14 ],
+		] =
+		[
+			a[ 4 ], a[ 8 ], a[ 12 ],
+			a[ 1 ], a[ 9 ], a[ 13 ],
+			a[ 2 ], a[ 6 ], a[ 14 ],
+			a[ 3 ], a[ 7 ], a[ 11 ],
+		];
 		return m;
 	}
 
@@ -213,9 +310,11 @@
 		create4: create4,
 		identity4: identity4,
 		translation4: translation4,
+		rotation4: rotation4,
 		scaling4: scaling4,
 		lookAt: lookAt,
 		multiply4: multiply4,
 		inverse4: inverse4,
+		transpose4: transpose4,
 	};
 } )();

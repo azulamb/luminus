@@ -118,11 +118,14 @@ interface VoxData
 				const header = this.readChunkHeader( data );
 				if ( !header.name ) { break; }
 	
-				if ( result.unknows && !( header.name in chunk ) )
+				if ( !( header.name in chunk ) )
 				{
 					// Unknown chunk.
 					const unknown = chunk.UNKNOWN( header );
-					result.unknows.push( unknown );
+					if ( result.unknows )
+					{
+						result.unknows.push( unknown );
+					}
 				}
 	
 				switch ( header.name )
