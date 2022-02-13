@@ -21,19 +21,19 @@
 			});
 		}
 
-		public prepare( support: LuminusSupport )
+		public prepare( program: LuminusProgram )
 		{
 			if ( !this.loaded ) { return Promise.resolve(); }
 			this.complete = false;
 
-			return this.onprepare( support ).then( () => { this.complete = true; } );
+			return this.onprepare( program ).then( () => { this.complete = true; } );
 		}
 
-		public render( support: LuminusSupport )
+		public render( program: LuminusProgram )
 		{
 			if ( this.complete )
 			{
-				return this.onrender( support );
+				return this.onrender( program );
 			}
 
 			/*if ( this.loaded === undefined )
@@ -43,13 +43,14 @@
 
 			if ( this.loaded === true && this.complete === undefined )
 			{
-				this.prepare( support ).then( () => { this.render( support ); } );
+				this.prepare( program ).then( () => { this.render( program ); } );
 			}
 		}
 
 		onload( arg: any ) { return Promise.resolve(); }
-		onprepare( support: LuminusSupport ) { return Promise.resolve(); }
-		onrender( support: LuminusSupport ) {}
+		onprepare( program: LuminusProgram ) { return Promise.resolve(); }
+		onrender( program: LuminusProgram ) {}
 	}
+
 	Luminus.models.model = Model;
 } )();

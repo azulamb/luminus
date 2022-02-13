@@ -45,8 +45,8 @@
 			this._model = model;
 			model.afterload = () =>
 			{
-				const support = this.support;
-				if ( support ) { model.prepare( support ); }
+				const program = this.program;
+				if ( program ) { model.prepare( program ); }
 			};
 		}
 
@@ -88,14 +88,14 @@
 
 		get complete() { return this.model && this.model.complete === true; }
 
-		get support()
+		get program()
 		{
-			return (<LuminusWorldElement | null>this.parentElement)?.support;
+			return (<LuminusWorldElement | null>this.parentElement)?.program;
 		}
 
-		public render( support: LuminusSupport )
+		public render( program: LuminusProgram )
 		{
-			this.model.render( support );
+			this.model.render( program );
 		}
 
 		public rerender()

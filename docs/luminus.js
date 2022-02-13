@@ -10,7 +10,7 @@
         matrix: null,
         model: null,
         models: {},
-        createProgram: () => { return null; },
+        program: null,
         createSupport: () => { return null; },
     };
     if (script.dataset.debug === undefined) {
@@ -24,7 +24,84 @@
     }
     window.Luminus = luminus;
 })(document.currentScript);
-Luminus.version = '0.0.1';
+Luminus.version = '0.1.0';
+(() => {
+    Luminus.program = class {
+        async init(world, support) {
+            this.support = support;
+            const vertex = `#version 300 es
+in vec4 vPosition;
+in vec4 vColor;
+in vec3 vNormal;
+uniform mat4 uModel;
+uniform mat4 uView;
+uniform mat4 uProjection;
+uniform vec3 lColor;
+uniform vec3 aColor;
+uniform float lMin;
+uniform vec3 lDirection;
+uniform mat4 nRotate;
+uniform mat4 iModel;
+out lowp vec4 oColor;
+void main(void) {
+	gl_Position = uProjection * uView * uModel * vPosition;
+
+	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
+	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( ( vec4( vNormal, 0.0 ) * nRotate ).xyz, invLight ), 0.0, 1.0 );
+	oColor = vColor * vec4( vec3( diffuse ), 1.0 ) + vec4( aColor.xyz, 0 ) * vColor.w;
+}`;
+            const fragment = `#version 300 es
+in lowp vec4 oColor;
+out lowp vec4 outColor;
+void main(void) {
+	outColor = oColor;
+}`;
+            await support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
+            support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
+            this.lColor = new Float32Array(world.lightColor);
+            this.aColor = new Float32Array(world.ambientColor);
+            this.uProjection = support.orthographic(world.left, world.right, world.bottom, world.top, world.near, world.far);
+            this.uView = support.matrix.identity4();
+            this.uModel = support.matrix.identity4();
+            this.iModel = support.matrix.identity4();
+        }
+        beginRender(world) {
+            const gl2 = this.support.gl;
+            this.support.matrix.lookAt([world.eyex, world.eyey, world.eyez], [world.centerx, world.centery, world.centerz], [world.upx, world.upy, world.upz], this.uView);
+            gl2.useProgram(this.support.program);
+            gl2.uniformMatrix4fv(this.support.uniform.uProjection, false, this.uProjection);
+            gl2.uniformMatrix4fv(this.support.uniform.uView, false, this.uView);
+            gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
+            gl2.uniform3f(this.support.uniform.lDirection, world.lightx, world.lighty, world.lightz);
+            this.lColor.set(world.lightColor);
+            gl2.uniform3fv(this.support.uniform.lColor, this.lColor);
+            this.aColor.set(world.ambientColor);
+            gl2.uniform3fv(this.support.uniform.aColor, this.aColor);
+            gl2.uniformMatrix4fv(this.support.uniform.iModel, false, this.iModel);
+            this.support.clear();
+        }
+        modelRender(model) {
+            const gl2 = this.support.gl;
+            const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);
+            [
+                this.support.matrix.translation4(model.x, model.y, model.z),
+                r,
+                this.support.matrix.translation4(-model.cx, -model.cy, -model.cz),
+            ].reduce((p, n) => {
+                return this.support.matrix.multiply4(p, n, this.uModel);
+            }, this.support.matrix.identity4());
+            gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
+            gl2.uniformMatrix4fv(this.support.uniform.nRotate, false, this.support.matrix.inverse4(r, r));
+            this.support.matrix.inverse4(this.uModel, this.iModel);
+            gl2.uniformMatrix4fv(this.support.uniform.iProjectionMatrix, false, this.iModel);
+            gl2.uniform1f(this.support.uniform.lMin, model.model.lMin === undefined ? 0.3 : model.model.lMin);
+            model.render(this);
+        }
+        endRender() {
+            this.support.gl.flush();
+        }
+    };
+})();
 (() => {
     function create4() { return new Float32Array(16); }
     function identity4(m) {
@@ -301,7 +378,6 @@ Luminus.version = '0.0.1';
             this.gl = gl2;
             this.texture = [];
             this.matrix = Luminus.matrix;
-            this.info = Luminus.createProgram(this);
         }
         enables(...enables) {
             for (const enable of enables) {
@@ -310,16 +386,79 @@ Luminus.version = '0.0.1';
             return this;
         }
         async init(vertex, fragment) {
-            await this.info.init();
+            const program = this.gl.createProgram();
+            if (!program) {
+                throw new Error('Failure createProgram.');
+            }
+            this.program = program;
             await Promise.all([
-                this.info.initShader(vertex, fragment),
+                this.initShader(vertex, fragment),
                 this.loadTexture('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQYV2P4////fwAJ+wP9BUNFygAAAABJRU5ErkJggg=='),
             ]);
-            this.info.loadPosition();
+            this.loadPosition();
             this.gl.clearColor(0.0, 0.0, 0.0, 0.0);
             this.gl.clearDepth(1.0);
             this.gl.depthFunc(this.gl.LEQUAL);
-            return this.info.program;
+            return this.program;
+        }
+        async initShader(vertex, fragment) {
+            const gl = this.gl;
+            const program = this.program;
+            const vertexShader = await (typeof vertex === 'string' ? this.loadShader(gl.VERTEX_SHADER, vertex) : this.loadShader(vertex)).then((result) => {
+                this.vertex = result.source;
+                return this.createShader(result.type, result.source);
+            });
+            const fragmentShader = await (typeof fragment === 'string' ? this.loadShader(gl.FRAGMENT_SHADER, fragment) : this.loadShader(fragment)).then((result) => {
+                return this.createShader(result.type, result.source);
+            });
+            gl.attachShader(program, vertexShader);
+            gl.attachShader(program, fragmentShader);
+            gl.linkProgram(program);
+            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+                throw new Error(gl.getProgramInfoLog(program) || '');
+            }
+        }
+        async loadShader(type, source) {
+            if (typeof type !== 'number') {
+                source = type.textContent || '';
+                type = type.type === 'x-shader/x-fragment' ? this.gl.FRAGMENT_SHADER : this.gl.VERTEX_SHADER;
+            }
+            return { type: type, source: source };
+        }
+        async createShader(type, source) {
+            const gl = this.gl;
+            const shader = gl.createShader(type);
+            if (!shader) {
+                throw new Error('Failure createShader.');
+            }
+            gl.shaderSource(shader, source);
+            gl.compileShader(shader);
+            if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                return shader;
+            }
+            gl.deleteShader(shader);
+            throw new Error(gl.getShaderInfoLog(shader) || '');
+        }
+        loadPosition() {
+            const gl = this.gl;
+            const program = this.program;
+            const inPosition = {};
+            const uniformPosition = {};
+            const vertex = this.vertex || '';
+            let result;
+            const inReg = new RegExp(/\sin [^\s]+ ([^\;\s]+)\;/sg);
+            while (result = inReg.exec(vertex)) {
+                const key = result[1];
+                inPosition[key] = gl.getAttribLocation(program, key);
+            }
+            const uniformReg = new RegExp(/\suniform [^\s]+ ([^\;\s]+)\;/sg);
+            while (result = uniformReg.exec(vertex)) {
+                const key = result[1];
+                uniformPosition[key] = gl.getUniformLocation(program, key);
+            }
+            this.in = inPosition;
+            this.uniform = uniformPosition;
+            return this;
         }
         clear(mask) {
             this.gl.clear(mask === undefined ? this.gl.COLOR_BUFFER_BIT | this.gl.DEPTH_BUFFER_BIT : mask);
@@ -374,80 +513,6 @@ Luminus.version = '0.0.1';
         }
     }
     Luminus.createSupport = (gl2) => { return new Support(gl2); };
-})();
-(() => {
-    class ProgramInfo {
-        constructor(support) {
-            this.support = support;
-        }
-        async init() {
-            const program = this.support.gl.createProgram();
-            if (!program) {
-                throw new Error('Failure createProgram.');
-            }
-            this.program = program;
-        }
-        async initShader(vertex, fragment) {
-            const gl = this.support.gl;
-            const program = this.program;
-            const vertexShader = await (typeof vertex === 'string' ? this.loadShader(gl.VERTEX_SHADER, vertex) : this.loadShader(vertex)).then((result) => {
-                this.vertex = result.source;
-                return this.createShader(result.type, result.source);
-            });
-            const fragmentShader = await (typeof fragment === 'string' ? this.loadShader(gl.FRAGMENT_SHADER, fragment) : this.loadShader(fragment)).then((result) => {
-                return this.createShader(result.type, result.source);
-            });
-            gl.attachShader(program, vertexShader);
-            gl.attachShader(program, fragmentShader);
-            gl.linkProgram(program);
-            if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-                throw new Error(gl.getProgramInfoLog(program) || '');
-            }
-        }
-        async loadShader(type, source) {
-            if (typeof type !== 'number') {
-                source = type.textContent || '';
-                type = type.type === 'x-shader/x-fragment' ? this.support.gl.FRAGMENT_SHADER : this.support.gl.VERTEX_SHADER;
-            }
-            return { type: type, source: source };
-        }
-        async createShader(type, source) {
-            const gl = this.support.gl;
-            const shader = gl.createShader(type);
-            if (!shader) {
-                throw new Error('Failure createShader.');
-            }
-            gl.shaderSource(shader, source);
-            gl.compileShader(shader);
-            if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-                return shader;
-            }
-            gl.deleteShader(shader);
-            throw new Error(gl.getShaderInfoLog(shader) || '');
-        }
-        loadPosition() {
-            const gl = this.support.gl;
-            const program = this.program;
-            const inPosition = {};
-            const uniformPosition = {};
-            const vertex = this.vertex || '';
-            let result;
-            const inReg = new RegExp(/\sin [^\s]+ ([^\;\s]+)\;/sg);
-            while (result = inReg.exec(vertex)) {
-                const key = result[1];
-                inPosition[key] = gl.getAttribLocation(program, key);
-            }
-            const uniformReg = new RegExp(/\suniform [^\s]+ ([^\;\s]+)\;/sg);
-            while (result = uniformReg.exec(vertex)) {
-                const key = result[1];
-                uniformPosition[key] = gl.getUniformLocation(program, key);
-            }
-            this.in = inPosition;
-            this.uniform = uniformPosition;
-            return this;
-        }
-    }
-    Luminus.createProgram = (support) => { return new ProgramInfo(support); };
 })();
 ((script, init) => {
     customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
@@ -556,24 +621,24 @@ Luminus.version = '0.0.1';
                 }
             });
         }
-        prepare(support) {
+        prepare(program) {
             if (!this.loaded) {
                 return Promise.resolve();
             }
             this.complete = false;
-            return this.onprepare(support).then(() => { this.complete = true; });
+            return this.onprepare(program).then(() => { this.complete = true; });
         }
-        render(support) {
+        render(program) {
             if (this.complete) {
-                return this.onrender(support);
+                return this.onrender(program);
             }
             if (this.loaded === true && this.complete === undefined) {
-                this.prepare(support).then(() => { this.render(support); });
+                this.prepare(program).then(() => { this.render(program); });
             }
         }
         onload(arg) { return Promise.resolve(); }
-        onprepare(support) { return Promise.resolve(); }
-        onrender(support) { }
+        onprepare(program) { return Promise.resolve(); }
+        onrender(program) { }
     }
     Luminus.models.model = Model;
 })();
@@ -610,9 +675,9 @@ Luminus.version = '0.0.1';
         set model(model) {
             this._model = model;
             model.afterload = () => {
-                const support = this.support;
-                if (support) {
-                    model.prepare(support);
+                const program = this.program;
+                if (program) {
+                    model.prepare(program);
                 }
             };
         }
@@ -641,12 +706,12 @@ Luminus.version = '0.0.1';
         get yaw() { return parseFloat(this.getAttribute('yaw') || '0') || 0; }
         set yaw(value) { this.setAttribute('yaw', value + ''); }
         get complete() { return this.model && this.model.complete === true; }
-        get support() {
+        get program() {
             var _a;
-            return (_a = this.parentElement) === null || _a === void 0 ? void 0 : _a.support;
+            return (_a = this.parentElement) === null || _a === void 0 ? void 0 : _a.program;
         }
-        render(support) {
-            this.model.render(support);
+        render(program) {
+            this.model.render(program);
         }
         rerender() {
             this.dispatchEvent(new CustomEvent('render'));
@@ -760,7 +825,7 @@ Luminus.version = '0.0.1';
             })();
         }
         get complete() { return this._complete; }
-        get support() { return this.lSupport; }
+        get program() { return this.lProgram; }
         get width() { return this.canvas.width; }
         set width(value) { this.canvas.width = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0); }
         get height() { return this.canvas.height; }
@@ -803,45 +868,16 @@ Luminus.version = '0.0.1';
         set lighty(value) { this.setAttribute('lighty', value + ''); }
         get lightz() { return parseFloat(this.getAttribute('lightz') || '') || 0; }
         set lightz(value) { this.setAttribute('lightz', value + ''); }
-        async init() {
+        async init(program) {
             Luminus.console.info('Start: init lu-world.');
-            const vertex = `#version 300 es
-in vec4 vPosition;
-in vec4 vColor;
-in vec3 vNormal;
-uniform mat4 uModel;
-uniform mat4 uView;
-uniform mat4 uProjection;
-uniform vec3 lColor;
-uniform vec3 aColor;
-uniform float lMin;
-uniform vec3 lDirection;
-uniform mat4 nRotate;
-uniform mat4 iModel;
-out lowp vec4 oColor;
-void main(void) {
-	gl_Position = uProjection * uView * uModel * vPosition;
-
-	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
-	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( ( vec4( vNormal, 0.0 ) * nRotate ).xyz, invLight ), 0.0, 1.0 );
-	oColor = vColor * vec4( vec3( diffuse ), 1.0 ) + vec4( aColor.xyz, 0 ) * vColor.w;
-}`;
-            const fragment = `#version 300 es
-in lowp vec4 oColor;
-out lowp vec4 outColor;
-void main(void) {
-	outColor = oColor;
-}`;
+            this._complete = false;
+            this.lProgram = null;
+            if (!program) {
+                program = new Luminus.program();
+            }
             const support = Luminus.createSupport(this.canvas.getContext("webgl2"));
-            await support.init(document.getElementById('vertex') || vertex, document.getElementById('fragment') || fragment);
-            this.lSupport = support;
-            support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
-            this.lColor = new Float32Array(this.lightColor);
-            this.aColor = new Float32Array(this.ambientColor);
-            this.uProjection = support.orthographic(this.left, this.right, this.bottom, this.top, this.near, this.far);
-            this.uView = support.matrix.identity4();
-            this.uModel = support.matrix.identity4();
-            this.iModel = support.matrix.identity4();
+            await program.init(this, support);
+            this.lProgram = !program ? new Luminus.program() : program;
             this._complete = true;
         }
         render() {
@@ -849,38 +885,13 @@ void main(void) {
                 return;
             }
             Luminus.console.info('Render:');
-            const gl2 = this.support.gl;
-            this.support.matrix.lookAt([this.eyex, this.eyey, this.eyez], [this.centerx, this.centery, this.centerz], [this.upx, this.upy, this.upz], this.uView);
-            gl2.useProgram(this.support.info.program);
-            gl2.uniformMatrix4fv(this.support.info.uniform.uProjection, false, this.uProjection);
-            gl2.uniformMatrix4fv(this.support.info.uniform.uView, false, this.uView);
-            gl2.uniformMatrix4fv(this.support.info.uniform.uModel, false, this.uModel);
-            gl2.uniform3f(this.support.info.uniform.lDirection, this.lightx, this.lighty, this.lightz);
-            this.lColor.set(this.lightColor);
-            gl2.uniform3fv(this.support.info.uniform.lColor, this.lColor);
-            this.aColor.set(this.ambientColor);
-            gl2.uniform3fv(this.support.info.uniform.aColor, this.aColor);
-            gl2.uniformMatrix4fv(this.support.info.uniform.iModel, false, this.iModel);
-            this.support.clear();
+            this.program.beginRender(this);
             for (const model of this.children) {
                 if (model instanceof Luminus.model) {
-                    const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);
-                    [
-                        this.support.matrix.translation4(model.x, model.y, model.z),
-                        r,
-                        this.support.matrix.translation4(-model.cx, -model.cy, -model.cz),
-                    ].reduce((p, n) => {
-                        return this.support.matrix.multiply4(p, n, this.uModel);
-                    }, this.support.matrix.identity4());
-                    gl2.uniformMatrix4fv(this.support.info.uniform.uModel, false, this.uModel);
-                    gl2.uniformMatrix4fv(this.support.info.uniform.nRotate, false, this.support.matrix.inverse4(r, r));
-                    this.support.matrix.inverse4(this.uModel, this.iModel);
-                    gl2.uniformMatrix4fv(this.support.info.uniform.iProjectionMatrix, false, this.iModel);
-                    gl2.uniform1f(this.support.info.uniform.lMin, model.model.lMin === undefined ? 0.3 : model.model.lMin);
-                    model.render(this.support);
+                    this.program.modelRender(model);
                 }
             }
-            gl2.flush();
+            this.program.endRender();
         }
         get ambientColor() {
             return (window.getComputedStyle(this, '').getPropertyValue('--ambient')
@@ -926,14 +937,15 @@ void main(void) {
             this._length = value;
             this._change = true;
         }
-        onprepare(support) {
+        onprepare(program) {
             const length = this.length;
-            const gl2 = support.gl;
-            const vao = support.gl.createVertexArray();
+            const gl2 = program.support.gl;
+            const vao = gl2.createVertexArray();
             if (!vao) {
                 return Promise.reject(new Error('Failure createVertexArray.'));
             }
-            support.gl.bindVertexArray(vao);
+            const support = program.support;
+            gl2.bindVertexArray(vao);
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
@@ -941,8 +953,8 @@ void main(void) {
                 0, 0, 0, 0, length, 0,
                 0, 0, 0, 0, 0, length,
             ]), gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vPosition);
-            gl2.vertexAttribPointer(support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vPosition);
+            gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
@@ -950,21 +962,21 @@ void main(void) {
                 0, 1, 0, 1, 0, 1, 0, 1,
                 0, 0, 1, 1, 0, 0, 1, 1,
             ]), gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vColor);
-            gl2.vertexAttribPointer(support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0);
-            support.gl.bindVertexArray(null);
+            gl2.enableVertexAttribArray(support.in.vColor);
+            gl2.vertexAttribPointer(support.in.vColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.bindVertexArray(null);
             this.vao = vao;
             this._change = false;
             return Promise.resolve();
         }
-        onrender(support) {
-            const gl = support.gl;
+        onrender(program) {
+            const gl2 = program.support.gl;
             if (this._change) {
-                this.prepare(support);
+                this.prepare(program);
             }
-            support.gl.bindVertexArray(this.vao);
-            gl.drawArrays(gl.LINES, 0, 6);
-            support.gl.bindVertexArray(null);
+            gl2.bindVertexArray(this.vao);
+            gl2.drawArrays(gl2.LINES, 0, 6);
+            gl2.bindVertexArray(null);
         }
     }
     Luminus.models.axis = Axis;
@@ -976,7 +988,7 @@ void main(void) {
             this.loaded = true;
             this.color = new Float32Array(4);
         }
-        onprepare(support) {
+        onprepare(program) {
             Luminus.console.info('Start: cube-prepare.');
             const verts = new Float32Array([
                 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1,
@@ -1009,39 +1021,40 @@ void main(void) {
                 16, 17, 18, 16, 18, 19,
                 20, 21, 22, 20, 22, 23,
             ]);
-            const gl2 = support.gl;
-            const vao = support.gl.createVertexArray();
+            const gl2 = program.support.gl;
+            const vao = gl2.createVertexArray();
             if (!vao) {
                 return Promise.reject(new Error('Failure createVertexArray.'));
             }
-            support.gl.bindVertexArray(vao);
+            const support = program.support;
+            gl2.bindVertexArray(vao);
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, verts, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vPosition);
-            gl2.vertexAttribPointer(support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vPosition);
+            gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, colors, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vColor);
-            gl2.vertexAttribPointer(support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vColor);
+            gl2.vertexAttribPointer(support.in.vColor, 4, gl2.FLOAT, false, 0, 0);
             const normalBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, normalBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, normals, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vNormal);
-            gl2.vertexAttribPointer(support.info.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vNormal);
+            gl2.vertexAttribPointer(support.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
             const indexBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
             gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, faces, gl2.STATIC_DRAW);
-            support.gl.bindVertexArray(null);
+            gl2.bindVertexArray(null);
             this.vao = vao;
             return Promise.resolve();
         }
-        onrender(support) {
-            const gl = support.gl;
-            support.gl.bindVertexArray(this.vao);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-            support.gl.bindVertexArray(null);
+        onrender(program) {
+            const gl2 = program.support.gl;
+            gl2.bindVertexArray(this.vao);
+            gl2.drawElements(gl2.TRIANGLES, 36, gl2.UNSIGNED_SHORT, 0);
+            gl2.bindVertexArray(null);
         }
     }
     Luminus.models.cube = Cube;
@@ -1279,42 +1292,43 @@ void main(void) {
                 this.faces = new Uint16Array(faces);
             });
         }
-        onprepare(support) {
+        onprepare(program) {
             Luminus.console.info('Start: vox-prepare.');
-            const gl2 = support.gl;
-            const vao = support.gl.createVertexArray();
+            const gl2 = program.support.gl;
+            const vao = gl2.createVertexArray();
             if (!vao) {
                 return Promise.reject(new Error('Failure createVertexArray.'));
             }
-            support.gl.bindVertexArray(vao);
+            const support = program.support;
+            gl2.bindVertexArray(vao);
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vPosition);
-            gl2.vertexAttribPointer(support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vPosition);
+            gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vColor);
-            gl2.vertexAttribPointer(support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vColor);
+            gl2.vertexAttribPointer(support.in.vColor, 4, gl2.FLOAT, false, 0, 0);
             const normalBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, normalBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, this.normals, gl2.STATIC_DRAW);
-            gl2.enableVertexAttribArray(support.info.in.vNormal);
-            gl2.vertexAttribPointer(support.info.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
+            gl2.enableVertexAttribArray(support.in.vNormal);
+            gl2.vertexAttribPointer(support.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
             const indexBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
             gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);
-            support.gl.bindVertexArray(null);
+            gl2.bindVertexArray(null);
             this.vao = vao;
             this.count = this.faces.length;
             return Promise.resolve();
         }
-        onrender(support) {
-            const gl = support.gl;
-            support.gl.bindVertexArray(this.vao);
-            gl.drawElements(gl.TRIANGLES, this.count, gl.UNSIGNED_SHORT, 0);
-            support.gl.bindVertexArray(null);
+        onrender(program) {
+            const gl2 = program.support.gl;
+            gl2.bindVertexArray(this.vao);
+            gl2.drawElements(gl2.TRIANGLES, this.count, gl2.UNSIGNED_SHORT, 0);
+            gl2.bindVertexArray(null);
         }
         export() {
             const data = [];

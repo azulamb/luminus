@@ -16,7 +16,7 @@
 		matrix: <any>null,
 		model: <any>null,
 		models: <any>{},
-		createProgram: () => { return <any>null; },
+		program: <any>null,
 		createSupport: () => { return <any>null; },
 	};
 

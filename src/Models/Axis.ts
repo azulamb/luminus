@@ -23,16 +23,18 @@
 			this._change = true;
 		}
 
-		public onprepare( support: LuminusSupport )
+		public onprepare( program: LuminusProgram )
 		{
 			const length = this.length;
 
-			const gl2 = support.gl;
+			const gl2 = program.support.gl;
 
-			const vao = support.gl.createVertexArray();
+			const vao = gl2.createVertexArray();
 			if ( !vao ) { return Promise.reject( new Error( 'Failure createVertexArray.' ) ); }
 
-			support.gl.bindVertexArray( vao );
+			const support = program.support;
+
+			gl2.bindVertexArray( vao );
 
 			const positionBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ARRAY_BUFFER, positionBuffer );
@@ -41,8 +43,8 @@
 				0, 0, 0, 0, length, 0,
 				0, 0, 0, 0, 0, length,
 			] ), gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.vPosition );
-			gl2.vertexAttribPointer( support.info.in.vPosition, 3, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.in.vPosition );
+			gl2.vertexAttribPointer( support.in.vPosition, 3, gl2.FLOAT, false, 0, 0 );
 
 			const colorBuffer = gl2.createBuffer();
 			gl2.bindBuffer( gl2.ARRAY_BUFFER, colorBuffer );
@@ -51,10 +53,10 @@
 				0, 1, 0, 1, 0, 1, 0, 1,
 				0, 0, 1, 1, 0, 0, 1, 1,
 			] ), gl2.STATIC_DRAW );
-			gl2.enableVertexAttribArray( support.info.in.vColor );
-			gl2.vertexAttribPointer( support.info.in.vColor, 4, gl2.FLOAT, false, 0, 0 );
+			gl2.enableVertexAttribArray( support.in.vColor );
+			gl2.vertexAttribPointer( support.in.vColor, 4, gl2.FLOAT, false, 0, 0 );
 
-			support.gl.bindVertexArray( null );
+			gl2.bindVertexArray( null );
 
 			this.vao = vao;
 
@@ -63,15 +65,15 @@
 			return Promise.resolve();
 		}
 
-		public onrender( support: LuminusSupport )
+		public onrender( program: LuminusProgram )
 		{
-			const gl = support.gl;
+			const gl2 = program.support.gl;
 
-			if ( this._change ) { this.prepare( support ); }
+			if ( this._change ) { this.prepare( program ); }
 
-			support.gl.bindVertexArray( this.vao );
-			gl.drawArrays( gl.LINES, 0, 6 );
-			support.gl.bindVertexArray( null );
+			gl2.bindVertexArray( this.vao );
+			gl2.drawArrays( gl2.LINES, 0, 6 );
+			gl2.bindVertexArray( null );
 		}
 	}
 	Luminus.models.axis = Axis;

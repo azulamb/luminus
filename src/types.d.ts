@@ -5,7 +5,7 @@
 interface LuminusWorldElement extends HTMLElement
 {
 	readonly complete: boolean;
-	readonly support: LuminusSupport;
+	readonly program: LuminusProgram;
 	// screen
 	width: number; height: number;
 	// camera
@@ -16,6 +16,8 @@ interface LuminusWorldElement extends HTMLElement
 	centerx: number; centery: number; centerz: number;
 	// light
 	lightx: number; lighty: number; lightz: number;
+	readonly ambientColor: number[];
+	readonly lightColor: number[];
 
 	init(): WebGLProgram | null;
 	render(): void;
@@ -25,7 +27,7 @@ interface LuminusModelElement extends HTMLElement
 {
 	model: LuminusModel<unknown>;
 	readonly complete: boolean;
-	readonly support: LuminusSupport | undefined;
+	readonly program: LuminusProgram | undefined;
 	// Model center x
 	cx: number;
 	// Model center y
@@ -51,7 +53,7 @@ interface LuminusModelElement extends HTMLElement
 	// Rotation z axis
 	yaw: number;
 	initStyle(): HTMLStyleElement;
-	render( support: LuminusSupport ): void;
+	render( program: LuminusProgram ): void;
 	rerender(): void;
 }
 
@@ -91,16 +93,16 @@ interface LuminusModel<T>
 	loaded?: boolean;
 	complete?: boolean;
 	load( p?: Promise<T> ): Promise<void>;
-	prepare( support: LuminusSupport ): Promise<void>;
-	render( support: LuminusSupport ): void;
+	prepare( program: LuminusProgram ): Promise<void>;
+	render( program: LuminusProgram ): void;
 
 	afterload?: () => unknown;
 
 	// Overwrite
 	lMin?: number;
 	onload( result: T ): Promise<unknown>;
-	onprepare( support: LuminusSupport ): Promise<unknown>;
-	onrender( support: LuminusSupport ): void;
+	onprepare( program: LuminusProgram ): Promise<unknown>;
+	onrender( program: LuminusProgram ): void;
 }
 
 interface LuminusModelAxis extends LuminusModel<void>
@@ -140,13 +142,24 @@ interface Matrix
 interface LuminusSupport
 {
 	gl: WebGL2RenderingContext;
-	info: LuminusProgramInfo;
+	program: WebGLProgram;
+	in: { [ keys: string ]: number };
+	uniform: { [ keys: string ]: WebGLUniformLocation };
 	texture: WebGLTexture[];
 	matrix: Matrix;
 
 	enables( ... enables: number[] ): this;
 
 	init( vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement ): Promise<WebGLProgram>;
+
+	initShader( vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement ): void;
+
+	loadShader( element: HTMLScriptElement ): Promise<{ type: number, source: string }>;
+	loadShader( type: number, source: string ): Promise<{ type: number, source: string }>;
+
+	createShader( type: number, source: string ): Promise<WebGLShader>;
+
+	loadPosition(): void;
 
 	// Screen
 	clear( mask?: number ): this;
@@ -157,22 +170,13 @@ interface LuminusSupport
 	useTexture( num: number ): void;
 }
 
-interface LuminusProgramInfo
+interface LuminusProgram
 {
-	program: WebGLProgram;
-	in: { [ keys: string ]: number };
-	uniform: { [ keys: string ]: WebGLUniformLocation };
-
-	init(): Promise<void>;
-
-	initShader( vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement ): void;
-
-	loadShader( element: HTMLScriptElement ): Promise<{ type: number, source: string }>;
-	loadShader( type: number, source: string ): Promise<{ type: number, source: string }>;
-
-	createShader( type: number, source: string ): Promise<WebGLShader>;
-
-	loadPosition(): void;
+	support: LuminusSupport;
+	init( world: LuminusWorldElement, support: LuminusSupport ): Promise<void>;
+	beginRender( world: LuminusWorldElement ): void;
+	modelRender( model: LuminusModelElement ): void;
+	endRender(): void;
 }
 
 interface Luminus
@@ -194,7 +198,7 @@ interface Luminus
 		model: { new (...params: any[]): LuminusModel<unknown>; },
 		[ keys: string ]: { new (...params: any[]): LuminusModel<any>; },
 	},
-	createProgram( support: LuminusSupport ): LuminusProgramInfo;
+	program: { new(): LuminusProgram },
 	createSupport( gl2: WebGL2RenderingContext ): LuminusSupport;
 }
 

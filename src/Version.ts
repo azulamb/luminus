@@ -1,1 +1,1 @@
-Luminus.version = '0.0.1';
+Luminus.version = '0.1.0';
