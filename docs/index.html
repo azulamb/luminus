@@ -113,26 +113,45 @@ slider-input { width: 400px; }
 	<lu-world
 		id="world"
 		width="600" height="400"
-		top="20" bottom="-20" left="-30" right="30" near="-100" far="100"
+		top="30" bottom="-30" left="-45" right="45" near="-100" far="100"
 		eyex="10" eyey="10" eyez="10"
 		upx="0" upy="1" upz="0"
 		centerx="0" centery="0" centerz="0"
 		lightx="0.5" lighty="1" lightz="0"
+		lightx_="-1" lighty_="0.3" lightz_="0.8"
 		style="width:600px;height:400px;"
 	>
-		<lu-axis></lu-axis>
-		<!--<lu-vox src="./cube.vox" x="2" y="0" z="2" roll="0" pitch="-45" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
-		<lu-vox src="./cube.vox" x="8" y="0" z="0" roll="0" pitch="-45" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
-		<lu-vox src="./cube.vox" x="0" y="8" z="0" roll="0" pitch="-45" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
-		<lu-vox src="./cube.vox" x="0" y="0" z="8" roll="0" pitch="45" yaw="0" cx="0" cy="0" cz="1" xaxis="0" yaxis="0" zaxis="90"></lu-vox>
-		<lu-vox src="./cube.vox" x="8" y="0" z="0" roll="0" pitch="0" yaw="0" cx="1" cy="1" cz="1" xaxis="0" yaxis="45" zaxis="0"></lu-vox>
-		-->
-		<!--<lu-vox id="meet" src="./sample.vox" x="0" y="0" z="12" cx="-1" cy="-3" cz="2.5"></lu-vox>-->
-		<lu-vox id="meet" src="./sample.vox" x="0" y="0" z="12" cx="-1" cy="-3" cz="2.5" pitch="0"></lu-vox>
-		<lu-vox id="meet" src="./sample.vox" x="12" y="0" z="0" cx="-1" cy="-3" cz="2.5" pitch="90"></lu-vox>
-		<!--<lu-vox id="meet" src="./sample.vox" x="0" y="-2" z="8"></lu-vox>
-		<lu-vox id="meet" src="./sample.vox" x="8" y="-2" z="0" pitch="90"></lu-vox>-->
-		<lu-cube id="cube"></lu-cube>
+		<lu-axis length="50"></lu-axis>
+		<lu-cube id="cube" x="1" y="1" z="1"></lu-cube>
+
+		<lu-vox id="meet" src="./sample.vox" x="0" y="0" z="24" cx="-1" cy="-3" cz="2.5" pitch="0"></lu-vox>
+		<lu-vox id="meet" src="./sample.vox" x="24" y="0" z="0" cx="-1" cy="-3" cz="2.5" pitch="90"></lu-vox>
+		<!-- floor -->
+		<lu-vox id="meet" src="./board.vox" x="0" y="-1" z="0"></lu-vox>
+		<lu-vox id="meet" src="./board_half_b.vox" x="0" y="-1" z="32"></lu-vox>
+		<lu-vox id="meet" src="./board_half_a.vox" x="8" y="-1" z="0"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="8" y="-1" z="16"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="16" y="-1" z="0"></lu-vox>
+		<lu-vox id="meet" src="./board_half_b.vox" x="16" y="-1" z="32"></lu-vox>
+		<lu-vox id="meet" src="./board_half_a.vox" x="24" y="-1" z="0"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="24" y="-1" z="16"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="32" y="-1" z="0"></lu-vox>
+		<lu-vox id="meet" src="./board_half_b.vox" x="32" y="-1" z="32"></lu-vox>
+		<lu-vox id="meet" src="./board_half_a.vox" x="40" y="-1" z="0"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="40" y="-1" z="16"></lu-vox>
+		<!-- wall -->
+		<lu-vox id="meet" src="./board.vox" x="-1" y="-1" z="0" roll="90" yaw="90"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="-1" y="-1" z="8" roll="90" yaw="90"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="-1" y="-1" z="16" roll="90" yaw="90"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="-1" y="-1" z="24" roll="90" yaw="90"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="-1" y="-1" z="32" roll="90" yaw="90"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="-1" y="-1" z="40" roll="90" yaw="90"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="8" y="-1" z="-1" roll="90" yaw="180"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="16" y="-1" z="-1" roll="90" yaw="180"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="24" y="-1" z="-1" roll="90" yaw="180"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="32" y="-1" z="-1" roll="90" yaw="180"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="40" y="-1" z="-1" roll="90" yaw="180"></lu-vox>
+		<lu-vox id="meet" src="./board.vox" x="48" y="-1" z="-1" roll="90" yaw="180"></lu-vox>
 	</lu-world>
 	<slider-input target="world" edit="eyex" min="-10" max="10">Camera-x</slider-input>
 	<slider-input target="world" edit="eyey" min="-10" max="10">Camera-y</slider-input>

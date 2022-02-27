@@ -19,7 +19,7 @@
 			this.support = support;
 
 			const vertex = `#version 300 es
-in vec4 vPosition;
+in vec3 vPosition;
 in vec4 vColor;
 in vec3 vNormal;
 uniform mat4 uModel;
@@ -29,14 +29,13 @@ uniform vec3 lColor;
 uniform vec3 aColor;
 uniform float lMin;
 uniform vec3 lDirection;
-uniform mat4 nRotate;
 uniform mat4 iModel;
 out lowp vec4 oColor;
 void main(void) {
-	gl_Position = uProjection * uView * uModel * vPosition;
+	gl_Position = uProjection * uView * uModel * vec4(vPosition, 1.0);
 
 	vec3 invLight = normalize( iModel * vec4( lDirection, 0.0 ) ).xyz;
-	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( ( vec4( vNormal, 0.0 ) * nRotate ).xyz, invLight ), 0.0, 1.0 );
+	float diffuse = lMin + ( 1.0 - lMin ) * clamp( dot( vNormal, invLight ), 0.0, 1.0 );
 	oColor = vColor * vec4( vec3( diffuse ), 1.0 ) + vec4( aColor.xyz, 0 ) * vColor.w;
 }`;
 			const fragment = `#version 300 es
@@ -109,9 +108,8 @@ void main(void) {
 
 			gl2.uniformMatrix4fv( this.support.uniform.uModel, false, this.uModel );
 
-			gl2.uniformMatrix4fv( this.support.uniform.nRotate, false, this.support.matrix.inverse4( r, r ) );
 			this.support.matrix.inverse4( this.uModel, this.iModel );
-			gl2.uniformMatrix4fv( this.support.uniform.iProjectionMatrix, false, this.iModel );
+			gl2.uniformMatrix4fv( this.support.uniform.iModel, false, this.iModel );
 			gl2.uniform1f( this.support.uniform.lMin, model.model.lMin === undefined ? 0.3 : model.model.lMin );
 
 			model.render( this );
