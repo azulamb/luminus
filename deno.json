@@ -1,0 +1,27 @@
+{
+	"tasks": {
+		"build": "tsc -p ./src",
+		"server": "file_server docs"
+	},
+	"lint": {
+		"files": {
+			"include": ["./src"]
+		},
+		"rules": {
+		  "tags": ["recommended"],
+		  "include": [],
+		  "exclude": ["require-await"]
+		}
+	},
+	"fmt": {
+		"files": {
+			"include": ["./src"]
+		},
+		"options": {
+			"useTabs": true,
+			"indentWidth": 4,
+			"lineWidth": 160,
+			"singleQuote": true
+		}
+	}
+}

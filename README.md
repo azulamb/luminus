@@ -38,6 +38,12 @@ Luminus is 3d webcomponents. (Use WebGL 2)
   * Minify
     * https://azulamb.github.io/luminus/voxminify.html
 
+## Build
+
+```
+deno task build
+```
+
 ## TODO
 
 * Add minify.
