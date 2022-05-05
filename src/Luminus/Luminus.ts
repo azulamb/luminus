@@ -1,27 +1,27 @@
 /// <reference path="../types.d.ts" />
 
-( ( script ) =>
-{
+((script) => {
 	const loaded = Promise.all(
-	[
-		customElements.whenDefined( 'lu-world' ),
-		customElements.whenDefined( 'lu-model' ),
-	] ).then( () => {} );
+		[
+			customElements.whenDefined('lu-world'),
+			customElements.whenDefined('lu-model'),
+		],
+	).then(() => {});
 
-	const luminus: Luminus =
-	{
+	const luminus: Luminus = {
 		version: '',
 		console: console,
 		loaded: loaded,
-		matrix: <any>null,
-		model: <any>null,
-		models: <any>{},
-		program: <any>null,
-		createSupport: () => { return <any>null; },
+		matrix: <any> null,
+		model: <any> null,
+		models: <any> {},
+		program: <any> null,
+		createSupport: () => {
+			return <any> null;
+		},
 	};
 
-	if ( script.dataset.debug === undefined )
-	{
+	if (script.dataset.debug === undefined) {
 		luminus.console = {
 			debug: () => {},
 			error: () => {},
@@ -31,5 +31,5 @@
 		};
 	}
 
-	(<any>window).Luminus = luminus;
-} )( <HTMLScriptElement>document.currentScript );
+	(<any> window).Luminus = luminus;
+})(<HTMLScriptElement> document.currentScript);

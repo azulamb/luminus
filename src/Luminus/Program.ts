@@ -1,7 +1,5 @@
-( () =>
-{
-	Luminus.program = class implements LuminusProgram
-	{
+(() => {
+	Luminus.program = class implements LuminusProgram {
 		public support: LuminusSupport;
 
 		// Light
@@ -14,8 +12,7 @@
 		private uModel: Float32Array;
 		private iModel: Float32Array;
 
-		public async init( world: LuminusWorldElement, support: LuminusSupport )
-		{
+		public async init(world: LuminusWorldElement, support: LuminusSupport) {
 			this.support = support;
 
 			const vertex = `#version 300 es
@@ -46,78 +43,74 @@ void main(void) {
 }`;
 
 			await support.init(
-				<HTMLScriptElement>document.getElementById( 'vertex' ) || vertex,
-				<HTMLScriptElement>document.getElementById( 'fragment' ) || fragment
+				<HTMLScriptElement> document.getElementById('vertex') || vertex,
+				<HTMLScriptElement> document.getElementById('fragment') || fragment,
 			);
 
-			support.enables( support.gl.DEPTH_TEST, support.gl.CULL_FACE );
+			support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
 
-			this.lColor = new Float32Array( world.lightColor );
-			this.aColor = new Float32Array( world.ambientColor );
+			this.lColor = new Float32Array(world.lightColor);
+			this.aColor = new Float32Array(world.ambientColor);
 
 			// TODO: frustum
-			this.uProjection = support.orthographic( world.left, world.right, world.bottom, world.top, world.near, world.far );
+			this.uProjection = support.orthographic(world.left, world.right, world.bottom, world.top, world.near, world.far);
 			this.uView = support.matrix.identity4();
 			this.uModel = support.matrix.identity4();
 
 			this.iModel = support.matrix.identity4();
 		}
 
-		public beginRender( world: LuminusWorldElement )
-		{
+		public beginRender(world: LuminusWorldElement) {
 			const gl2 = this.support.gl;
 
 			this.support.matrix.lookAt(
-				[ world.eyex, world.eyey, world.eyez ],
-				[ world.centerx, world.centery, world.centerz ],
-				[ world.upx, world.upy, world.upz ],
-				this.uView
+				[world.eyex, world.eyey, world.eyez],
+				[world.centerx, world.centery, world.centerz],
+				[world.upx, world.upy, world.upz],
+				this.uView,
 			);
 
 			// TODO: move Support.
-			gl2.useProgram( this.support.program );
+			gl2.useProgram(this.support.program);
 
-			gl2.uniformMatrix4fv( this.support.uniform.uProjection, false, this.uProjection );
-			gl2.uniformMatrix4fv( this.support.uniform.uView, false, this.uView );
-			gl2.uniformMatrix4fv( this.support.uniform.uModel, false, this.uModel );
+			gl2.uniformMatrix4fv(this.support.uniform.uProjection, false, this.uProjection);
+			gl2.uniformMatrix4fv(this.support.uniform.uView, false, this.uView);
+			gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
 
 			// Light.
-			gl2.uniform3f( this.support.uniform.lDirection, world.lightx, world.lighty, world.lightz );
-			this.lColor.set( world.lightColor );
-			gl2.uniform3fv( this.support.uniform.lColor, this.lColor );
-			this.aColor.set( world.ambientColor );
-			gl2.uniform3fv( this.support.uniform.aColor, this.aColor );
-			gl2.uniformMatrix4fv( this.support.uniform.iModel, false, this.iModel );
+			gl2.uniform3f(this.support.uniform.lDirection, world.lightx, world.lighty, world.lightz);
+			this.lColor.set(world.lightColor);
+			gl2.uniform3fv(this.support.uniform.lColor, this.lColor);
+			this.aColor.set(world.ambientColor);
+			gl2.uniform3fv(this.support.uniform.aColor, this.aColor);
+			gl2.uniformMatrix4fv(this.support.uniform.iModel, false, this.iModel);
 
 			this.support.clear();
 		}
 
-		public modelRender( model: LuminusModelElement )
-		{
+		public modelRender(model: LuminusModelElement) {
 			const gl2 = this.support.gl;
 
-			const r = this.support.matrix.rotation4( model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis );
+			const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);
 			[
-				this.support.matrix.translation4( model.x, model.y, model.z ), // Move
+				this.support.matrix.translation4(model.x, model.y, model.z), // Move
 				r, // Rotate model
-				this.support.matrix.translation4( - model.cx, - model.cy, - model.cz ), // Move center
-			].reduce( ( p, n ) =>
-			{
-				return this.support.matrix.multiply4( p, n, this.uModel );
-			}, this.support.matrix.identity4() );
+				this.support.matrix.translation4(-model.cx, -model.cy, -model.cz), // Move center
+			].reduce((p, n) => {
+				return this.support.matrix.multiply4(p, n, this.uModel);
+			}, this.support.matrix.identity4());
 
-			gl2.uniformMatrix4fv( this.support.uniform.uModel, false, this.uModel );
+			gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
 
-			this.support.matrix.inverse4( this.uModel, this.iModel );
-			gl2.uniformMatrix4fv( this.support.uniform.iModel, false, this.iModel );
-			gl2.uniform1f( this.support.uniform.lMin, model.model.lMin === undefined ? 0.3 : model.model.lMin );
+			this.support.matrix.inverse4(this.uModel, this.iModel);
+			gl2.uniformMatrix4fv(this.support.uniform.iModel, false, this.iModel);
+			gl2.uniform1f(this.support.uniform.lMin, model.model.lMin === undefined ? 0.3 : model.model.lMin);
 
-			model.render( this );
+			model.render(this);
 		}
 
-		public endRender()
-		{
+		public endRender() {
 			this.support.gl.flush();
 		}
-	}
-} )();
+	};
+})();

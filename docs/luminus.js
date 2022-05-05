@@ -11,7 +11,9 @@
         model: null,
         models: {},
         program: null,
-        createSupport: () => { return null; },
+        createSupport: () => {
+            return null;
+        },
     };
     if (script.dataset.debug === undefined) {
         luminus.console = {
@@ -101,7 +103,9 @@ void main(void) {
     };
 })();
 (() => {
-    function create4() { return new Float32Array(16); }
+    function create4() {
+        return new Float32Array(16);
+    }
     function identity4(m) {
         if (!m) {
             m = create4();
@@ -186,7 +190,6 @@ void main(void) {
         m[14] = z;
         return m;
     }
-    ;
     function scaling4(x, y, z, m) {
         if (!m) {
             m = identity4();
@@ -204,39 +207,34 @@ void main(void) {
             m = b.length < 16 ? new Float32Array(4) : create4();
         }
         const A = a[0], B = a[1], C = a[2], D = a[3], E = a[4], F = a[5], G = a[6], H = a[7], I = a[8], J = a[9], K = a[10], L = a[11], M = a[12], N = a[13], O = a[14], P = a[15];
-        [m[0], m[1], m[2], m[3]] =
-            [
-                b[0] * A + b[1] * E + b[2] * I + b[3] * M,
-                b[0] * B + b[1] * F + b[2] * J + b[3] * N,
-                b[0] * C + b[1] * G + b[2] * K + b[3] * O,
-                b[0] * D + b[1] * H + b[2] * L + b[3] * P,
-            ];
+        [m[0], m[1], m[2], m[3]] = [
+            b[0] * A + b[1] * E + b[2] * I + b[3] * M,
+            b[0] * B + b[1] * F + b[2] * J + b[3] * N,
+            b[0] * C + b[1] * G + b[2] * K + b[3] * O,
+            b[0] * D + b[1] * H + b[2] * L + b[3] * P,
+        ];
         if (4 < m.length) {
-            [m[4], m[5], m[6], m[7]] =
-                [
-                    b[4] * A + b[5] * E + b[6] * I + b[7] * M,
-                    b[4] * B + b[5] * F + b[6] * J + b[7] * N,
-                    b[4] * C + b[5] * G + b[6] * K + b[7] * O,
-                    b[4] * D + b[5] * H + b[6] * L + b[7] * P,
-                ];
-            [m[8], m[9], m[10], m[11]] =
-                [
-                    b[8] * A + b[9] * E + b[10] * I + b[11] * M,
-                    b[8] * B + b[9] * F + b[10] * J + b[11] * N,
-                    b[8] * C + b[9] * G + b[10] * K + b[11] * O,
-                    b[8] * D + b[9] * H + b[10] * L + b[11] * P,
-                ];
-            [m[12], m[13], m[14], m[15]] =
-                [
-                    b[12] * A + b[13] * E + b[14] * I + b[15] * M,
-                    b[12] * B + b[13] * F + b[14] * J + b[15] * N,
-                    b[12] * C + b[13] * G + b[14] * K + b[15] * O,
-                    b[12] * D + b[13] * H + b[14] * L + b[15] * P,
-                ];
+            [m[4], m[5], m[6], m[7]] = [
+                b[4] * A + b[5] * E + b[6] * I + b[7] * M,
+                b[4] * B + b[5] * F + b[6] * J + b[7] * N,
+                b[4] * C + b[5] * G + b[6] * K + b[7] * O,
+                b[4] * D + b[5] * H + b[6] * L + b[7] * P,
+            ];
+            [m[8], m[9], m[10], m[11]] = [
+                b[8] * A + b[9] * E + b[10] * I + b[11] * M,
+                b[8] * B + b[9] * F + b[10] * J + b[11] * N,
+                b[8] * C + b[9] * G + b[10] * K + b[11] * O,
+                b[8] * D + b[9] * H + b[10] * L + b[11] * P,
+            ];
+            [m[12], m[13], m[14], m[15]] = [
+                b[12] * A + b[13] * E + b[14] * I + b[15] * M,
+                b[12] * B + b[13] * F + b[14] * J + b[15] * N,
+                b[12] * C + b[13] * G + b[14] * K + b[15] * O,
+                b[12] * D + b[13] * H + b[14] * L + b[15] * P,
+            ];
         }
         return m;
     }
-    ;
     function quaternion(roll, pitch, yaw, m) {
         if (!m) {
             m = new Float32Array(4);
@@ -315,29 +313,40 @@ void main(void) {
         }
         const id = 1.0 / d;
         [
-            m[0], m[1], m[2], m[3],
-            m[4], m[5], m[6], m[7],
-            m[8], m[9], m[10], m[11],
-            m[12], m[13], m[14], m[15],
-        ] =
-            [
-                id * (a[5] * a[10] * a[15] + a[6] * a[11] * a[13] + a[7] * a[9] * a[14] - a[5] * a[11] * a[14] - a[6] * a[9] * a[15] - a[7] * a[10] * a[13]),
-                id * (a[1] * a[11] * a[14] + a[2] * a[9] * a[15] + a[3] * a[10] * a[13] - a[1] * a[10] * a[15] - a[2] * a[11] * a[13] - a[3] * a[9] * a[14]),
-                id * (a[1] * a[6] * a[15] + a[2] * a[7] * a[13] + a[3] * a[5] * a[14] - a[1] * a[7] * a[14] - a[2] * a[5] * a[15] - a[3] * a[6] * a[13]),
-                id * (a[1] * a[7] * a[10] + a[2] * a[5] * a[11] + a[3] * a[6] * a[9] - a[1] * a[6] * a[11] - a[2] * a[7] * a[9] - a[3] * a[5] * a[10]),
-                id * (a[4] * a[11] * a[14] + a[6] * a[8] * a[15] + a[7] * a[10] * a[12] - a[4] * a[10] * a[15] - a[6] * a[11] * a[12] - a[7] * a[8] * a[14]),
-                id * (a[0] * a[10] * a[15] + a[2] * a[11] * a[12] + a[3] * a[8] * a[14] - a[0] * a[11] * a[14] - a[2] * a[8] * a[15] - a[3] * a[10] * a[12]),
-                id * (a[0] * a[7] * a[14] + a[2] * a[4] * a[15] + a[3] * a[6] * a[12] - a[0] * a[6] * a[15] - a[2] * a[7] * a[12] - a[3] * a[4] * a[14]),
-                id * (a[0] * a[6] * a[11] + a[2] * a[7] * a[8] + a[3] * a[4] * a[10] - a[0] * a[7] * a[10] - a[2] * a[4] * a[11] - a[3] * a[6] * a[8]),
-                id * (a[4] * a[9] * a[15] + a[5] * a[11] * a[12] + a[7] * a[8] * a[13] - a[4] * a[11] * a[13] - a[5] * a[8] * a[15] - a[7] * a[9] * a[12]),
-                id * (a[0] * a[11] * a[13] + a[1] * a[8] * a[15] + a[3] * a[9] * a[12] - a[0] * a[9] * a[15] - a[1] * a[11] * a[12] - a[3] * a[8] * a[13]),
-                id * (a[0] * a[5] * a[15] + a[1] * a[7] * a[12] + a[3] * a[4] * a[13] - a[0] * a[7] * a[13] - a[1] * a[4] * a[15] - a[3] * a[5] * a[12]),
-                id * (a[0] * a[7] * a[9] + a[1] * a[4] * a[11] + a[3] * a[5] * a[8] - a[0] * a[5] * a[11] - a[1] * a[7] * a[8] - a[3] * a[4] * a[9]),
-                id * (a[4] * a[10] * a[13] + a[5] * a[8] * a[14] + a[6] * a[9] * a[12] - a[4] * a[9] * a[14] - a[5] * a[10] * a[12] - a[6] * a[8] * a[13]),
-                id * (a[0] * a[9] * a[14] + a[1] * a[10] * a[12] + a[2] * a[8] * a[13] - a[0] * a[10] * a[13] - a[1] * a[8] * a[14] - a[2] * a[9] * a[12]),
-                id * (a[0] * a[6] * a[13] + a[1] * a[4] * a[14] + a[2] * a[5] * a[12] - a[0] * a[5] * a[14] - a[1] * a[6] * a[12] - a[2] * a[4] * a[13]),
-                id * (a[0] * a[5] * a[10] + a[1] * a[6] * a[8] + a[2] * a[4] * a[9] - a[0] * a[6] * a[9] - a[1] * a[4] * a[10] - a[2] * a[5] * a[8]),
-            ];
+            m[0],
+            m[1],
+            m[2],
+            m[3],
+            m[4],
+            m[5],
+            m[6],
+            m[7],
+            m[8],
+            m[9],
+            m[10],
+            m[11],
+            m[12],
+            m[13],
+            m[14],
+            m[15],
+        ] = [
+            id * (a[5] * a[10] * a[15] + a[6] * a[11] * a[13] + a[7] * a[9] * a[14] - a[5] * a[11] * a[14] - a[6] * a[9] * a[15] - a[7] * a[10] * a[13]),
+            id * (a[1] * a[11] * a[14] + a[2] * a[9] * a[15] + a[3] * a[10] * a[13] - a[1] * a[10] * a[15] - a[2] * a[11] * a[13] - a[3] * a[9] * a[14]),
+            id * (a[1] * a[6] * a[15] + a[2] * a[7] * a[13] + a[3] * a[5] * a[14] - a[1] * a[7] * a[14] - a[2] * a[5] * a[15] - a[3] * a[6] * a[13]),
+            id * (a[1] * a[7] * a[10] + a[2] * a[5] * a[11] + a[3] * a[6] * a[9] - a[1] * a[6] * a[11] - a[2] * a[7] * a[9] - a[3] * a[5] * a[10]),
+            id * (a[4] * a[11] * a[14] + a[6] * a[8] * a[15] + a[7] * a[10] * a[12] - a[4] * a[10] * a[15] - a[6] * a[11] * a[12] - a[7] * a[8] * a[14]),
+            id * (a[0] * a[10] * a[15] + a[2] * a[11] * a[12] + a[3] * a[8] * a[14] - a[0] * a[11] * a[14] - a[2] * a[8] * a[15] - a[3] * a[10] * a[12]),
+            id * (a[0] * a[7] * a[14] + a[2] * a[4] * a[15] + a[3] * a[6] * a[12] - a[0] * a[6] * a[15] - a[2] * a[7] * a[12] - a[3] * a[4] * a[14]),
+            id * (a[0] * a[6] * a[11] + a[2] * a[7] * a[8] + a[3] * a[4] * a[10] - a[0] * a[7] * a[10] - a[2] * a[4] * a[11] - a[3] * a[6] * a[8]),
+            id * (a[4] * a[9] * a[15] + a[5] * a[11] * a[12] + a[7] * a[8] * a[13] - a[4] * a[11] * a[13] - a[5] * a[8] * a[15] - a[7] * a[9] * a[12]),
+            id * (a[0] * a[11] * a[13] + a[1] * a[8] * a[15] + a[3] * a[9] * a[12] - a[0] * a[9] * a[15] - a[1] * a[11] * a[12] - a[3] * a[8] * a[13]),
+            id * (a[0] * a[5] * a[15] + a[1] * a[7] * a[12] + a[3] * a[4] * a[13] - a[0] * a[7] * a[13] - a[1] * a[4] * a[15] - a[3] * a[5] * a[12]),
+            id * (a[0] * a[7] * a[9] + a[1] * a[4] * a[11] + a[3] * a[5] * a[8] - a[0] * a[5] * a[11] - a[1] * a[7] * a[8] - a[3] * a[4] * a[9]),
+            id * (a[4] * a[10] * a[13] + a[5] * a[8] * a[14] + a[6] * a[9] * a[12] - a[4] * a[9] * a[14] - a[5] * a[10] * a[12] - a[6] * a[8] * a[13]),
+            id * (a[0] * a[9] * a[14] + a[1] * a[10] * a[12] + a[2] * a[8] * a[13] - a[0] * a[10] * a[13] - a[1] * a[8] * a[14] - a[2] * a[9] * a[12]),
+            id * (a[0] * a[6] * a[13] + a[1] * a[4] * a[14] + a[2] * a[5] * a[12] - a[0] * a[5] * a[14] - a[1] * a[6] * a[12] - a[2] * a[4] * a[13]),
+            id * (a[0] * a[5] * a[10] + a[1] * a[6] * a[8] + a[2] * a[4] * a[9] - a[0] * a[6] * a[9] - a[1] * a[4] * a[10] - a[2] * a[5] * a[8]),
+        ];
         return m;
     }
     function transpose4(a, m) {
@@ -345,17 +354,32 @@ void main(void) {
             m = create4();
         }
         [
-            m[1], m[2], m[3],
-            m[4], m[6], m[7],
-            m[8], m[9], m[11],
-            m[12], m[13], m[14],
-        ] =
-            [
-                a[4], a[8], a[12],
-                a[1], a[9], a[13],
-                a[2], a[6], a[14],
-                a[3], a[7], a[11],
-            ];
+            m[1],
+            m[2],
+            m[3],
+            m[4],
+            m[6],
+            m[7],
+            m[8],
+            m[9],
+            m[11],
+            m[12],
+            m[13],
+            m[14],
+        ] = [
+            a[4],
+            a[8],
+            a[12],
+            a[1],
+            a[9],
+            a[13],
+            a[2],
+            a[6],
+            a[14],
+            a[3],
+            a[7],
+            a[11],
+        ];
         return m;
     }
     Luminus.matrix = {
@@ -484,7 +508,9 @@ void main(void) {
                 this.texture[index] = null;
             }
             return (img.complete && img.src ? Promise.resolve(img) : new Promise((resolve, reject) => {
-                img.onload = () => { resolve(img); };
+                img.onload = () => {
+                    resolve(img);
+                };
                 img.onerror = reject;
                 img.onabort = reject;
                 if (typeof image === 'string') {
@@ -510,7 +536,9 @@ void main(void) {
             this.gl.bindTexture(this.gl.TEXTURE_2D, this.texture[num] || null);
         }
     }
-    Luminus.createSupport = (gl2) => { return new Support(gl2); };
+    Luminus.createSupport = (gl2) => {
+        return new Support(gl2);
+    };
 })();
 ((script, init) => {
     customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
@@ -528,21 +556,27 @@ void main(void) {
             super();
             const model = new Luminus.models.axis();
             this.model = model;
-            if (this.hasAttribute('length')) {
-                model.length = this.length;
-            }
-            else {
-                this.length = model.length;
-            }
+            setTimeout(() => {
+                if (this.hasAttribute('length')) {
+                    model.length = this.length;
+                }
+                else {
+                    this.length = model.length;
+                }
+            }, 0);
         }
-        get length() { return this.model.length; }
+        get length() {
+            return this.model.length;
+        }
         set length(value) {
             const length = typeof value === 'number' ? value : parseFloat(value);
             this.model.length = length;
             this.setAttribute('length', length + '');
             this.rerender();
         }
-        static get observedAttributes() { return ['length']; }
+        static get observedAttributes() {
+            return ['length'];
+        }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
@@ -576,10 +610,9 @@ void main(void) {
         }
         initStyle() {
             const style = document.createElement('style');
-            style.innerHTML =
-                [
-                    ':host { display: none; color: #99ccfd; }',
-                ].join('');
+            style.innerHTML = [
+                ':host { display: none; color: #99ccfd; }',
+            ].join('');
             return style;
         }
         get color() {
@@ -587,21 +620,124 @@ void main(void) {
                 .replace(/\s/g, '')
                 .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
                 .slice(0, 4)
-                .map((v, i) => { return i === 3 ? parseFloat(v) : parseInt(v) / 255.0; });
+                .map((v, i) => {
+                return i === 3 ? parseFloat(v) : parseInt(v) / 255.0;
+            });
         }
-        get length() { return this.model.length; }
+        get length() {
+            return this.model.length;
+        }
         set length(value) {
             const length = typeof value === 'number' ? value : parseFloat(value);
             this.model.length = length;
             this.setAttribute('length', length + '');
             this.rerender();
         }
-        static get observedAttributes() { return ['length']; }
+        static get observedAttributes() {
+            return ['length'];
+        }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
             }
             this.length = newVal;
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-line';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends Luminus.model {
+        constructor() {
+            super();
+            const model = new Luminus.models.line();
+            this.model = model;
+            this.updatePosition();
+        }
+        updatePosition() {
+            if (this._updatePosition) {
+                clearTimeout(this._updatePosition);
+            }
+            this._updatePosition = setTimeout(() => {
+                this.model.start(this.sx, this.sy, this.sx);
+                this.model.end(this.ex, this.ey, this.ez);
+                this._updatePosition = 0;
+                this.rerender();
+            }, 0);
+        }
+        get sx() {
+            return parseFloat(this.getAttribute('sx') || '') || 0;
+        }
+        set sx(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('sx', n + '');
+        }
+        get sy() {
+            return parseFloat(this.getAttribute('sy') || '') || 0;
+        }
+        set sy(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('sy', n + '');
+        }
+        get sz() {
+            return parseFloat(this.getAttribute('sz') || '') || 0;
+        }
+        set sz(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('sz', n + '');
+        }
+        get ex() {
+            return parseFloat(this.getAttribute('ex') || '') || 0;
+        }
+        set ex(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('ex', n + '');
+        }
+        get ey() {
+            return parseFloat(this.getAttribute('ey') || '') || 0;
+        }
+        set ey(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('ey', n + '');
+        }
+        get ez() {
+            return parseFloat(this.getAttribute('ez') || '') || 0;
+        }
+        set ez(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('ez', n + '');
+        }
+        start(x, y, z) {
+            this.sx = x;
+            this.sy = y;
+            this.sz = z;
+            return this;
+        }
+        end(x, y, z) {
+            this.ex = x;
+            this.ey = y;
+            this.ez = z;
+            return this;
+        }
+        color(r0, g0, b0, a0, r1, g1, b1, a1) {
+            return this;
+        }
+        static get observedAttributes() {
+            return ['x', 'y', 'z', 'X', 'Y', 'Z'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            this.updatePosition();
         }
     }, script.dataset.prefix);
 });
@@ -624,18 +760,26 @@ void main(void) {
                 return Promise.resolve();
             }
             this.complete = false;
-            return this.onprepare(program).then(() => { this.complete = true; });
+            return this.onprepare(program).then(() => {
+                this.complete = true;
+            });
         }
         render(program) {
             if (this.complete) {
                 return this.onrender(program);
             }
             if (this.loaded === true && this.complete === undefined) {
-                this.prepare(program).then(() => { this.render(program); });
+                this.prepare(program).then(() => {
+                    this.render(program);
+                });
             }
         }
-        onload(arg) { return Promise.resolve(); }
-        onprepare(program) { return Promise.resolve(); }
+        onload(arg) {
+            return Promise.resolve();
+        }
+        onprepare(program) {
+            return Promise.resolve();
+        }
         onrender(program) { }
     }
     Luminus.models.model = Model;
@@ -644,7 +788,9 @@ void main(void) {
     if (document.readyState !== 'loading') {
         return init(script);
     }
-    document.addEventListener('DOMContentLoaded', () => { init(script); });
+    document.addEventListener('DOMContentLoaded', () => {
+        init(script);
+    });
 })(document.currentScript, (script) => {
     ((component, prefix = 'lu') => {
         const tagname = prefix + '-model';
@@ -663,13 +809,14 @@ void main(void) {
         }
         initStyle() {
             const style = document.createElement('style');
-            style.innerHTML =
-                [
-                    ':host { display: none; }',
-                ].join('');
+            style.innerHTML = [
+                ':host { display: none; }',
+            ].join('');
             return style;
         }
-        get model() { return this._model; }
+        get model() {
+            return this._model;
+        }
         set model(model) {
             this._model = model;
             model.afterload = () => {
@@ -679,31 +826,81 @@ void main(void) {
                 }
             };
         }
-        get cx() { return parseFloat(this.getAttribute('cx') || '0') || 0; }
-        set cx(value) { this.setAttribute('cx', value + ''); }
-        get cy() { return parseFloat(this.getAttribute('cy') || '0') || 0; }
-        set cy(value) { this.setAttribute('cy', value + ''); }
-        get cz() { return parseFloat(this.getAttribute('cz') || '0') || 0; }
-        set cz(value) { this.setAttribute('cz', value + ''); }
-        get xaxis() { return parseFloat(this.getAttribute('xaxis') || '0') || 0; }
-        set xaxis(value) { this.setAttribute('xaxis', value + ''); }
-        get yaxis() { return parseFloat(this.getAttribute('yaxis') || '0') || 0; }
-        set yaxis(value) { this.setAttribute('yaxis', value + ''); }
-        get zaxis() { return parseFloat(this.getAttribute('zaxis') || '0') || 0; }
-        set zaxis(value) { this.setAttribute('zaxis', value + ''); }
-        get x() { return parseFloat(this.getAttribute('x') || '0') || 0; }
-        set x(value) { this.setAttribute('x', value + ''); }
-        get y() { return parseFloat(this.getAttribute('y') || '0') || 0; }
-        set y(value) { this.setAttribute('y', value + ''); }
-        get z() { return parseFloat(this.getAttribute('z') || '0') || 0; }
-        set z(value) { this.setAttribute('z', value + ''); }
-        get roll() { return parseFloat(this.getAttribute('roll') || '0') || 0; }
-        set roll(value) { this.setAttribute('roll', value + ''); }
-        get pitch() { return parseFloat(this.getAttribute('pitch') || '0') || 0; }
-        set pitch(value) { this.setAttribute('pitch', value + ''); }
-        get yaw() { return parseFloat(this.getAttribute('yaw') || '0') || 0; }
-        set yaw(value) { this.setAttribute('yaw', value + ''); }
-        get complete() { return this.model && this.model.complete === true; }
+        get cx() {
+            return parseFloat(this.getAttribute('cx') || '0') || 0;
+        }
+        set cx(value) {
+            this.setAttribute('cx', value + '');
+        }
+        get cy() {
+            return parseFloat(this.getAttribute('cy') || '0') || 0;
+        }
+        set cy(value) {
+            this.setAttribute('cy', value + '');
+        }
+        get cz() {
+            return parseFloat(this.getAttribute('cz') || '0') || 0;
+        }
+        set cz(value) {
+            this.setAttribute('cz', value + '');
+        }
+        get xaxis() {
+            return parseFloat(this.getAttribute('xaxis') || '0') || 0;
+        }
+        set xaxis(value) {
+            this.setAttribute('xaxis', value + '');
+        }
+        get yaxis() {
+            return parseFloat(this.getAttribute('yaxis') || '0') || 0;
+        }
+        set yaxis(value) {
+            this.setAttribute('yaxis', value + '');
+        }
+        get zaxis() {
+            return parseFloat(this.getAttribute('zaxis') || '0') || 0;
+        }
+        set zaxis(value) {
+            this.setAttribute('zaxis', value + '');
+        }
+        get x() {
+            return parseFloat(this.getAttribute('x') || '0') || 0;
+        }
+        set x(value) {
+            this.setAttribute('x', value + '');
+        }
+        get y() {
+            return parseFloat(this.getAttribute('y') || '0') || 0;
+        }
+        set y(value) {
+            this.setAttribute('y', value + '');
+        }
+        get z() {
+            return parseFloat(this.getAttribute('z') || '0') || 0;
+        }
+        set z(value) {
+            this.setAttribute('z', value + '');
+        }
+        get roll() {
+            return parseFloat(this.getAttribute('roll') || '0') || 0;
+        }
+        set roll(value) {
+            this.setAttribute('roll', value + '');
+        }
+        get pitch() {
+            return parseFloat(this.getAttribute('pitch') || '0') || 0;
+        }
+        set pitch(value) {
+            this.setAttribute('pitch', value + '');
+        }
+        get yaw() {
+            return parseFloat(this.getAttribute('yaw') || '0') || 0;
+        }
+        set yaw(value) {
+            this.setAttribute('yaw', value + '');
+        }
+        get complete() {
+            return this.model && this.model.complete === true;
+        }
         get program() {
             var _a;
             return (_a = this.parentElement) === null || _a === void 0 ? void 0 : _a.program;
@@ -731,13 +928,17 @@ void main(void) {
         constructor() {
             super();
             const model = new Luminus.models.vox();
-            model.afterload = () => { this.rerender(); };
+            model.afterload = () => {
+                this.rerender();
+            };
             this.model = model;
             if (this.src) {
                 this.load();
             }
         }
-        get src() { return this.getAttribute('src') || ''; }
+        get src() {
+            return this.getAttribute('src') || '';
+        }
         set src(value) {
             const old = this.src;
             if (old === value) {
@@ -751,7 +952,9 @@ void main(void) {
             if (!url) {
                 return;
             }
-            this.model.load(fetch(url, init)).then(() => { this.rerender(); });
+            this.model.load(fetch(url, init)).then(() => {
+                this.rerender();
+            });
         }
         import(file) {
             return new Promise((resolve, reject) => {
@@ -759,17 +962,24 @@ void main(void) {
                 reader.onload = () => {
                     const data = reader.result;
                     const response = new Response(data);
-                    this.model.load(Promise.resolve(response)).then(() => { this.rerender(); resolve(); });
+                    this.model.load(Promise.resolve(response)).then(() => {
+                        this.rerender();
+                        resolve();
+                    });
                 };
                 reader.onerror = reject;
                 reader.onabort = reject;
                 reader.readAsArrayBuffer(file);
-            }).then(() => { return this; });
+            }).then(() => {
+                return this;
+            });
         }
         export() {
             return this.model.export();
         }
-        static get observedAttributes() { return ['src']; }
+        static get observedAttributes() {
+            return ['src'];
+        }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
@@ -794,11 +1004,10 @@ void main(void) {
             this._complete = false;
             const shadow = this.attachShadow({ mode: 'open' });
             const style = document.createElement('style');
-            style.innerHTML =
-                [
-                    ':host { display: block; background: black; --light: white; --ambient: rgba( 255, 255, 255, 0 ); }',
-                    'canvas { display: block; width: 100%; height: 100%; }',
-                ].join('');
+            style.innerHTML = [
+                ':host { display: block; background: black; --light: white; --ambient: rgba( 255, 255, 255, 0 ); }',
+                'canvas { display: block; width: 100%; height: 100%; }',
+            ].join('');
             this.canvas = document.createElement('canvas');
             this.width = (this.hasAttribute('width') ? (parseInt(this.getAttribute('width') || '')) : 0) || 400;
             this.height = (this.hasAttribute('height') ? (parseInt(this.getAttribute('height') || '')) : 0) || 400;
@@ -822,50 +1031,138 @@ void main(void) {
                 }, true);
             })();
         }
-        get complete() { return this._complete; }
-        get program() { return this.lProgram; }
-        get width() { return this.canvas.width; }
-        set width(value) { this.canvas.width = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0); }
-        get height() { return this.canvas.height; }
-        set height(value) { this.canvas.height = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0); }
-        get top() { return parseFloat(this.getAttribute('top') || '') || 0; }
-        set top(value) { this.setAttribute('top', value + ''); }
-        get bottom() { return parseFloat(this.getAttribute('bottom') || '') || 0; }
-        set bottom(value) { this.setAttribute('bottom', value + ''); }
-        get left() { return parseFloat(this.getAttribute('left') || '') || 0; }
-        set left(value) { this.setAttribute('left', value + ''); }
-        get right() { return parseFloat(this.getAttribute('right') || '') || 0; }
-        set right(value) { this.setAttribute('right', value + ''); }
-        get near() { return parseFloat(this.getAttribute('near') || '') || 0; }
-        set near(value) { this.setAttribute('near', value + ''); }
-        get far() { return parseFloat(this.getAttribute('far') || '') || 0; }
-        set far(value) { this.setAttribute('far', value + ''); }
-        get view() { return this.getAttribute('view') === 'volume' ? 'volume' : 'frustum'; }
-        set view(value) { this.setAttribute('view', value === 'volume' ? 'volume' : 'frustum'); }
-        get eyex() { return parseFloat(this.getAttribute('eyex') || '') || 0; }
-        set eyex(value) { this.setAttribute('eyex', value + ''); }
-        get eyey() { return parseFloat(this.getAttribute('eyey') || '') || 0; }
-        set eyey(value) { this.setAttribute('eyey', value + ''); }
-        get eyez() { return parseFloat(this.getAttribute('eyez') || '') || 0; }
-        set eyez(value) { this.setAttribute('eyez', value + ''); }
-        get upx() { return parseFloat(this.getAttribute('upx') || '') || 0; }
-        set upx(value) { this.setAttribute('upx', value + ''); }
-        get upy() { return parseFloat(this.getAttribute('upy') || '') || 0; }
-        set upy(value) { this.setAttribute('upy', value + ''); }
-        get upz() { return parseFloat(this.getAttribute('upz') || '') || 0; }
-        set upz(value) { this.setAttribute('upz', value + ''); }
-        get centerx() { return parseFloat(this.getAttribute('centerx') || '') || 0; }
-        set centerx(value) { this.setAttribute('centerx', value + ''); }
-        get centery() { return parseFloat(this.getAttribute('centery') || '') || 0; }
-        set centery(value) { this.setAttribute('centery', value + ''); }
-        get centerz() { return parseFloat(this.getAttribute('centerz') || '') || 0; }
-        set centerz(value) { this.setAttribute('centerz', value + ''); }
-        get lightx() { return parseFloat(this.getAttribute('lightx') || '') || 0; }
-        set lightx(value) { this.setAttribute('lightx', value + ''); }
-        get lighty() { return parseFloat(this.getAttribute('lighty') || '') || 0; }
-        set lighty(value) { this.setAttribute('lighty', value + ''); }
-        get lightz() { return parseFloat(this.getAttribute('lightz') || '') || 0; }
-        set lightz(value) { this.setAttribute('lightz', value + ''); }
+        get complete() {
+            return this._complete;
+        }
+        get program() {
+            return this.lProgram;
+        }
+        get width() {
+            return this.canvas.width;
+        }
+        set width(value) {
+            this.canvas.width = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0);
+        }
+        get height() {
+            return this.canvas.height;
+        }
+        set height(value) {
+            this.canvas.height = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0);
+        }
+        get top() {
+            return parseFloat(this.getAttribute('top') || '') || 0;
+        }
+        set top(value) {
+            this.setAttribute('top', value + '');
+        }
+        get bottom() {
+            return parseFloat(this.getAttribute('bottom') || '') || 0;
+        }
+        set bottom(value) {
+            this.setAttribute('bottom', value + '');
+        }
+        get left() {
+            return parseFloat(this.getAttribute('left') || '') || 0;
+        }
+        set left(value) {
+            this.setAttribute('left', value + '');
+        }
+        get right() {
+            return parseFloat(this.getAttribute('right') || '') || 0;
+        }
+        set right(value) {
+            this.setAttribute('right', value + '');
+        }
+        get near() {
+            return parseFloat(this.getAttribute('near') || '') || 0;
+        }
+        set near(value) {
+            this.setAttribute('near', value + '');
+        }
+        get far() {
+            return parseFloat(this.getAttribute('far') || '') || 0;
+        }
+        set far(value) {
+            this.setAttribute('far', value + '');
+        }
+        get view() {
+            return this.getAttribute('view') === 'volume' ? 'volume' : 'frustum';
+        }
+        set view(value) {
+            this.setAttribute('view', value === 'volume' ? 'volume' : 'frustum');
+        }
+        get eyex() {
+            return parseFloat(this.getAttribute('eyex') || '') || 0;
+        }
+        set eyex(value) {
+            this.setAttribute('eyex', value + '');
+        }
+        get eyey() {
+            return parseFloat(this.getAttribute('eyey') || '') || 0;
+        }
+        set eyey(value) {
+            this.setAttribute('eyey', value + '');
+        }
+        get eyez() {
+            return parseFloat(this.getAttribute('eyez') || '') || 0;
+        }
+        set eyez(value) {
+            this.setAttribute('eyez', value + '');
+        }
+        get upx() {
+            return parseFloat(this.getAttribute('upx') || '') || 0;
+        }
+        set upx(value) {
+            this.setAttribute('upx', value + '');
+        }
+        get upy() {
+            return parseFloat(this.getAttribute('upy') || '') || 0;
+        }
+        set upy(value) {
+            this.setAttribute('upy', value + '');
+        }
+        get upz() {
+            return parseFloat(this.getAttribute('upz') || '') || 0;
+        }
+        set upz(value) {
+            this.setAttribute('upz', value + '');
+        }
+        get centerx() {
+            return parseFloat(this.getAttribute('centerx') || '') || 0;
+        }
+        set centerx(value) {
+            this.setAttribute('centerx', value + '');
+        }
+        get centery() {
+            return parseFloat(this.getAttribute('centery') || '') || 0;
+        }
+        set centery(value) {
+            this.setAttribute('centery', value + '');
+        }
+        get centerz() {
+            return parseFloat(this.getAttribute('centerz') || '') || 0;
+        }
+        set centerz(value) {
+            this.setAttribute('centerz', value + '');
+        }
+        get lightx() {
+            return parseFloat(this.getAttribute('lightx') || '') || 0;
+        }
+        set lightx(value) {
+            this.setAttribute('lightx', value + '');
+        }
+        get lighty() {
+            return parseFloat(this.getAttribute('lighty') || '') || 0;
+        }
+        set lighty(value) {
+            this.setAttribute('lighty', value + '');
+        }
+        get lightz() {
+            return parseFloat(this.getAttribute('lightz') || '') || 0;
+        }
+        set lightz(value) {
+            this.setAttribute('lightz', value + '');
+        }
         async init(program) {
             Luminus.console.info('Start: init lu-world.');
             this._complete = false;
@@ -873,7 +1170,7 @@ void main(void) {
             if (!program) {
                 program = new Luminus.program();
             }
-            const support = Luminus.createSupport(this.canvas.getContext("webgl2"));
+            const support = Luminus.createSupport(this.canvas.getContext('webgl2'));
             await program.init(this, support);
             this.lProgram = !program ? new Luminus.program() : program;
             this._complete = true;
@@ -896,7 +1193,9 @@ void main(void) {
                 .replace(/\s/g, '')
                 .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
                 .slice(0, 4)
-                .map((v, i, a) => { return parseInt(v) / 255.0 * parseFloat(a[3]); })
+                .map((v, i, a) => {
+                return parseInt(v) / 255.0 * parseFloat(a[3]);
+            })
                 .slice(0, 3);
         }
         get lightColor() {
@@ -904,9 +1203,13 @@ void main(void) {
                 .replace(/\s/g, '')
                 .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
                 .slice(0, 3)
-                .map((v) => { return parseInt(v) / 255.0; });
+                .map((v) => {
+                return parseInt(v) / 255.0;
+            });
         }
-        static get observedAttributes() { return ['width', 'height']; }
+        static get observedAttributes() {
+            return ['width', 'height'];
+        }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
@@ -930,7 +1233,9 @@ void main(void) {
             this.loaded = true;
             this._length = 10;
         }
-        get length() { return this._length; }
+        get length() {
+            return this._length;
+        }
         set length(value) {
             this._length = value;
             this._change = true;
@@ -947,18 +1252,54 @@ void main(void) {
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
-                0, 0, 0, length, 0, 0,
-                0, 0, 0, 0, length, 0,
-                0, 0, 0, 0, 0, length,
+                0,
+                0,
+                0,
+                length,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                length,
+                0,
+                0,
+                0,
+                0,
+                0,
+                0,
+                length,
             ]), gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.in.vPosition);
             gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
-                1, 0, 0, 1, 1, 0, 0, 1,
-                0, 1, 0, 1, 0, 1, 0, 1,
-                0, 0, 1, 1, 0, 0, 1, 1,
+                1,
+                0,
+                0,
+                1,
+                1,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                1,
+                0,
+                0,
+                1,
+                1,
+                0,
+                0,
+                1,
+                1,
             ]), gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.in.vColor);
             gl2.vertexAttribPointer(support.in.vColor, 4, gl2.FLOAT, false, 0, 0);
@@ -989,12 +1330,78 @@ void main(void) {
         onprepare(program) {
             Luminus.console.info('Start: cube-prepare.');
             const verts = new Float32Array([
-                0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1, 1,
-                0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0, 0,
-                0, 1, 0, 0, 1, 1, 1, 1, 1, 1, 1, 0,
-                0, 0, 0, 1, 0, 0, 1, 0, 1, 0, 0, 1,
-                1, 0, 0, 1, 1, 0, 1, 1, 1, 1, 0, 1,
-                0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 0,
+                0,
+                0,
+                1,
+                1,
+                0,
+                1,
+                1,
+                1,
+                1,
+                0,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                1,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                1,
+                0,
+                0,
+                1,
+                1,
+                0,
+                0,
+                1,
+                1,
+                0,
+                1,
+                1,
+                1,
+                1,
+                0,
+                1,
+                0,
+                0,
+                0,
+                0,
+                0,
+                1,
+                0,
+                1,
+                1,
+                0,
+                1,
+                0,
             ]);
             const colors = new Float32Array([...Array(verts.length / 3 * 4)]);
             for (let i = 0; i < colors.length; i += 4) {
@@ -1004,20 +1411,116 @@ void main(void) {
                 colors[i + 3] = this.color[3];
             }
             const normals = new Float32Array([
-                0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1,
-                0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1,
-                0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0,
-                0, -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0,
-                1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0,
-                -1, 0, 0, -1, 0, 0, -1, 0, 0, -1, 0, 0,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
+                -1,
+                0,
+                0,
             ]);
             const faces = new Uint16Array([
-                0, 1, 2, 0, 2, 3,
-                4, 5, 6, 4, 6, 7,
-                8, 9, 10, 8, 10, 11,
-                12, 13, 14, 12, 14, 15,
-                16, 17, 18, 16, 18, 19,
-                20, 21, 22, 20, 22, 23,
+                0,
+                1,
+                2,
+                0,
+                2,
+                3,
+                4,
+                5,
+                6,
+                4,
+                6,
+                7,
+                8,
+                9,
+                10,
+                8,
+                10,
+                11,
+                12,
+                13,
+                14,
+                12,
+                14,
+                15,
+                16,
+                17,
+                18,
+                16,
+                18,
+                19,
+                20,
+                21,
+                22,
+                20,
+                22,
+                23,
             ]);
             const gl2 = program.support.gl;
             const vao = gl2.createVertexArray();
@@ -1056,6 +1559,101 @@ void main(void) {
         }
     }
     Luminus.models.cube = Cube;
+})();
+(() => {
+    class Line extends Luminus.models.model {
+        constructor() {
+            super();
+            this.lMin = 1;
+            this.loaded = true;
+            this.position = new Float32Array([10, 10, 10, 0, 0, 0]);
+            this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
+        }
+        onprepare(program) {
+            const gl2 = program.support.gl;
+            const vao = gl2.createVertexArray();
+            if (!vao) {
+                return Promise.reject(new Error('Failure createVertexArray.'));
+            }
+            const support = program.support;
+            gl2.bindVertexArray(vao);
+            const positionBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
+            gl2.bufferData(gl2.ARRAY_BUFFER, this.position, gl2.STATIC_DRAW);
+            gl2.enableVertexAttribArray(support.in.vPosition);
+            gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
+            const colorBuffer = gl2.createBuffer();
+            gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
+            gl2.bufferData(gl2.ARRAY_BUFFER, this.colors, gl2.STATIC_DRAW);
+            gl2.enableVertexAttribArray(support.in.vColor);
+            gl2.vertexAttribPointer(support.in.vColor, 4, gl2.FLOAT, false, 0, 0);
+            gl2.bindVertexArray(null);
+            this.vao = vao;
+            this._change = false;
+            return Promise.resolve();
+        }
+        onrender(program) {
+            const gl2 = program.support.gl;
+            if (this._change) {
+                this.prepare(program);
+            }
+            gl2.bindVertexArray(this.vao);
+            gl2.drawArrays(gl2.LINES, 0, 2);
+            gl2.bindVertexArray(null);
+        }
+        start(x, y, z) {
+            this.position[0] = x;
+            this.position[1] = y;
+            this.position[2] = z;
+            this._change = true;
+            return this;
+        }
+        end(x, y, z) {
+            this.position[3] = x;
+            this.position[4] = y;
+            this.position[5] = z;
+            this._change = true;
+            return this;
+        }
+        color(r0, g0, b0, a0, r1, g1, b1, a1) {
+            if (a0 === undefined) {
+                this.colors[0] = this.colors[4] = r0;
+                this.colors[1] = this.colors[5] = g0;
+                this.colors[2] = this.colors[6] = b0;
+                this.colors[3] = this.colors[7] = 1;
+                return this;
+            }
+            if (r1 === undefined) {
+                this.colors[0] = this.colors[4] = r0;
+                this.colors[1] = this.colors[5] = g0;
+                this.colors[2] = this.colors[6] = b0;
+                this.colors[3] = this.colors[7] = a0;
+                return this;
+            }
+            if (b1 === undefined) {
+                this.colors[0] = r0;
+                this.colors[1] = g0;
+                this.colors[2] = b0;
+                this.colors[4] = a0;
+                this.colors[5] = r1;
+                this.colors[6] = g1;
+                this.colors[3] = this.colors[7] = 1;
+                return this;
+            }
+            if (a1 !== undefined) {
+                this.colors[0] = r0;
+                this.colors[1] = g0;
+                this.colors[2] = b0;
+                this.colors[3] = a0;
+                this.colors[4] = r1;
+                this.colors[5] = g1;
+                this.colors[6] = b1;
+                this.colors[7] = a1;
+            }
+            return this;
+        }
+    }
+    Luminus.models.line = Line;
 })();
 (() => {
     class VoxReader {
@@ -1132,29 +1730,26 @@ void main(void) {
                     }
                 }
                 switch (header.name) {
-                    case 'SIZE':
-                        {
-                            const size = chunk.SIZE(header);
-                            result.models.push({
-                                size: size,
-                                count: 0,
-                                xyzi: [],
-                            });
-                            break;
-                        }
-                    case 'XYZI':
-                        {
-                            const xyzi = chunk.XYZI(header);
-                            result.models[result.models.length - 1].count = xyzi.count;
-                            result.models[result.models.length - 1].xyzi = xyzi.boxes;
-                            break;
-                        }
-                    case 'RGBA':
-                        {
-                            const rgba = chunk.RGBA(header);
-                            result.palette = rgba.palette;
-                            break;
-                        }
+                    case 'SIZE': {
+                        const size = chunk.SIZE(header);
+                        result.models.push({
+                            size: size,
+                            count: 0,
+                            xyzi: [],
+                        });
+                        break;
+                    }
+                    case 'XYZI': {
+                        const xyzi = chunk.XYZI(header);
+                        result.models[result.models.length - 1].count = xyzi.count;
+                        result.models[result.models.length - 1].xyzi = xyzi.boxes;
+                        break;
+                    }
+                    case 'RGBA': {
+                        const rgba = chunk.RGBA(header);
+                        result.palette = rgba.palette;
+                        break;
+                    }
                 }
             }
             return result;
@@ -1359,7 +1954,9 @@ void main(void) {
             data.push(new Uint8Array([0, 0, 0, 0]));
             size += 256 * 4;
             setSize(data[2], size);
-            const result = new Uint8Array(data.reduce((prev, now) => { return prev + now.length; }, 0));
+            const result = new Uint8Array(data.reduce((prev, now) => {
+                return prev + now.length;
+            }, 0));
             let offset = 0;
             for (const d of data) {
                 result.set(d, offset);

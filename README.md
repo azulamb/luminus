@@ -46,5 +46,6 @@ deno task build
 
 ## TODO
 
+* Download cache.
 * Add minify.
 * Billboard
