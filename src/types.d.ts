@@ -2,20 +2,33 @@
  * WebComponents
  */
 
-interface LuminusWorldElement extends HTMLElement
-{
+interface LuminusWorldElement extends HTMLElement {
 	readonly complete: boolean;
 	readonly program: LuminusProgram;
 	// screen
-	width: number; height: number;
+	width: number;
+	height: number;
 	// camera
-	top: number; bottom: number; left: number; right: number; near: number; far: number;
+	top: number;
+	bottom: number;
+	left: number;
+	right: number;
+	near: number;
+	far: number;
 	view: 'volume' | 'frustum';
-	eyex: number; eyey: number; eyez: number;
-	upx: number; upy: number; upz: number;
-	centerx: number; centery: number; centerz: number;
+	eyex: number;
+	eyey: number;
+	eyez: number;
+	upx: number;
+	upy: number;
+	upz: number;
+	centerx: number;
+	centery: number;
+	centerz: number;
 	// light
-	lightx: number; lighty: number; lightz: number;
+	lightx: number;
+	lighty: number;
+	lightz: number;
 	readonly ambientColor: number[];
 	readonly lightColor: number[];
 
@@ -23,8 +36,7 @@ interface LuminusWorldElement extends HTMLElement
 	render(): void;
 }
 
-interface LuminusModelElement extends HTMLElement
-{
+interface LuminusModelElement extends HTMLElement {
 	model: LuminusModel<unknown>;
 	readonly complete: boolean;
 	readonly program: LuminusProgram | undefined;
@@ -53,21 +65,44 @@ interface LuminusModelElement extends HTMLElement
 	// Rotation z axis
 	yaw: number;
 	initStyle(): HTMLStyleElement;
-	render( program: LuminusProgram ): void;
+	render(program: LuminusProgram): void;
 	rerender(): void;
 }
 
-interface LuminusModelAxisElement extends LuminusModelElement
-{
+interface LuminusModelLineElement extends LuminusModelElement {
+	/** start x */
+	sx: number;
+	/** start y */
+	sy: number;
+	/** start z */
+	sz: number;
+	/** end x */
+	ex: number;
+	/** end y */
+	ey: number;
+	/** end z */
+	ez: number;
+	start(x: number, y: number, z: number): this;
+	end(x: number, y: number, z: number): this;
+	color(r: number, g: number, b: number): this;
+	color(r: number, g: number, b: number, a: number): this;
+	color(r0: number, g0: number, b0: number, r1: number, g1: number, b1: number): this;
+	color(r0: number, g0: number, b0: number, a0: number, r1: number, g1: number, b1: number, a1: number): this;
+}
+
+interface LuminusModelAxisElement extends LuminusModelElement {
+	length: number;
+}
+
+interface LuminusModelCubeElement extends LuminusModelElement {
 	length: number;
 }
 
 // Load .vox model only.
-interface LuminusModelVoxElement extends LuminusModelElement
-{
+interface LuminusModelVoxElement extends LuminusModelElement {
 	model: LuminusModelVox;
 	src: string;
-	import( file: File ): Promise<this>;
+	import(file: File): Promise<this>;
 	// Export minimize vox.
 	export(): Uint8Array;
 }
@@ -76,8 +111,7 @@ interface LuminusModelVoxElement extends LuminusModelElement
  * Models
  */
 
-interface LuminusModel<T>
-{
+interface LuminusModel<T> {
 	/*
 	loaded = complete = undefined
 	        Loading has not started.
@@ -92,31 +126,37 @@ interface LuminusModel<T>
 	*/
 	loaded?: boolean;
 	complete?: boolean;
-	load( p?: Promise<T> ): Promise<void>;
-	prepare( program: LuminusProgram ): Promise<void>;
-	render( program: LuminusProgram ): void;
+	load(p?: Promise<T>): Promise<void>;
+	prepare(program: LuminusProgram): Promise<void>;
+	render(program: LuminusProgram): void;
 
 	afterload?: () => unknown;
 
 	// Overwrite
 	lMin?: number;
-	onload( result: T ): Promise<unknown>;
-	onprepare( program: LuminusProgram ): Promise<unknown>;
-	onrender( program: LuminusProgram ): void;
+	onload(result: T): Promise<unknown>;
+	onprepare(program: LuminusProgram): Promise<unknown>;
+	onrender(program: LuminusProgram): void;
 }
 
-interface LuminusModelAxis extends LuminusModel<void>
-{
+interface LuminusModelLine extends LuminusModel<void> {
+	start(x: number, y: number, z: number): this;
+	end(x: number, y: number, z: number): this;
+	color(r: number, g: number, b: number): this;
+	color(r: number, g: number, b: number, a: number): this;
+	color(r0: number, g0: number, b0: number, r1: number, g1: number, b1: number): this;
+	color(r0: number, g0: number, b0: number, a0: number, r1: number, g1: number, b1: number, a1: number): this;
+}
+
+interface LuminusModelAxis extends LuminusModel<void> {
 	length: number;
 }
 
-interface LuminusModelCube extends LuminusModel<void>
-{
+interface LuminusModelCube extends LuminusModel<void> {
 	color: Float32Array;
 }
 
-interface LuminusModelVox extends LuminusModel<Response>
-{
+interface LuminusModelVox extends LuminusModel<Response> {
 	export(): Uint8Array;
 }
 
@@ -124,66 +164,61 @@ interface LuminusModelVox extends LuminusModel<Response>
  * Luminus
  */
 
-interface Matrix
-{
+interface Matrix {
 	// Init matrix.
 	create4(): Float32Array;
-	identity4( m?: Float32Array ): Float32Array;
-	translation4( x: number, y: number, z: number, m?: Float32Array ): Float32Array;
-	rotation4( roll: number, pitch: number, yaw: number, m?: Float32Array ): Float32Array,
-	scaling4( x: number, y: number, z: number, m?: Float32Array ): Float32Array;
-	lookAt( eye: number[], center: number[], up: number[], m?: Float32Array ): Float32Array;
+	identity4(m?: Float32Array): Float32Array;
+	translation4(x: number, y: number, z: number, m?: Float32Array): Float32Array;
+	rotation4(roll: number, pitch: number, yaw: number, m?: Float32Array): Float32Array;
+	scaling4(x: number, y: number, z: number, m?: Float32Array): Float32Array;
+	lookAt(eye: number[], center: number[], up: number[], m?: Float32Array): Float32Array;
 	// calc
-	multiply4( a: Float32Array, b: Float32Array, m?: Float32Array ): Float32Array;
-	inverse4( a: Float32Array, m?: Float32Array ): Float32Array;
-	transpose4( a: Float32Array, m?: Float32Array ): Float32Array;
+	multiply4(a: Float32Array, b: Float32Array, m?: Float32Array): Float32Array;
+	inverse4(a: Float32Array, m?: Float32Array): Float32Array;
+	transpose4(a: Float32Array, m?: Float32Array): Float32Array;
 }
 
-interface LuminusSupport
-{
+interface LuminusSupport {
 	gl: WebGL2RenderingContext;
 	program: WebGLProgram;
-	in: { [ keys: string ]: number };
-	uniform: { [ keys: string ]: WebGLUniformLocation };
+	in: { [keys: string]: number };
+	uniform: { [keys: string]: WebGLUniformLocation };
 	texture: WebGLTexture[];
 	matrix: Matrix;
 
-	enables( ... enables: number[] ): this;
+	enables(...enables: number[]): this;
 
-	init( vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement ): Promise<WebGLProgram>;
+	init(vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement): Promise<WebGLProgram>;
 
-	initShader( vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement ): void;
+	initShader(vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement): void;
 
-	loadShader( element: HTMLScriptElement ): Promise<{ type: number, source: string }>;
-	loadShader( type: number, source: string ): Promise<{ type: number, source: string }>;
+	loadShader(element: HTMLScriptElement): Promise<{ type: number; source: string }>;
+	loadShader(type: number, source: string): Promise<{ type: number; source: string }>;
 
-	createShader( type: number, source: string ): Promise<WebGLShader>;
+	createShader(type: number, source: string): Promise<WebGLShader>;
 
 	loadPosition(): void;
 
 	// Screen
-	clear( mask?: number ): this;
-	orthographic( left: number, right: number, bottom: number, top: number, near: number, far: number ): Float32Array;
+	clear(mask?: number): this;
+	orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): Float32Array;
 
 	// Texture
-	loadTexture( image: string | HTMLImageElement, num?: number ): Promise<number>;
-	useTexture( num: number ): void;
+	loadTexture(image: string | HTMLImageElement, num?: number): Promise<number>;
+	useTexture(num: number): void;
 }
 
-interface LuminusProgram
-{
+interface LuminusProgram {
 	support: LuminusSupport;
-	init( world: LuminusWorldElement, support: LuminusSupport ): Promise<void>;
-	beginRender( world: LuminusWorldElement ): void;
-	modelRender( model: LuminusModelElement ): void;
+	init(world: LuminusWorldElement, support: LuminusSupport): Promise<void>;
+	beginRender(world: LuminusWorldElement): void;
+	modelRender(model: LuminusModelElement): void;
 	endRender(): void;
 }
 
-interface Luminus
-{
+interface Luminus {
 	version: string;
-	console:
-	{
+	console: {
 		debug(...data: any[]): void;
 		error(...data: any[]): void;
 		info(...data: any[]): void;
@@ -192,14 +227,13 @@ interface Luminus
 	};
 	loaded: Promise<void>;
 	matrix: Matrix;
-	model: { new (...params: any[]): LuminusModelElement; };
-	models:
-	{
-		model: { new (...params: any[]): LuminusModel<unknown>; },
-		[ keys: string ]: { new (...params: any[]): LuminusModel<any>; },
-	},
-	program: { new(): LuminusProgram },
-	createSupport( gl2: WebGL2RenderingContext ): LuminusSupport;
+	model: { new (...params: any[]): LuminusModelElement };
+	models: {
+		model: { new (...params: any[]): LuminusModel<unknown> };
+		[keys: string]: { new (...params: any[]): LuminusModel<any> };
+	};
+	program: { new (): LuminusProgram };
+	createSupport(gl2: WebGL2RenderingContext): LuminusSupport;
 }
 
 declare const Luminus: Luminus;
