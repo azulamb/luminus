@@ -360,30 +360,11 @@ Luminus.matrix = (() => {
 			m = new Float32Array(3);
 		}
 
-		/*inverse4(uProjection);
-		inverse4(uView);
-		const tmp = multiply4(uProjection, uView);
-		inverse4(tmp, tmp);
-
-		const v = multiply4(tmp, v4);*/
-
-		//transpose4(uView, uView);
-
 		const tmp = multiply4(uProjection, uView);
 		inverse4(tmp, tmp);
 
 		const v = multiply4(tmp, v4);
 
-		/*const tmp = multiply4(uProjection, uView);
-		const iProjection = inverse4(uProjection);
-		const iView = inverse4(uView);
-		console.log(iProjection);
-		console.log(iView);
-
-		const v1 = multiply4(iView, iProjection);
-		const v = multiply4(v1, v4);*/
-
-		console.log(v);
 		if(v[3] === 0.0) {
 			return create4();
 		}
