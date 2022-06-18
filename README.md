@@ -44,6 +44,14 @@ Luminus is 3d webcomponents. (Use WebGL 2)
 deno task build
 ```
 
+### Local debug
+
+```
+deno task server
+```
+
+And access `http://127.0.0.1:4507/`
+
 ## TODO
 
 * Download cache.
