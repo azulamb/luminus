@@ -49,3 +49,4 @@ deno task build
 * Download cache.
 * Add minify.
 * Billboard
+* Debug option(li-world)

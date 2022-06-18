@@ -40,29 +40,31 @@ interface LuminusModelElement extends HTMLElement {
 	model: LuminusModel<unknown>;
 	readonly complete: boolean;
 	readonly program: LuminusProgram | undefined;
-	// Model center x
+	/** true = This model selectable. */
+	selectable: boolean;
+	/** Model center x */
 	cx: number;
-	// Model center y
+	/** Model center y */
 	cy: number;
-	// Model center z
+	/** Model center z */
 	cz: number;
-	// Rotation x axis
+	/** Rotation x axis */
 	xaxis: number;
-	// Rotation y axis
+	/** Rotation y axis */
 	yaxis: number;
-	// Rotation z axis
+	/** Rotation z axis */
 	zaxis: number;
-	// Translate x
+	/** Translate x */
 	x: number;
-	// Translate y
+	/** Translate y */
 	y: number;
-	// Translate z
+	/** Translate z */
 	z: number;
-	// Rotation x axis
+	/** Rotation x axis */
 	roll: number;
-	// Rotation y axis
+	/** Rotation y axis */
 	pitch: number;
-	// Rotation z axis
+	/** Rotation z axis */
 	yaw: number;
 	initStyle(): HTMLStyleElement;
 	render(program: LuminusProgram): void;
@@ -111,6 +113,10 @@ interface LuminusModelVoxElement extends LuminusModelElement {
  * Models
  */
 
+interface CollisionDetection {
+	collisionDetectionTriangles(verts: Float32Array, faces: Uint16Array): number;
+}
+
 interface LuminusModel<T> {
 	/*
 	loaded = complete = undefined
@@ -137,6 +143,7 @@ interface LuminusModel<T> {
 	onload(result: T): Promise<unknown>;
 	onprepare(program: LuminusProgram): Promise<unknown>;
 	onrender(program: LuminusProgram): void;
+	collisionDetection(cd: CollisionDetection): number;
 }
 
 interface LuminusModelLine extends LuminusModel<void> {
@@ -176,6 +183,8 @@ interface Matrix {
 	multiply4(a: Float32Array, b: Float32Array, m?: Float32Array): Float32Array;
 	inverse4(a: Float32Array, m?: Float32Array): Float32Array;
 	transpose4(a: Float32Array, m?: Float32Array): Float32Array;
+	normalize3(a: Float32Array, m?: Float32Array): Float32Array;
+	unProject(v4: Float32Array, uProjection: Float32Array, uView: Float32Array, m?: Float32Array): Float32Array;
 }
 
 interface LuminusSupport {
@@ -202,6 +211,8 @@ interface LuminusSupport {
 	// Screen
 	clear(mask?: number): this;
 	orthographic(left: number, right: number, bottom: number, top: number, near: number, far: number): Float32Array;
+	setViewPort(x: number, y: number, width: number, height: number): this;
+	getViewport(): Int32Array;
 
 	// Texture
 	loadTexture(image: string | HTMLImageElement, num?: number): Promise<number>;
@@ -214,6 +225,14 @@ interface LuminusProgram {
 	beginRender(world: LuminusWorldElement): void;
 	modelRender(model: LuminusModelElement): void;
 	endRender(): void;
+	unProject(viewport: Int32Array, screenX: number, screenY: number, z?: number): Float32Array;
+}
+
+interface LuminusRay extends CollisionDetection {
+	setOrigin(x: number, y: number, z: number): this;
+	setOrigin(origin: Float32Array): this;
+	setVector(x: number, y: number, z: number): this;
+	setVector(vector: Float32Array): this;
 }
 
 interface Luminus {
@@ -233,6 +252,10 @@ interface Luminus {
 		[keys: string]: { new (...params: any[]): LuminusModel<any> };
 	};
 	program: { new (): LuminusProgram };
+	ray: {
+		new (x: number, y: number, z: number, vx: number, vy: number, vz: number): LuminusRay;
+		new (origin: Float32Array, vector: Float32Array): LuminusRay;
+	};
 	createSupport(gl2: WebGL2RenderingContext): LuminusSupport;
 }
 

@@ -69,6 +69,7 @@ void main(void) {
 				[world.upx, world.upy, world.upz],
 				this.uView,
 			);
+			//this.support.gl.viewport();
 
 			// TODO: move Support.
 			gl2.useProgram(this.support.program);
@@ -111,6 +112,24 @@ void main(void) {
 
 		public endRender() {
 			this.support.gl.flush();
+		}
+
+		public unProject(viewport: Int32Array, screenX: number, screenY: number, z: number = 1): Float32Array {
+			console.log('-------');
+			console.log(viewport);
+			console.log(this.uProjection);
+			console.log(this.uView);
+			const x = (screenX - viewport[0]) * 2 / viewport[2] - 1;
+			const y = 1 - (screenY - viewport[1]) * 2 / viewport[3];
+			//const y = (screenY - viewport[1]) * 2 / viewport[3] - 1;
+
+			const position = Luminus.matrix.unProject(
+				new Float32Array([x, y, z, 1.0]),
+				this.uProjection,
+				this.uView,
+			);
+
+			return position;
 		}
 	};
 })();

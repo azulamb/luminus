@@ -30,6 +30,10 @@
 				].join('');
 
 				this.canvas = document.createElement('canvas');
+				// TODO: del
+				this.canvas.addEventListener('click', (event) => {
+					this.searchSelectedModels(event.offsetX, event.offsetY);
+				});
 
 				this.width = (this.hasAttribute('width') ? (parseInt(this.getAttribute('width') || '')) : 0) || 400;
 				this.height = (this.hasAttribute('height') ? (parseInt(this.getAttribute('height') || '')) : 0) || 400;
@@ -59,6 +63,73 @@
 						}, 0);
 					}, true);
 				})();
+			}
+
+			protected createEvent() {
+				const data = {
+					next: true,
+					event: new CustomEvent('select', {
+						cancelable: true,
+					}),
+				};
+				data.event.stopPropagation = () => {
+					data.next = false;
+				};
+				return data;
+			}
+
+			protected searchSelectedModels(screenX: number, screenY: number) {
+				const viewport = this.program.support.getViewport();
+				console.log(`Click: ${screenX} x ${screenY}`);
+				const origin = this.program.unProject(viewport, screenX, screenY, 0);
+				const position = this.program.unProject(viewport, screenX, screenY, -1);
+				const vector = new Float32Array([
+					position[0] - origin[0],
+					position[1] - origin[1],
+					position[2] - origin[2],
+				]);
+
+				const line = <LuminusModelLineElement> document.getElementById('line');
+				line.sx = origin[0];
+				line.sy = origin[1];
+				line.sz = origin[2];
+				line.ex = position[0];
+				line.ey = position[1];
+				line.ez = position[2];
+
+				const ray = new Luminus.ray(origin, vector);
+				/*const list: { distance: number; model: LuminusModelElement }[] = [];
+				for (const child of this.querySelectorAll('[selectable]')) {
+					if (!(child instanceof Luminus.model)) {
+						continue;
+					}
+					const model = <LuminusModelElement> child;
+					const distance = model.model.collisionDetection(ray);
+					console.log(distance);
+					if (isFinite(distance)) {
+						list.push({ distance: distance, model: model });
+					}
+				}
+				if (list.length <= 0) {
+					return;
+				}
+				list.sort((a, b) => {
+					return a.distance - b.distance;
+				});
+				const event = this.createEvent();
+				for (const data of list) {
+					console.log('dispatch', data);
+					data.model.dispatchEvent(event.event);
+					if (!event.next) {
+						continue;
+					}
+				}*/
+				for (const model of this.children) {
+					if (model.id === 'cube') {
+						const d = (<LuminusModelElement> model).model.collisionDetection(ray);
+						console.log(d);
+					}
+				}
 			}
 
 			get complete() {

@@ -51,6 +51,17 @@
 				};
 			}
 
+			get selectable() {
+				return this.hasAttribute('selectable');
+			}
+			set selectable(value) {
+				if (!value) {
+					this.removeAttribute('selectable');
+				} else {
+					this.setAttribute('selectable', '');
+				}
+			}
+
 			get cx() {
 				return parseFloat(this.getAttribute('cx') || '0') || 0;
 			}

@@ -17,7 +17,7 @@
 				const model = <LuminusModelAxis> new Luminus.models.axis();
 				this.model = model;
 
-				setTimeout( () => {
+				setTimeout(() => {
 					if (this.hasAttribute('length')) {
 						model.length = this.length;
 					} else {

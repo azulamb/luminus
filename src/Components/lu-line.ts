@@ -28,8 +28,7 @@
 					clearTimeout(this._updatePosition);
 				}
 				this._updatePosition = setTimeout(() => {
-					(<LuminusModelLine> this.model).start(this.sx, this.sy, this.sx);
-					(<LuminusModelLine> this.model).end(this.ex, this.ey, this.ez);
+					(<LuminusModelLine> this.model).start(this.sx, this.sy, this.sx).end(this.ex, this.ey, this.ez);
 
 					this._updatePosition = 0;
 					this.rerender();
@@ -109,7 +108,7 @@
 			}
 
 			static get observedAttributes() {
-				return ['x', 'y', 'z', 'X', 'Y', 'Z'];
+				return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
 			}
 
 			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {

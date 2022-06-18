@@ -19,6 +19,7 @@
 		createSupport: () => {
 			return <any> null;
 		},
+		ray: <any> null,
 	};
 
 	if (script.dataset.debug === undefined) {

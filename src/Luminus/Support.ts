@@ -157,6 +157,15 @@
 			return m;
 		}
 
+		public setViewPort(x: number, y: number, width: number, height: number) {
+			this.gl.viewport(x, y, width, height);
+			return this;
+		}
+
+		public getViewport() {
+			return <Int32Array>this.gl.getParameter(this.gl.VIEWPORT);
+		}
+
 		public loadTexture(image: string | HTMLImageElement, num?: number) {
 			const img = typeof image === 'string' ? document.createElement('img') : image;
 			const index = num === undefined ? this.texture.length : num;

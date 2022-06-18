@@ -359,6 +359,10 @@ interface VoxData {
 			gl2.bindVertexArray(null);
 		}
 
+		public collisionDetection(cd: CollisionDetection): number {
+			return cd.collisionDetectionTriangles(this.verts, this.faces);
+		}
+
 		public export() {
 			const data: Uint8Array[] = [];
 

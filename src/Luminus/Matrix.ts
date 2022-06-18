@@ -1,7 +1,8 @@
-(() => {
+Luminus.matrix = (() => {
 	function create4() {
 		return new Float32Array(16);
 	}
+
 	function identity4(m?: Float32Array) {
 		if (!m) {
 			m = create4();
@@ -15,19 +16,19 @@
 		if (!m) {
 			m = create4();
 		}
-
-		let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
 		const eyex = eye[0], eyey = eye[1], eyez = eye[2];
-		const upx = up[0], upy = up[1], upz = up[2];
 		const centerx = center[0], centery = center[1], centerz = center[2];
+		const upx = up[0], upy = up[1], upz = up[2];
 
 		if (
 			Math.abs(eyex - centerx) < 0.000001 &&
 			Math.abs(eyey - centery) < 0.000001 &&
 			Math.abs(eyez - centerz) < 0.000001
 		) {
-			return identity4();
+			return identity4(m);
 		}
+
+		let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
 
 		z0 = eyex - centerx;
 		z1 = eyey - centery;
@@ -337,7 +338,64 @@
 		return m;
 	}
 
-	Luminus.matrix = {
+	function normalize3(a: Float32Array, m?: Float32Array) {
+		let len = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+		if (len > 0) {
+		  len = 1 / Math.sqrt(len);
+		}
+
+		if(!m) {
+			m = new Float32Array(3);
+		}
+
+		m[0] = a[0] * len;
+		m[1] = a[1] * len;
+		m[2] = a[2] * len;
+
+		return m;
+	}
+
+	function unProject(v4: Float32Array, uProjection: Float32Array, uView: Float32Array, m?: Float32Array) {
+		if (!m) {
+			m = new Float32Array(3);
+		}
+
+		/*inverse4(uProjection);
+		inverse4(uView);
+		const tmp = multiply4(uProjection, uView);
+		inverse4(tmp, tmp);
+
+		const v = multiply4(tmp, v4);*/
+
+		//transpose4(uView, uView);
+
+		const tmp = multiply4(uProjection, uView);
+		inverse4(tmp, tmp);
+
+		const v = multiply4(tmp, v4);
+
+		/*const tmp = multiply4(uProjection, uView);
+		const iProjection = inverse4(uProjection);
+		const iView = inverse4(uView);
+		console.log(iProjection);
+		console.log(iView);
+
+		const v1 = multiply4(iView, iProjection);
+		const v = multiply4(v1, v4);*/
+
+		console.log(v);
+		if(v[3] === 0.0) {
+			return create4();
+		}
+
+		m[0] = v[0] / v[3];
+		m[1] = v[1] / v[3];
+		m[2] = v[2] / v[3];
+
+		return m;
+	};
+
+	return {
 		create4: create4,
 		identity4: identity4,
 		translation4: translation4,
@@ -347,5 +405,7 @@
 		multiply4: multiply4,
 		inverse4: inverse4,
 		transpose4: transpose4,
+		normalize3: normalize3,
+		unProject: unProject,
 	};
 })();

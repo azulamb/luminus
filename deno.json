@@ -15,7 +15,8 @@
 	},
 	"fmt": {
 		"files": {
-			"include": ["./src"]
+			"include": ["./src"],
+			"exclude": ["./src/Luminus/Matrix.ts", "./src/Luminus/Support.ts"]
 		},
 		"options": {
 			"useTabs": true,

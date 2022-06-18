@@ -46,13 +46,19 @@
 			}
 		}
 
-		onload(arg: any) {
+		public onload(arg: any) {
 			return Promise.resolve();
 		}
-		onprepare(program: LuminusProgram) {
+
+		public onprepare(program: LuminusProgram) {
 			return Promise.resolve();
 		}
-		onrender(program: LuminusProgram) {}
+
+		public onrender(program: LuminusProgram) {}
+
+		public collisionDetection(cd: CollisionDetection): number {
+			return Infinity;
+		}
 	}
 
 	Luminus.models.model = Model;

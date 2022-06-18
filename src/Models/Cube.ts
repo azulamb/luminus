@@ -3,13 +3,15 @@
 		public loaded?: boolean = true;
 		public complete?: boolean;
 		public color: Float32Array = new Float32Array(4);
+		protected verts: Float32Array;
+		protected faces: Uint16Array;
 
 		protected vao: WebGLVertexArrayObject;
 
 		public onprepare(program: LuminusProgram) {
 			Luminus.console.info('Start: cube-prepare.');
 
-			const verts = new Float32Array(
+			this.verts = new Float32Array(
 				[
 					0,
 					0,
@@ -86,7 +88,7 @@
 				],
 			);
 
-			const colors = new Float32Array([...Array(verts.length / 3 * 4)]);
+			const colors = new Float32Array([...Array(this.verts.length / 3 * 4)]);
 			for (let i = 0; i < colors.length; i += 4) {
 				colors[i] = this.color[0];
 				colors[i + 1] = this.color[1];
@@ -171,7 +173,7 @@
 				],
 			);
 
-			const faces = new Uint16Array(
+			this.faces = new Uint16Array(
 				[
 					0,
 					1,
@@ -225,7 +227,7 @@
 
 			const positionBuffer = gl2.createBuffer();
 			gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
-			gl2.bufferData(gl2.ARRAY_BUFFER, verts, gl2.STATIC_DRAW);
+			gl2.bufferData(gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW);
 			gl2.enableVertexAttribArray(support.in.vPosition);
 			gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
 
@@ -243,7 +245,7 @@
 
 			const indexBuffer = gl2.createBuffer();
 			gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
-			gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, faces, gl2.STATIC_DRAW);
+			gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);
 
 			gl2.bindVertexArray(null);
 
@@ -258,6 +260,10 @@
 			gl2.bindVertexArray(this.vao);
 			gl2.drawElements(gl2.TRIANGLES, 36, gl2.UNSIGNED_SHORT, 0);
 			gl2.bindVertexArray(null);
+		}
+
+		public collisionDetection(cd: CollisionDetection): number {
+			return cd.collisionDetectionTriangles(this.verts, this.faces);
 		}
 	}
 

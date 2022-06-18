@@ -14,6 +14,7 @@
         createSupport: () => {
             return null;
         },
+        ray: null,
     };
     if (script.dataset.debug === undefined) {
         luminus.console = {
@@ -100,9 +101,19 @@ void main(void) {
         endRender() {
             this.support.gl.flush();
         }
+        unProject(viewport, screenX, screenY, z = 1) {
+            console.log('-------');
+            console.log(viewport);
+            console.log(this.uProjection);
+            console.log(this.uView);
+            const x = (screenX - viewport[0]) * 2 / viewport[2] - 1;
+            const y = 1 - (screenY - viewport[1]) * 2 / viewport[3];
+            const position = Luminus.matrix.unProject(new Float32Array([x, y, z, 1.0]), this.uProjection, this.uView);
+            return position;
+        }
     };
 })();
-(() => {
+Luminus.matrix = (() => {
     function create4() {
         return new Float32Array(16);
     }
@@ -118,15 +129,15 @@ void main(void) {
         if (!m) {
             m = create4();
         }
-        let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
         const eyex = eye[0], eyey = eye[1], eyez = eye[2];
-        const upx = up[0], upy = up[1], upz = up[2];
         const centerx = center[0], centery = center[1], centerz = center[2];
+        const upx = up[0], upy = up[1], upz = up[2];
         if (Math.abs(eyex - centerx) < 0.000001 &&
             Math.abs(eyey - centery) < 0.000001 &&
             Math.abs(eyez - centerz) < 0.000001) {
-            return identity4();
+            return identity4(m);
         }
+        let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
         z0 = eyex - centerx;
         z1 = eyey - centery;
         z2 = eyez - centerz;
@@ -382,7 +393,37 @@ void main(void) {
         ];
         return m;
     }
-    Luminus.matrix = {
+    function normalize3(a, m) {
+        let len = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
+        if (len > 0) {
+            len = 1 / Math.sqrt(len);
+        }
+        if (!m) {
+            m = new Float32Array(3);
+        }
+        m[0] = a[0] * len;
+        m[1] = a[1] * len;
+        m[2] = a[2] * len;
+        return m;
+    }
+    function unProject(v4, uProjection, uView, m) {
+        if (!m) {
+            m = new Float32Array(3);
+        }
+        const tmp = multiply4(uProjection, uView);
+        inverse4(tmp, tmp);
+        const v = multiply4(tmp, v4);
+        console.log(v);
+        if (v[3] === 0.0) {
+            return create4();
+        }
+        m[0] = v[0] / v[3];
+        m[1] = v[1] / v[3];
+        m[2] = v[2] / v[3];
+        return m;
+    }
+    ;
+    return {
         create4: create4,
         identity4: identity4,
         translation4: translation4,
@@ -392,6 +433,8 @@ void main(void) {
         multiply4: multiply4,
         inverse4: inverse4,
         transpose4: transpose4,
+        normalize3: normalize3,
+        unProject: unProject,
     };
 })();
 (() => {
@@ -501,6 +544,13 @@ void main(void) {
             m[15] = 1;
             return m;
         }
+        setViewPort(x, y, width, height) {
+            this.gl.viewport(x, y, width, height);
+            return this;
+        }
+        getViewport() {
+            return this.gl.getParameter(this.gl.VIEWPORT);
+        }
         loadTexture(image, num) {
             const img = typeof image === 'string' ? document.createElement('img') : image;
             const index = num === undefined ? this.texture.length : num;
@@ -538,6 +588,116 @@ void main(void) {
     }
     Luminus.createSupport = (gl2) => {
         return new Support(gl2);
+    };
+})();
+(() => {
+    Luminus.ray = class {
+        constructor(x, y, z, vx, vy, vz) {
+            this.origin = new Float32Array(3);
+            this.vector = new Float32Array(3);
+            if (typeof x === 'number') {
+                this.setOrigin(x, y, z);
+                this.setVector(vx, vy, vz);
+            }
+            else {
+                this.setOrigin(x);
+                this.setVector(y);
+            }
+        }
+        setOrigin(x, y, z) {
+            if (typeof x === 'number') {
+                this.origin[0] = x;
+                this.origin[1] = y;
+                this.origin[2] = z;
+            }
+            else {
+                this.origin[0] = x[0];
+                this.origin[1] = x[1];
+                this.origin[2] = x[2];
+            }
+            return this;
+        }
+        setVector(x, y, z) {
+            if (typeof x === 'number') {
+                this.vector[0] = x;
+                this.vector[1] = y;
+                this.vector[2] = z;
+            }
+            else {
+                this.vector[0] = x[0];
+                this.vector[1] = x[1];
+                this.vector[2] = x[2];
+            }
+            Luminus.matrix.normalize3(this.vector, this.vector);
+            return this;
+        }
+        include(a, b, c) {
+            return a[0] * b[1] * c[2] + a[1] * b[2] * c[0] + a[2] * b[0] * c[1] -
+                a[0] * b[2] * c[1] - a[1] * b[0] * c[2] - a[2] * b[1] * c[0];
+        }
+        rayCast(triangle, position) {
+            if (!position) {
+                position = new Float32Array(3);
+            }
+            const ray = new Float32Array([-1 * this.vector[0], -1 * this.vector[1], -1 * this.vector[2]]);
+            const edge1 = new Float32Array([
+                triangle[3] - triangle[0],
+                triangle[4] - triangle[1],
+                triangle[5] - triangle[2],
+            ]);
+            const edge2 = new Float32Array([
+                triangle[6] - triangle[0],
+                triangle[7] - triangle[1],
+                triangle[8] - triangle[2],
+            ]);
+            const denominator = this.include(edge1, edge2, ray);
+            if (denominator <= 0) {
+                return Infinity;
+            }
+            const d = new Float32Array([
+                this.origin[0] - triangle[0],
+                this.origin[1] - triangle[1],
+                this.origin[2] - triangle[2],
+            ]);
+            const u = this.include(d, edge2, ray) / denominator;
+            if (0 <= u && u <= 1) {
+                const v = this.include(edge1, d, ray) / denominator;
+                if (0 <= v && u + v <= 1) {
+                    const distance = this.include(edge1, edge2, d) / denominator;
+                    if (distance < 0) {
+                        return Infinity;
+                    }
+                    position[0] = this.origin[0] + ray[0] * distance;
+                    position[1] = this.origin[1] + ray[1] * distance;
+                    position[2] = this.origin[2] + ray[2] * distance;
+                    return distance;
+                }
+            }
+            return Infinity;
+        }
+        collisionDetectionTriangles(verts, faces) {
+            let min = Infinity;
+            const triangle = new Float32Array(9);
+            for (let i = 0; i < faces.length; i += 3) {
+                const a = faces[i] * 3;
+                triangle[0] = verts[a];
+                triangle[1] = verts[a + 1];
+                triangle[2] = verts[a + 2];
+                const b = faces[i + 1] * 3;
+                triangle[3] = verts[b];
+                triangle[4] = verts[b + 1];
+                triangle[5] = verts[b + 2];
+                const c = faces[i + 2] * 3;
+                triangle[6] = verts[c];
+                triangle[7] = verts[c + 1];
+                triangle[8] = verts[c + 2];
+                const distance = this.rayCast(triangle);
+                if (distance < min) {
+                    min = distance;
+                }
+            }
+            return min;
+        }
     };
 })();
 ((script, init) => {
@@ -667,8 +827,7 @@ void main(void) {
                 clearTimeout(this._updatePosition);
             }
             this._updatePosition = setTimeout(() => {
-                this.model.start(this.sx, this.sy, this.sx);
-                this.model.end(this.ex, this.ey, this.ez);
+                this.model.start(this.sx, this.sy, this.sx).end(this.ex, this.ey, this.ez);
                 this._updatePosition = 0;
                 this.rerender();
             }, 0);
@@ -731,7 +890,7 @@ void main(void) {
             return this;
         }
         static get observedAttributes() {
-            return ['x', 'y', 'z', 'X', 'Y', 'Z'];
+            return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
         }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
@@ -781,6 +940,9 @@ void main(void) {
             return Promise.resolve();
         }
         onrender(program) { }
+        collisionDetection(cd) {
+            return Infinity;
+        }
     }
     Luminus.models.model = Model;
 })();
@@ -825,6 +987,17 @@ void main(void) {
                     model.prepare(program);
                 }
             };
+        }
+        get selectable() {
+            return this.hasAttribute('selectable');
+        }
+        set selectable(value) {
+            if (!value) {
+                this.removeAttribute('selectable');
+            }
+            else {
+                this.setAttribute('selectable', '');
+            }
         }
         get cx() {
             return parseFloat(this.getAttribute('cx') || '0') || 0;
@@ -1009,6 +1182,9 @@ void main(void) {
                 'canvas { display: block; width: 100%; height: 100%; }',
             ].join('');
             this.canvas = document.createElement('canvas');
+            this.canvas.addEventListener('click', (event) => {
+                this.searchSelectedModels(event.offsetX, event.offsetY);
+            });
             this.width = (this.hasAttribute('width') ? (parseInt(this.getAttribute('width') || '')) : 0) || 400;
             this.height = (this.hasAttribute('height') ? (parseInt(this.getAttribute('height') || '')) : 0) || 400;
             const contents = document.createElement('div');
@@ -1030,6 +1206,43 @@ void main(void) {
                     }, 0);
                 }, true);
             })();
+        }
+        createEvent() {
+            const data = {
+                next: true,
+                event: new CustomEvent('select', {
+                    cancelable: true,
+                }),
+            };
+            data.event.stopPropagation = () => {
+                data.next = false;
+            };
+            return data;
+        }
+        searchSelectedModels(screenX, screenY) {
+            const viewport = this.program.support.getViewport();
+            console.log(`Click: ${screenX} x ${screenY}`);
+            const origin = this.program.unProject(viewport, screenX, screenY, 0);
+            const position = this.program.unProject(viewport, screenX, screenY, -1);
+            const vector = new Float32Array([
+                position[0] - origin[0],
+                position[1] - origin[1],
+                position[2] - origin[2],
+            ]);
+            const line = document.getElementById('line');
+            line.sx = origin[0];
+            line.sy = origin[1];
+            line.sz = origin[2];
+            line.ex = position[0];
+            line.ey = position[1];
+            line.ez = position[2];
+            const ray = new Luminus.ray(origin, vector);
+            for (const model of this.children) {
+                if (model.id === 'cube') {
+                    const d = model.model.collisionDetection(ray);
+                    console.log(d);
+                }
+            }
         }
         get complete() {
             return this._complete;
@@ -1329,7 +1542,7 @@ void main(void) {
         }
         onprepare(program) {
             Luminus.console.info('Start: cube-prepare.');
-            const verts = new Float32Array([
+            this.verts = new Float32Array([
                 0,
                 0,
                 1,
@@ -1403,7 +1616,7 @@ void main(void) {
                 1,
                 0,
             ]);
-            const colors = new Float32Array([...Array(verts.length / 3 * 4)]);
+            const colors = new Float32Array([...Array(this.verts.length / 3 * 4)]);
             for (let i = 0; i < colors.length; i += 4) {
                 colors[i] = this.color[0];
                 colors[i + 1] = this.color[1];
@@ -1484,7 +1697,7 @@ void main(void) {
                 0,
                 0,
             ]);
-            const faces = new Uint16Array([
+            this.faces = new Uint16Array([
                 0,
                 1,
                 2,
@@ -1531,7 +1744,7 @@ void main(void) {
             gl2.bindVertexArray(vao);
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
-            gl2.bufferData(gl2.ARRAY_BUFFER, verts, gl2.STATIC_DRAW);
+            gl2.bufferData(gl2.ARRAY_BUFFER, this.verts, gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.in.vPosition);
             gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
@@ -1546,7 +1759,7 @@ void main(void) {
             gl2.vertexAttribPointer(support.in.vNormal, 3, gl2.FLOAT, false, 0, 0);
             const indexBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ELEMENT_ARRAY_BUFFER, indexBuffer);
-            gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, faces, gl2.STATIC_DRAW);
+            gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);
             gl2.bindVertexArray(null);
             this.vao = vao;
             return Promise.resolve();
@@ -1556,6 +1769,9 @@ void main(void) {
             gl2.bindVertexArray(this.vao);
             gl2.drawElements(gl2.TRIANGLES, 36, gl2.UNSIGNED_SHORT, 0);
             gl2.bindVertexArray(null);
+        }
+        collisionDetection(cd) {
+            return cd.collisionDetectionTriangles(this.verts, this.faces);
         }
     }
     Luminus.models.cube = Cube;
@@ -1567,7 +1783,7 @@ void main(void) {
             this.lMin = 1;
             this.loaded = true;
             this.position = new Float32Array([10, 10, 10, 0, 0, 0]);
-            this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
+            this.colors = new Float32Array([1, 1, 1, 1, 1, 0, 0, 1]);
         }
         onprepare(program) {
             const gl2 = program.support.gl;
@@ -1922,6 +2138,9 @@ void main(void) {
             gl2.bindVertexArray(this.vao);
             gl2.drawElements(gl2.TRIANGLES, this.count, gl2.UNSIGNED_SHORT, 0);
             gl2.bindVertexArray(null);
+        }
+        collisionDetection(cd) {
+            return cd.collisionDetectionTriangles(this.verts, this.faces);
         }
         export() {
             const data = [];
