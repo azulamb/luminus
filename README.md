@@ -57,4 +57,5 @@ And access `http://127.0.0.1:4507/`
 * Download cache.
 * Add minify.
 * Billboard
-* Debug option(li-world)
+* Debug option(lu-world option? script?)
+* lu-model.clone

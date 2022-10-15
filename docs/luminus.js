@@ -84,14 +84,7 @@ void main(void) {
         }
         modelRender(model) {
             const gl2 = this.support.gl;
-            const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);
-            [
-                this.support.matrix.translation4(model.x, model.y, model.z),
-                r,
-                this.support.matrix.translation4(-model.cx, -model.cy, -model.cz),
-            ].reduce((p, n) => {
-                return this.support.matrix.multiply4(p, n, this.uModel);
-            }, this.support.matrix.identity4());
+            model.copyMatrix(this.uModel);
             gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
             this.support.matrix.inverse4(this.uModel, this.iModel);
             gl2.uniformMatrix4fv(this.support.uniform.iModel, false, this.iModel);
@@ -102,10 +95,6 @@ void main(void) {
             this.support.gl.flush();
         }
         unProject(viewport, screenX, screenY, z = 1) {
-            console.log('-------');
-            console.log(viewport);
-            console.log(this.uProjection);
-            console.log(this.uView);
             const x = (screenX - viewport[0]) * 2 / viewport[2] - 1;
             const y = 1 - (screenY - viewport[1]) * 2 / viewport[3];
             const position = Luminus.matrix.unProject(new Float32Array([x, y, z, 1.0]), this.uProjection, this.uView);
@@ -217,31 +206,42 @@ Luminus.matrix = (() => {
         if (!m) {
             m = b.length < 16 ? new Float32Array(4) : create4();
         }
-        const A = a[0], B = a[1], C = a[2], D = a[3], E = a[4], F = a[5], G = a[6], H = a[7], I = a[8], J = a[9], K = a[10], L = a[11], M = a[12], N = a[13], O = a[14], P = a[15];
-        [m[0], m[1], m[2], m[3]] = [
-            b[0] * A + b[1] * E + b[2] * I + b[3] * M,
-            b[0] * B + b[1] * F + b[2] * J + b[3] * N,
-            b[0] * C + b[1] * G + b[2] * K + b[3] * O,
-            b[0] * D + b[1] * H + b[2] * L + b[3] * P,
-        ];
         if (4 < m.length) {
-            [m[4], m[5], m[6], m[7]] = [
-                b[4] * A + b[5] * E + b[6] * I + b[7] * M,
-                b[4] * B + b[5] * F + b[6] * J + b[7] * N,
-                b[4] * C + b[5] * G + b[6] * K + b[7] * O,
-                b[4] * D + b[5] * H + b[6] * L + b[7] * P,
+            [
+                m[0], m[1], m[2], m[3],
+                m[4], m[5], m[6], m[7],
+                m[8], m[9], m[10], m[11],
+                m[12], m[13], m[14], m[15],
+            ] = [
+                a[0] * b[0] + a[1] * b[4] + a[2] * b[8] + a[3] * b[12],
+                a[0] * b[1] + a[1] * b[5] + a[2] * b[9] + a[3] * b[13],
+                a[0] * b[2] + a[1] * b[6] + a[2] * b[10] + a[3] * b[14],
+                a[0] * b[3] + a[1] * b[7] + a[2] * b[11] + a[3] * b[15],
+                a[4] * b[0] + a[5] * b[4] + a[6] * b[8] + a[7] * b[12],
+                a[4] * b[1] + a[5] * b[5] + a[6] * b[9] + a[7] * b[13],
+                a[4] * b[2] + a[5] * b[6] + a[6] * b[10] + a[7] * b[14],
+                a[4] * b[3] + a[5] * b[7] + a[6] * b[11] + a[7] * b[15],
+                a[8] * b[0] + a[9] * b[4] + a[10] * b[8] + a[11] * b[12],
+                a[8] * b[1] + a[9] * b[5] + a[10] * b[9] + a[11] * b[13],
+                a[8] * b[2] + a[9] * b[6] + a[10] * b[10] + a[11] * b[14],
+                a[8] * b[3] + a[9] * b[7] + a[10] * b[11] + a[11] * b[15],
+                a[12] * b[0] + a[13] * b[4] + a[14] * b[8] + a[15] * b[12],
+                a[12] * b[1] + a[13] * b[5] + a[14] * b[9] + a[15] * b[13],
+                a[12] * b[2] + a[13] * b[6] + a[14] * b[10] + a[15] * b[14],
+                a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15],
             ];
-            [m[8], m[9], m[10], m[11]] = [
-                b[8] * A + b[9] * E + b[10] * I + b[11] * M,
-                b[8] * B + b[9] * F + b[10] * J + b[11] * N,
-                b[8] * C + b[9] * G + b[10] * K + b[11] * O,
-                b[8] * D + b[9] * H + b[10] * L + b[11] * P,
-            ];
-            [m[12], m[13], m[14], m[15]] = [
-                b[12] * A + b[13] * E + b[14] * I + b[15] * M,
-                b[12] * B + b[13] * F + b[14] * J + b[15] * N,
-                b[12] * C + b[13] * G + b[14] * K + b[15] * O,
-                b[12] * D + b[13] * H + b[14] * L + b[15] * P,
+        }
+        else {
+            [
+                m[0],
+                m[1],
+                m[2],
+                m[3],
+            ] = [
+                a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3],
+                a[1] * b[0] + a[5] * b[1] + a[9] * b[2] + a[13] * b[3],
+                a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14] * b[3],
+                a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3],
             ];
         }
         return m;
@@ -365,31 +365,15 @@ Luminus.matrix = (() => {
             m = create4();
         }
         [
-            m[1],
-            m[2],
-            m[3],
-            m[4],
-            m[6],
-            m[7],
-            m[8],
-            m[9],
-            m[11],
-            m[12],
-            m[13],
-            m[14],
+            m[1], m[2], m[3],
+            m[4], m[6], m[7],
+            m[8], m[9], m[11],
+            m[12], m[13], m[14],
         ] = [
-            a[4],
-            a[8],
-            a[12],
-            a[1],
-            a[9],
-            a[13],
-            a[2],
-            a[6],
-            a[14],
-            a[3],
-            a[7],
-            a[11],
+            a[4], a[8], a[12],
+            a[1], a[9], a[13],
+            a[2], a[6], a[14],
+            a[3], a[7], a[11],
         ];
         return m;
     }
@@ -410,10 +394,9 @@ Luminus.matrix = (() => {
         if (!m) {
             m = new Float32Array(3);
         }
-        const tmp = multiply4(uProjection, uView);
-        inverse4(tmp, tmp);
-        const v = multiply4(tmp, v4);
-        console.log(v);
+        const pv = multiply4(uView, uProjection);
+        inverse4(pv, pv);
+        const v = multiply4(pv, v4);
         if (v[3] === 0.0) {
             return create4();
         }
@@ -631,6 +614,23 @@ Luminus.matrix = (() => {
             Luminus.matrix.normalize3(this.vector, this.vector);
             return this;
         }
+        clone() {
+            return new Luminus.ray(this.origin, this.vector);
+        }
+        transform(matrix) {
+            const start = new Float32Array([...this.origin, 1.0]);
+            const end = new Float32Array([
+                this.origin[0] + this.vector[0],
+                this.origin[1] + this.vector[1],
+                this.origin[2] + this.vector[2],
+                1.0,
+            ]);
+            Luminus.matrix.multiply4(matrix, start, start);
+            Luminus.matrix.multiply4(matrix, end, end);
+            this.setOrigin(start);
+            this.setVector(end[0] - start[0], end[1] - start[1], end[2] - start[2]);
+            return this;
+        }
         include(a, b, c) {
             return a[0] * b[1] * c[2] + a[1] * b[2] * c[0] + a[2] * b[0] * c[1] -
                 a[0] * b[2] * c[1] - a[1] * b[0] * c[2] - a[2] * b[1] * c[0];
@@ -827,7 +827,7 @@ Luminus.matrix = (() => {
                 clearTimeout(this._updatePosition);
             }
             this._updatePosition = setTimeout(() => {
-                this.model.start(this.sx, this.sy, this.sx).end(this.ex, this.ey, this.ez);
+                this.model.start(this.sx, this.sy, this.sz).end(this.ex, this.ey, this.ez);
                 this._updatePosition = 0;
                 this.rerender();
             }, 0);
@@ -966,8 +966,11 @@ Luminus.matrix = (() => {
     })(class extends HTMLElement {
         constructor() {
             super();
+            this._timer = 0;
             const shadow = this.attachShadow({ mode: 'open' });
             shadow.appendChild(this.initStyle());
+            this._matrix = Luminus.matrix.identity4();
+            this.updateMatrix(true);
         }
         initStyle() {
             const style = document.createElement('style');
@@ -975,6 +978,34 @@ Luminus.matrix = (() => {
                 ':host { display: none; }',
             ].join('');
             return style;
+        }
+        copyMatrix(out) {
+            out.set(this._matrix);
+        }
+        updateMatrix(sync = false) {
+            if (this._timer) {
+                clearTimeout(this._timer);
+            }
+            if (sync) {
+                return this.onUpdateMatrix();
+            }
+            this._timer = setTimeout(() => {
+                this.onUpdateMatrix();
+            }, 0);
+        }
+        onUpdateMatrix() {
+            [
+                Luminus.matrix.translation4(this.x, this.y, this.z),
+                Luminus.matrix.rotation4(this.roll + this.xaxis, this.pitch + this.yaxis, this.yaw + this.zaxis),
+                Luminus.matrix.translation4(-this.cx, -this.cy, -this.cz),
+            ].reduce((p, n) => {
+                return Luminus.matrix.multiply4(n, p, this._matrix);
+            }, Luminus.matrix.identity4());
+        }
+        collisionDetection(cd) {
+            const tmp = cd.clone();
+            tmp.transform(Luminus.matrix.inverse4(this._matrix));
+            return this.model.collisionDetection(tmp);
         }
         get model() {
             return this._model;
@@ -1004,72 +1035,84 @@ Luminus.matrix = (() => {
         }
         set cx(value) {
             this.setAttribute('cx', value + '');
+            this.updateMatrix();
         }
         get cy() {
             return parseFloat(this.getAttribute('cy') || '0') || 0;
         }
         set cy(value) {
             this.setAttribute('cy', value + '');
+            this.updateMatrix();
         }
         get cz() {
             return parseFloat(this.getAttribute('cz') || '0') || 0;
         }
         set cz(value) {
             this.setAttribute('cz', value + '');
+            this.updateMatrix();
         }
         get xaxis() {
             return parseFloat(this.getAttribute('xaxis') || '0') || 0;
         }
         set xaxis(value) {
             this.setAttribute('xaxis', value + '');
+            this.updateMatrix();
         }
         get yaxis() {
             return parseFloat(this.getAttribute('yaxis') || '0') || 0;
         }
         set yaxis(value) {
             this.setAttribute('yaxis', value + '');
+            this.updateMatrix();
         }
         get zaxis() {
             return parseFloat(this.getAttribute('zaxis') || '0') || 0;
         }
         set zaxis(value) {
             this.setAttribute('zaxis', value + '');
+            this.updateMatrix();
         }
         get x() {
             return parseFloat(this.getAttribute('x') || '0') || 0;
         }
         set x(value) {
             this.setAttribute('x', value + '');
+            this.updateMatrix();
         }
         get y() {
             return parseFloat(this.getAttribute('y') || '0') || 0;
         }
         set y(value) {
             this.setAttribute('y', value + '');
+            this.updateMatrix();
         }
         get z() {
             return parseFloat(this.getAttribute('z') || '0') || 0;
         }
         set z(value) {
             this.setAttribute('z', value + '');
+            this.updateMatrix();
         }
         get roll() {
             return parseFloat(this.getAttribute('roll') || '0') || 0;
         }
         set roll(value) {
             this.setAttribute('roll', value + '');
+            this.updateMatrix();
         }
         get pitch() {
             return parseFloat(this.getAttribute('pitch') || '0') || 0;
         }
         set pitch(value) {
             this.setAttribute('pitch', value + '');
+            this.updateMatrix();
         }
         get yaw() {
             return parseFloat(this.getAttribute('yaw') || '0') || 0;
         }
         set yaw(value) {
             this.setAttribute('yaw', value + '');
+            this.updateMatrix();
         }
         get complete() {
             return this.model && this.model.complete === true;
@@ -1221,9 +1264,8 @@ Luminus.matrix = (() => {
         }
         searchSelectedModels(screenX, screenY) {
             const viewport = this.program.support.getViewport();
-            console.log(`Click: ${screenX} x ${screenY}`);
-            const origin = this.program.unProject(viewport, screenX, screenY, 0);
-            const position = this.program.unProject(viewport, screenX, screenY, -1);
+            const origin = this.program.unProject(viewport, screenX, screenY, -1);
+            const position = this.program.unProject(viewport, screenX, screenY, 1);
             const vector = new Float32Array([
                 position[0] - origin[0],
                 position[1] - origin[1],
@@ -1237,10 +1279,30 @@ Luminus.matrix = (() => {
             line.ey = position[1];
             line.ez = position[2];
             const ray = new Luminus.ray(origin, vector);
-            for (const model of this.children) {
-                if (model.id === 'cube') {
-                    const d = model.model.collisionDetection(ray);
-                    console.log(d);
+            const list = [];
+            for (const child of this.querySelectorAll('[selectable]')) {
+                const model = child;
+                if (!(model instanceof Luminus.model)) {
+                    continue;
+                }
+                const distance = model.collisionDetection(ray);
+                console.log(distance);
+                if (isFinite(distance)) {
+                    list.push({ distance: distance, model: model });
+                }
+            }
+            if (list.length <= 0) {
+                return;
+            }
+            list.sort((a, b) => {
+                return a.distance - b.distance;
+            });
+            const event = this.createEvent();
+            for (const data of list) {
+                console.log('dispatch', data);
+                data.model.dispatchEvent(event.event);
+                if (!event.next) {
+                    continue;
                 }
             }
         }
@@ -1543,78 +1605,14 @@ Luminus.matrix = (() => {
         onprepare(program) {
             Luminus.console.info('Start: cube-prepare.');
             this.verts = new Float32Array([
-                0,
-                0,
-                1,
-                1,
-                0,
-                1,
-                1,
-                1,
-                1,
-                0,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                1,
-                1,
-                0,
-                1,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                1,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                1,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                1,
-                1,
-                0,
-                1,
-                1,
-                1,
-                1,
-                0,
-                1,
-                0,
-                0,
-                0,
-                0,
-                0,
-                1,
-                0,
-                1,
-                1,
-                0,
-                1,
-                0,
+                0, 0, 1, 1, 0, 1, 1, 1, 1,
+                0, 1, 1, 0, 0, 0, 0, 1, 0,
+                1, 1, 0, 1, 0, 0, 0, 1, 0,
+                0, 1, 1, 1, 1, 1, 1, 1, 0,
+                0, 0, 0, 1, 0, 0, 1, 0, 1,
+                0, 0, 1, 1, 0, 0, 1, 1, 0,
+                1, 1, 1, 1, 0, 1, 0, 0, 0,
+                0, 0, 1, 0, 1, 1, 0, 1, 0,
             ]);
             const colors = new Float32Array([...Array(this.verts.length / 3 * 4)]);
             for (let i = 0; i < colors.length; i += 4) {
@@ -1624,116 +1622,20 @@ Luminus.matrix = (() => {
                 colors[i + 3] = this.color[3];
             }
             const normals = new Float32Array([
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
-                -1,
-                0,
-                0,
+                0, 0, 1, 0, 0, 1, 0, 0, 1,
+                0, 0, 1, 0, 0, -1, 0, 0, -1,
+                0, 0, -1, 0, 0, -1, 0, 1, 0,
+                0, 1, 0, 0, 1, 0, 0, 1, 0,
+                0, -1, 0, 0, -1, 0, 0, -1, 0,
+                0, -1, 0, 1, 0, 0, 1, 0, 0,
+                1, 0, 0, 1, 0, 0, -1, 0, 0,
+                -1, 0, 0, -1, 0, 0, -1, 0, 0,
             ]);
             this.faces = new Uint16Array([
-                0,
-                1,
-                2,
-                0,
-                2,
-                3,
-                4,
-                5,
-                6,
-                4,
-                6,
-                7,
-                8,
-                9,
-                10,
-                8,
-                10,
-                11,
-                12,
-                13,
-                14,
-                12,
-                14,
-                15,
-                16,
-                17,
-                18,
-                16,
-                18,
-                19,
-                20,
-                21,
-                22,
-                20,
-                22,
-                23,
+                0, 1, 2, 0, 2, 3, 4, 5, 6,
+                4, 6, 7, 8, 9, 10, 8, 10, 11,
+                12, 13, 14, 12, 14, 15, 16, 17, 18,
+                16, 18, 19, 20, 21, 22, 20, 22, 23,
             ]);
             const gl2 = program.support.gl;
             const vao = gl2.createVertexArray();
@@ -1782,8 +1684,8 @@ Luminus.matrix = (() => {
             super();
             this.lMin = 1;
             this.loaded = true;
-            this.position = new Float32Array([10, 10, 10, 0, 0, 0]);
-            this.colors = new Float32Array([1, 1, 1, 1, 1, 0, 0, 1]);
+            this.position = new Float32Array([0, 0, 0, 0, 0, 0]);
+            this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
         }
         onprepare(program) {
             const gl2 = program.support.gl;

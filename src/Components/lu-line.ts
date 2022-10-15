@@ -28,7 +28,7 @@
 					clearTimeout(this._updatePosition);
 				}
 				this._updatePosition = setTimeout(() => {
-					(<LuminusModelLine> this.model).start(this.sx, this.sy, this.sx).end(this.ex, this.ey, this.ez);
+					(<LuminusModelLine> this.model).start(this.sx, this.sy, this.sz).end(this.ex, this.ey, this.ez);
 
 					this._updatePosition = 0;
 					this.rerender();

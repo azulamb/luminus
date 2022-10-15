@@ -39,6 +39,32 @@ slider-input { width: 400px; }
 				target.world.render();
 			} );
 		} );
+
+		const camera = {
+			x: document.querySelector('[edit="eyex"]'),
+			y: document.querySelector('[edit="eyey"]'),
+			z: document.querySelector('[edit="eyez"]'),
+		};
+		document.getElementById('default').addEventListener('click', () => {
+			camera.x.value = 10;
+			camera.y.value = 10;
+			camera.z.value = 10;
+		});
+		document.getElementById('front_x').addEventListener('click', () => {
+			camera.x.value = 10;
+			camera.y.value = 0;
+			camera.z.value = 0;
+		});
+		document.getElementById('front_y').addEventListener('click', () => {
+			camera.x.value = 0;
+			camera.y.value = 10;
+			camera.z.value = 0;
+		});
+		document.getElementById('front_z').addEventListener('click', () => {
+			camera.x.value = 0;
+			camera.y.value = 0;
+			camera.z.value = 10;
+		});
 	} );
 } )(class Slider extends HTMLElement
 {
@@ -99,8 +125,11 @@ slider-input { width: 400px; }
 	get value() { return parseFloat( this.s.value ); }
 	set value( value )
 	{
-		this.s.value = value;
-		this.v.value = value;
+		if(this.s.value != value || this.v.value != value) {
+			this.s.value = value;
+			this.v.value = value;
+			this.dispatchEvent(new CustomEvent('change'));
+		}
 	}
 	
 	get edit() { return this.getAttribute( 'edit' ) || ''; }
@@ -157,6 +186,12 @@ slider-input { width: 400px; }
 		<!-- line -->
 		<lu-line id="line" sx="10" sy="20" sz="10"></lu-line>
 	</lu-world>
+	<div>
+		<button id="default">0</button>
+		<button id="front_x">X</button>
+		<button id="front_y">Y</button>
+		<button id="front_z">Z</button>
+	</div>
 	<slider-input target="world" edit="eyex" min="-10" max="10">Camera-x</slider-input>
 	<slider-input target="world" edit="eyey" min="-10" max="10">Camera-y</slider-input>
 	<slider-input target="world" edit="eyez" min="-10" max="10">Camera-z</slider-input>

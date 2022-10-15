@@ -7,7 +7,9 @@ Luminus.matrix = (() => {
 		if (!m) {
 			m = create4();
 		}
+		// deno-fmt-ignore
 		m[1] = m[2] = m[3] = m[4] = m[6] = m[7] = m[8] = m[9] = m[11] = m[12] = m[13] = m[14] = 0;
+		// deno-fmt-ignore
 		m[0] = m[5] = m[10] = m[15] = 1;
 		return m;
 	}
@@ -16,6 +18,7 @@ Luminus.matrix = (() => {
 		if (!m) {
 			m = create4();
 		}
+
 		const eyex = eye[0], eyey = eye[1], eyez = eye[2];
 		const centerx = center[0], centery = center[1], centerz = center[2];
 		const upx = up[0], upy = up[1], upz = up[2];
@@ -66,7 +69,6 @@ Luminus.matrix = (() => {
 			y1 *= len;
 			y2 *= len;
 		}
-
 		m[0] = x0;
 		m[1] = y0;
 		m[2] = z0;
@@ -119,47 +121,44 @@ Luminus.matrix = (() => {
 		if (!m) {
 			m = b.length < 16 ? new Float32Array(4) : create4();
 		}
-		const A = a[0],
-			B = a[1],
-			C = a[2],
-			D = a[3],
-			E = a[4],
-			F = a[5],
-			G = a[6],
-			H = a[7],
-			I = a[8],
-			J = a[9],
-			K = a[10],
-			L = a[11],
-			M = a[12],
-			N = a[13],
-			O = a[14],
-			P = a[15];
 
-		[m[0], m[1], m[2], m[3]] = [
-			b[0] * A + b[1] * E + b[2] * I + b[3] * M,
-			b[0] * B + b[1] * F + b[2] * J + b[3] * N,
-			b[0] * C + b[1] * G + b[2] * K + b[3] * O,
-			b[0] * D + b[1] * H + b[2] * L + b[3] * P,
-		];
 		if (4 < m.length) {
-			[m[4], m[5], m[6], m[7]] = [
-				b[4] * A + b[5] * E + b[6] * I + b[7] * M,
-				b[4] * B + b[5] * F + b[6] * J + b[7] * N,
-				b[4] * C + b[5] * G + b[6] * K + b[7] * O,
-				b[4] * D + b[5] * H + b[6] * L + b[7] * P,
+			// deno-fmt-ignore
+			[
+				m[0], m[1], m[2], m[3],
+				m[4], m[5], m[6], m[7],
+				m[8], m[9], m[10], m[11],
+				m[12], m[13], m[14], m[15],
+			] = [
+				a[0] * b[0] + a[1] * b[4] + a[2] * b[8] + a[3] * b[12],
+				a[0] * b[1] + a[1] * b[5] + a[2] * b[9] + a[3] * b[13],
+				a[0] * b[2] + a[1] * b[6] + a[2] * b[10] + a[3] * b[14],
+				a[0] * b[3] + a[1] * b[7] + a[2] * b[11] + a[3] * b[15],
+				a[4] * b[0] + a[5] * b[4] + a[6] * b[8] + a[7] * b[12],
+				a[4] * b[1] + a[5] * b[5] + a[6] * b[9] + a[7] * b[13],
+				a[4] * b[2] + a[5] * b[6] + a[6] * b[10] + a[7] * b[14],
+				a[4] * b[3] + a[5] * b[7] + a[6] * b[11] + a[7] * b[15],
+				a[8] * b[0] + a[9] * b[4] + a[10] * b[8] + a[11] * b[12],
+				a[8] * b[1] + a[9] * b[5] + a[10] * b[9] + a[11] * b[13],
+				a[8] * b[2] + a[9] * b[6] + a[10] * b[10] + a[11] * b[14],
+				a[8] * b[3] + a[9] * b[7] + a[10] * b[11] + a[11] * b[15],
+				a[12] * b[0] + a[13] * b[4] + a[14] * b[8] + a[15] * b[12],
+				a[12] * b[1] + a[13] * b[5] + a[14] * b[9] + a[15] * b[13],
+				a[12] * b[2] + a[13] * b[6] + a[14] * b[10] + a[15] * b[14],
+				a[12] * b[3] + a[13] * b[7] + a[14] * b[11] + a[15] * b[15],
 			];
-			[m[8], m[9], m[10], m[11]] = [
-				b[8] * A + b[9] * E + b[10] * I + b[11] * M,
-				b[8] * B + b[9] * F + b[10] * J + b[11] * N,
-				b[8] * C + b[9] * G + b[10] * K + b[11] * O,
-				b[8] * D + b[9] * H + b[10] * L + b[11] * P,
-			];
-			[m[12], m[13], m[14], m[15]] = [
-				b[12] * A + b[13] * E + b[14] * I + b[15] * M,
-				b[12] * B + b[13] * F + b[14] * J + b[15] * N,
-				b[12] * C + b[13] * G + b[14] * K + b[15] * O,
-				b[12] * D + b[13] * H + b[14] * L + b[15] * P,
+		} else {
+			// deno-fmt-ignore
+			[
+				m[0],
+				m[1],
+				m[2],
+				m[3],
+			] = [
+				a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3],
+				a[1] * b[0] + a[5] * b[1] + a[9] * b[2] + a[13] * b[3],
+				a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14] * b[3],
+				a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3],
 			];
 		}
 
@@ -226,6 +225,7 @@ Luminus.matrix = (() => {
 	}
 
 	function inverse4(a: Float32Array, m?: Float32Array) {
+		// deno-fmt-ignore
 		const d = a[0] * a[5] * a[10] * a[15] +
 			a[0] * a[6] * a[11] * a[13] +
 			a[0] * a[7] * a[9] * a[14] +
@@ -261,6 +261,7 @@ Luminus.matrix = (() => {
 
 		const id = 1.0 / d;
 
+		// deno-fmt-ignore
 		[
 			m[0],
 			m[1],
@@ -308,32 +309,17 @@ Luminus.matrix = (() => {
 			m = create4();
 		}
 
+		// deno-fmt-ignore
 		[
-			m[1],
-			m[2],
-			m[3],
-			m[4],
-			m[6],
-			m[7],
-			m[8],
-			m[9],
-			m[11],
-			m[12],
-			m[13],
-			m[14],
+			m[1], m[2], m[3],
+			m[4], m[6], m[7],
+			m[8], m[9], m[11],
+			m[12], m[13], m[14],
 		] = [
-			a[4],
-			a[8],
-			a[12],
-			a[1],
-			a[9],
-			a[13],
-			a[2],
-			a[6],
-			a[14],
-			a[3],
-			a[7],
-			a[11],
+			a[4], a[8], a[12],
+			a[1], a[9], a[13],
+			a[2], a[6], a[14],
+			a[3], a[7], a[11],
 		];
 		return m;
 	}
@@ -360,10 +346,10 @@ Luminus.matrix = (() => {
 			m = new Float32Array(3);
 		}
 
-		const tmp = multiply4(uProjection, uView);
-		inverse4(tmp, tmp);
+		const pv = multiply4(uView, uProjection);
+		inverse4(pv, pv);
 
-		const v = multiply4(tmp, v4);
+		const v = multiply4(pv, v4);
 
 		if(v[3] === 0.0) {
 			return create4();

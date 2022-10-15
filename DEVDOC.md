@@ -57,3 +57,20 @@ TODO: 再度見直す
   * `lu-world` でイベントの補足
   * `lu-world::render()` の実行
     * 他の再描画要請の可能性もあるので描画処理はタイマーを仕掛けている
+
+## 構造について
+
+* Components/
+  * Luminusの基本WebComponents
+    * Modelsを読み込んで描画する
+* Luminus/
+  * Luminusの基盤処理。フレームワーク部分。
+* Models/
+  * Luminusの基本モデル。
+  * 立方体や線の外3Dモデルを読み込むものがある。
+
+### Luminus/
+
+### Models/
+
+### Components/

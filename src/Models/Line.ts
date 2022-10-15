@@ -11,9 +11,8 @@
 
 		constructor() {
 			super();
-			this.position = new Float32Array([10, 10, 10, 0, 0, 0]);
-			//this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
-			this.colors = new Float32Array([1, 1, 1, 1, 1, 0, 0, 1]);
+			this.position = new Float32Array([0, 0, 0, 0, 0, 0]);
+			this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
 		}
 
 		public onprepare(program: LuminusProgram) {

@@ -69,11 +69,15 @@ void main(void) {
 				[world.upx, world.upy, world.upz],
 				this.uView,
 			);
+			//Luminus.matrix.inverse4(this.uView, this.uView);
 			//this.support.gl.viewport();
 
 			// TODO: move Support.
 			gl2.useProgram(this.support.program);
 
+			//const pv = Luminus.matrix.multiply4(this.uProjection,this.uView);
+			//gl2.uniformMatrix4fv(this.support.uniform.uProjection, false, pv);
+			//gl2.uniformMatrix4fv(this.support.uniform.uView, false, Luminus.matrix.identity4());
 			gl2.uniformMatrix4fv(this.support.uniform.uProjection, false, this.uProjection);
 			gl2.uniformMatrix4fv(this.support.uniform.uView, false, this.uView);
 			gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
@@ -92,14 +96,15 @@ void main(void) {
 		public modelRender(model: LuminusModelElement) {
 			const gl2 = this.support.gl;
 
-			const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);
+			/*const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);
 			[
 				this.support.matrix.translation4(model.x, model.y, model.z), // Move
 				r, // Rotate model
 				this.support.matrix.translation4(-model.cx, -model.cy, -model.cz), // Move center
 			].reduce((p, n) => {
-				return this.support.matrix.multiply4(p, n, this.uModel);
-			}, this.support.matrix.identity4());
+				return this.support.matrix.multiply4(n, p, this.uModel);
+			}, this.support.matrix.identity4());*/
+			model.copyMatrix(this.uModel);
 
 			gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
 
@@ -115,13 +120,8 @@ void main(void) {
 		}
 
 		public unProject(viewport: Int32Array, screenX: number, screenY: number, z: number = 1): Float32Array {
-			console.log('-------');
-			console.log(viewport);
-			console.log(this.uProjection);
-			console.log(this.uView);
 			const x = (screenX - viewport[0]) * 2 / viewport[2] - 1;
 			const y = 1 - (screenY - viewport[1]) * 2 / viewport[3];
-			//const y = (screenY - viewport[1]) * 2 / viewport[3] - 1;
 
 			const position = Luminus.matrix.unProject(
 				new Float32Array([x, y, z, 1.0]),

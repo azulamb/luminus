@@ -67,6 +67,17 @@ interface LuminusModelElement extends HTMLElement {
 	/** Rotation z axis */
 	yaw: number;
 	initStyle(): HTMLStyleElement;
+	/**
+	 * Update model matrix.
+	 * @param sync true = sync
+	 */
+	updateMatrix(sync?: boolean): void;
+	/** Get model matrix. */
+	copyMatrix(out: Float32Array): void;
+	/**
+	 * @return Infinity = not collide. Other number = collide.(distance from origin.)
+	 */
+	collisionDetection(cd: CollisionDetection): number;
 	render(program: LuminusProgram): void;
 	rerender(): void;
 }
@@ -115,6 +126,8 @@ interface LuminusModelVoxElement extends LuminusModelElement {
 
 interface CollisionDetection {
 	collisionDetectionTriangles(verts: Float32Array, faces: Uint16Array): number;
+	clone(): CollisionDetection;
+	transform(matrix: Float32Array): this;
 }
 
 interface LuminusModel<T> {
@@ -229,6 +242,8 @@ interface LuminusProgram {
 }
 
 interface LuminusRay extends CollisionDetection {
+	origin: Float32Array;
+	vector: Float32Array;
 	setOrigin(x: number, y: number, z: number): this;
 	setOrigin(origin: Float32Array): this;
 	setVector(x: number, y: number, z: number): this;
@@ -246,12 +261,12 @@ interface Luminus {
 	};
 	loaded: Promise<void>;
 	matrix: Matrix;
+	program: { new (): LuminusProgram };
 	model: { new (...params: any[]): LuminusModelElement };
 	models: {
 		model: { new (...params: any[]): LuminusModel<unknown> };
 		[keys: string]: { new (...params: any[]): LuminusModel<any> };
 	};
-	program: { new (): LuminusProgram };
 	ray: {
 		new (x: number, y: number, z: number, vx: number, vy: number, vz: number): LuminusRay;
 		new (origin: Float32Array, vector: Float32Array): LuminusRay;

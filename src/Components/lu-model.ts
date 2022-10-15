@@ -20,6 +20,8 @@
 	})(
 		class extends HTMLElement implements LuminusModelElement {
 			private _model: LuminusModel<unknown>;
+			protected _matrix: Float32Array;
+			protected _timer: number = 0;
 
 			constructor() {
 				super();
@@ -27,6 +29,8 @@
 				const shadow = this.attachShadow({ mode: 'open' });
 
 				shadow.appendChild(this.initStyle());
+				this._matrix = Luminus.matrix.identity4();
+				this.updateMatrix(true);
 			}
 
 			public initStyle() {
@@ -36,6 +40,38 @@
 				].join('');
 
 				return style;
+			}
+
+			public copyMatrix(out: Float32Array) {
+				out.set(this._matrix);
+			}
+
+			public updateMatrix(sync = false) {
+				if (this._timer) {
+					clearTimeout(this._timer);
+				}
+				if (sync) {
+					return this.onUpdateMatrix();
+				}
+				this._timer = setTimeout(() => {
+					this.onUpdateMatrix();
+				}, 0);
+			}
+
+			protected onUpdateMatrix() {
+				[
+					Luminus.matrix.translation4(this.x, this.y, this.z), // Move
+					Luminus.matrix.rotation4(this.roll + this.xaxis, this.pitch + this.yaxis, this.yaw + this.zaxis), // Rotate model
+					Luminus.matrix.translation4(-this.cx, -this.cy, -this.cz), // Move center
+				].reduce((p, n) => {
+					return Luminus.matrix.multiply4(n, p, this._matrix);
+				}, Luminus.matrix.identity4()); // TODO: change first matrix.
+			}
+
+			public collisionDetection(cd: CollisionDetection) {
+				const tmp = cd.clone();
+				tmp.transform(Luminus.matrix.inverse4(this._matrix));
+				return this.model.collisionDetection(tmp);
 			}
 
 			get model() {
@@ -67,6 +103,7 @@
 			}
 			set cx(value) {
 				this.setAttribute('cx', value + '');
+				this.updateMatrix();
 			}
 
 			get cy() {
@@ -74,6 +111,7 @@
 			}
 			set cy(value) {
 				this.setAttribute('cy', value + '');
+				this.updateMatrix();
 			}
 
 			get cz() {
@@ -81,6 +119,7 @@
 			}
 			set cz(value) {
 				this.setAttribute('cz', value + '');
+				this.updateMatrix();
 			}
 
 			get xaxis() {
@@ -88,6 +127,7 @@
 			}
 			set xaxis(value) {
 				this.setAttribute('xaxis', value + '');
+				this.updateMatrix();
 			}
 
 			get yaxis() {
@@ -95,6 +135,7 @@
 			}
 			set yaxis(value) {
 				this.setAttribute('yaxis', value + '');
+				this.updateMatrix();
 			}
 
 			get zaxis() {
@@ -102,6 +143,7 @@
 			}
 			set zaxis(value) {
 				this.setAttribute('zaxis', value + '');
+				this.updateMatrix();
 			}
 
 			get x() {
@@ -109,6 +151,7 @@
 			}
 			set x(value) {
 				this.setAttribute('x', value + '');
+				this.updateMatrix();
 			}
 
 			get y() {
@@ -116,6 +159,7 @@
 			}
 			set y(value) {
 				this.setAttribute('y', value + '');
+				this.updateMatrix();
 			}
 
 			get z() {
@@ -123,6 +167,7 @@
 			}
 			set z(value) {
 				this.setAttribute('z', value + '');
+				this.updateMatrix();
 			}
 
 			get roll() {
@@ -130,6 +175,7 @@
 			}
 			set roll(value) {
 				this.setAttribute('roll', value + '');
+				this.updateMatrix();
 			}
 
 			get pitch() {
@@ -137,6 +183,7 @@
 			}
 			set pitch(value) {
 				this.setAttribute('pitch', value + '');
+				this.updateMatrix();
 			}
 
 			get yaw() {
@@ -144,6 +191,7 @@
 			}
 			set yaw(value) {
 				this.setAttribute('yaw', value + '');
+				this.updateMatrix();
 			}
 
 			get complete() {

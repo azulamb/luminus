@@ -1,7 +1,7 @@
 (() => {
 	Luminus.ray = class implements LuminusRay {
-		protected origin: Float32Array;
-		protected vector: Float32Array;
+		public origin: Float32Array;
+		public vector: Float32Array;
 
 		constructor(x: number, y: number, z: number, vx: number, vy: number, vz: number);
 		constructor(origin: Float32Array, vector: Float32Array);
@@ -34,7 +34,7 @@
 
 		public setVector(x: number, y: number, z: number): this;
 		public setVector(vector: Float32Array): this;
-		public setVector(x: Float32Array | number, y?: number, z?: number): this {
+		setVector(x: Float32Array | number, y?: number, z?: number): this {
 			if (typeof x === 'number') {
 				this.vector[0] = <number> x;
 				this.vector[1] = <number> y;
@@ -45,6 +45,32 @@
 				this.vector[2] = <number> x[2];
 			}
 			Luminus.matrix.normalize3(this.vector, this.vector);
+			return this;
+		}
+
+		public clone() {
+			return new Luminus.ray(this.origin, this.vector);
+		}
+
+		public transform(matrix: Float32Array) {
+			const start = new Float32Array([...this.origin, 1.0]);
+			const end = new Float32Array([
+				this.origin[0] + this.vector[0],
+				this.origin[1] + this.vector[1],
+				this.origin[2] + this.vector[2],
+				1.0,
+			]);
+
+			Luminus.matrix.multiply4(matrix, start, start);
+			Luminus.matrix.multiply4(matrix, end, end);
+
+			this.setOrigin(start);
+			this.setVector(
+				end[0] - start[0],
+				end[1] - start[1],
+				end[2] - start[2],
+			);
+
 			return this;
 		}
 
