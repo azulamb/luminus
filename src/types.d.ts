@@ -175,6 +175,7 @@ interface LuminusModelAxis extends LuminusModel<void> {
 }
 
 interface LuminusModelCube extends LuminusModel<void> {
+	length: number;
 	color: Float32Array;
 }
 

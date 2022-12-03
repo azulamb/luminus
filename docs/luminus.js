@@ -768,7 +768,6 @@ Luminus.matrix = (() => {
             ].reduce((p, n) => {
                 return Luminus.matrix.multiply4(n, p, this.matrix);
             }, Luminus.matrix.identity4());
-            console.log(this.matrix);
         }
     };
 })();
@@ -836,18 +835,27 @@ Luminus.matrix = (() => {
             super(...arguments);
             this.loaded = true;
             this.color = new Float32Array(4);
+            this._length = 1;
+        }
+        get length() {
+            return this._length;
+        }
+        set length(value) {
+            this._length = value;
+            this._change = true;
         }
         onprepare(program) {
             Luminus.console.info('Start: cube-prepare.');
+            const l = this._length;
             this.verts = new Float32Array([
-                0, 0, 1, 1, 0, 1, 1, 1, 1,
-                0, 1, 1, 0, 0, 0, 0, 1, 0,
-                1, 1, 0, 1, 0, 0, 0, 1, 0,
-                0, 1, 1, 1, 1, 1, 1, 1, 0,
-                0, 0, 0, 1, 0, 0, 1, 0, 1,
-                0, 0, 1, 1, 0, 0, 1, 1, 0,
-                1, 1, 1, 1, 0, 1, 0, 0, 0,
-                0, 0, 1, 0, 1, 1, 0, 1, 0,
+                0, 0, l, l, 0, l, l, l, l,
+                0, l, l, 0, 0, 0, 0, l, 0,
+                l, l, 0, l, 0, 0, 0, l, 0,
+                0, l, l, l, l, l, l, l, 0,
+                0, 0, 0, l, 0, 0, l, 0, l,
+                0, 0, l, l, 0, 0, l, l, 0,
+                l, l, l, l, 0, l, 0, 0, 0,
+                0, 0, l, 0, l, l, 0, l, 0,
             ]);
             const colors = new Float32Array([...Array(this.verts.length / 3 * 4)]);
             for (let i = 0; i < colors.length; i += 4) {
@@ -899,10 +907,14 @@ Luminus.matrix = (() => {
             gl2.bufferData(gl2.ELEMENT_ARRAY_BUFFER, this.faces, gl2.STATIC_DRAW);
             gl2.bindVertexArray(null);
             this.vao = vao;
+            this._change = false;
             return Promise.resolve();
         }
         onrender(program) {
             const gl2 = program.support.gl;
+            if (this._change) {
+                this.prepare(program);
+            }
             gl2.bindVertexArray(this.vao);
             gl2.drawElements(gl2.TRIANGLES, 36, gl2.UNSIGNED_SHORT, 0);
             gl2.bindVertexArray(null);

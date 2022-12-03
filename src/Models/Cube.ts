@@ -1,27 +1,38 @@
 (() => {
-	class Cube extends Luminus.models.model implements LuminusModel<Response> {
+	class Cube extends Luminus.models.model implements LuminusModelCube {
 		public loaded?: boolean = true;
 		public complete?: boolean;
 		public color: Float32Array = new Float32Array(4);
 		protected verts: Float32Array;
 		protected faces: Uint16Array;
+		private _length: number = 1;
+		private _change: boolean;
 
 		protected vao: WebGLVertexArrayObject;
+
+		get length() {
+			return this._length;
+		}
+		set length(value) {
+			this._length = value;
+			this._change = true;
+		}
 
 		public onprepare(program: LuminusProgram) {
 			Luminus.console.info('Start: cube-prepare.');
 
+			const l = this._length;
 			// deno-fmt-ignore
 			this.verts = new Float32Array(
 				[
-					0, 0, 1, 1, 0, 1, 1, 1, 1,
-					0, 1, 1, 0, 0, 0, 0, 1, 0,
-					1, 1, 0, 1, 0, 0, 0, 1, 0,
-					0, 1, 1, 1, 1, 1, 1, 1, 0,
-					0, 0, 0, 1, 0, 0, 1, 0, 1,
-					0, 0, 1, 1, 0, 0, 1, 1, 0,
-					1, 1, 1, 1, 0, 1, 0, 0, 0,
-					0, 0, 1, 0, 1, 1, 0, 1, 0,
+					0, 0, l, l, 0, l, l, l, l,
+					0, l, l, 0, 0, 0, 0, l, 0,
+					l, l, 0, l, 0, 0, 0, l, 0,
+					0, l, l, l, l, l, l, l, 0,
+					0, 0, 0, l, 0, 0, l, 0, l,
+					0, 0, l, l, 0, 0, l, l, 0,
+					l, l, l, l, 0, l, 0, 0, 0,
+					0, 0, l, 0, l, l, 0, l, 0,
 				],
 			);
 
@@ -94,11 +105,17 @@
 
 			this.vao = vao;
 
+			this._change = false;
+
 			return Promise.resolve();
 		}
 
 		public onrender(program: LuminusProgram) {
 			const gl2 = program.support.gl;
+
+			if (this._change) {
+				this.prepare(program);
+			}
 
 			gl2.bindVertexArray(this.vao);
 			gl2.drawElements(gl2.TRIANGLES, 36, gl2.UNSIGNED_SHORT, 0);

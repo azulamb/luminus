@@ -45,11 +45,11 @@
 			}
 
 			get length() {
-				return (<LuminusModelAxis> this.model).length;
+				return (<LuminusModelCube> this.model).length;
 			}
 			set length(value) {
 				const length = typeof value === 'number' ? value : parseFloat(value);
-				(<LuminusModelAxis> this.model).length = length;
+				(<LuminusModelCube> this.model).length = length;
 				this.setAttribute('length', length + '');
 				this.rerender();
 			}
