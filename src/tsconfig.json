@@ -10,7 +10,7 @@
 	},
 	"include": [
 		"./index.ts",
-		"./State/*.ts",
+		"./States/*.ts",
 		"./Models/*.ts",
 		"./Components/*.ts"
 	]

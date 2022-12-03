@@ -62,15 +62,27 @@ TODO: 再度見直す
 
 * Components/
   * Luminusの基本WebComponents
-    * Modelsを読み込んで描画する
+    * Modelsを読み込む
+    * Stateを管理する
+    * ModelとStateを使って描画する
 * Luminus/
-  * Luminusの基盤処理。フレームワーク部分。
+  * Luminusの基盤処理（フレームワーク部分）
 * Models/
-  * Luminusの基本モデル。
-  * 立方体や線の外3Dモデルを読み込むものがある。
+  * Luminusの基本モデル
+  * 立方体や線の外3Dモデルを読み込むものがある
+* States/
+  * Luminusのモデルのステータス
+  * モデル用の行列を管理する
+    * 最終結果の行列
+    * その行列を操作するパラメーター
 
 ### Luminus/
 
 ### Models/
 
+### States/
+
 ### Components/
+
+コンポーネントは基本的にUIであり重要なのはModelとStateを紐づけること。
+操作はModelの読み込みやStateの値操作となる。

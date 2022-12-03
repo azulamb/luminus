@@ -5,4 +5,4 @@
 /// <reference path="./Luminus/Support.ts" />
 /// <reference path="./Luminus/Ray.ts" />
 /// <reference path="./Models/Model.ts" />
-/// <reference path="./State/State.ts" />
+/// <reference path="./States/State.ts" />
