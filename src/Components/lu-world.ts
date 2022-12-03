@@ -52,6 +52,7 @@
 
 				const contents = document.createElement('div');
 				contents.appendChild(this.canvas);
+				contents.appendChild(document.createElement('slot'));
 
 				shadow.appendChild(style);
 				shadow.appendChild(contents);

@@ -10,6 +10,7 @@
         matrix: null,
         model: null,
         models: {},
+        states: {},
         program: null,
         createSupport: () => {
             return null;
@@ -324,22 +325,10 @@ Luminus.matrix = (() => {
         }
         const id = 1.0 / d;
         [
-            m[0],
-            m[1],
-            m[2],
-            m[3],
-            m[4],
-            m[5],
-            m[6],
-            m[7],
-            m[8],
-            m[9],
-            m[10],
-            m[11],
-            m[12],
-            m[13],
-            m[14],
-            m[15],
+            m[0], m[1], m[2], m[3],
+            m[4], m[5], m[6], m[7],
+            m[8], m[9], m[10], m[11],
+            m[12], m[13], m[14], m[15],
         ] = [
             id * (a[5] * a[10] * a[15] + a[6] * a[11] * a[13] + a[7] * a[9] * a[14] - a[5] * a[11] * a[14] - a[6] * a[9] * a[15] - a[7] * a[10] * a[13]),
             id * (a[1] * a[11] * a[14] + a[2] * a[9] * a[15] + a[3] * a[10] * a[13] - a[1] * a[10] * a[15] - a[2] * a[11] * a[13] - a[3] * a[9] * a[14]),
@@ -405,7 +394,6 @@ Luminus.matrix = (() => {
         m[2] = v[2] / v[3];
         return m;
     }
-    ;
     return {
         create4: create4,
         identity4: identity4,
@@ -700,208 +688,8 @@ Luminus.matrix = (() => {
         }
     };
 })();
-((script, init) => {
-    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
-        init(script);
-    });
-})(document.currentScript, (script) => {
-    ((component, prefix = 'lu') => {
-        const tagname = prefix + '-axis';
-        if (customElements.get(tagname)) {
-            return;
-        }
-        customElements.define(tagname, component);
-    })(class extends Luminus.model {
-        constructor() {
-            super();
-            const model = new Luminus.models.axis();
-            this.model = model;
-            setTimeout(() => {
-                if (this.hasAttribute('length')) {
-                    model.length = this.length;
-                }
-                else {
-                    this.length = model.length;
-                }
-            }, 0);
-        }
-        get length() {
-            return this.model.length;
-        }
-        set length(value) {
-            const length = typeof value === 'number' ? value : parseFloat(value);
-            this.model.length = length;
-            this.setAttribute('length', length + '');
-            this.rerender();
-        }
-        static get observedAttributes() {
-            return ['length'];
-        }
-        attributeChangedCallback(attrName, oldVal, newVal) {
-            if (oldVal === newVal) {
-                return;
-            }
-            this.length = newVal;
-        }
-    }, script.dataset.prefix);
-});
-((script, init) => {
-    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
-        init(script);
-    });
-})(document.currentScript, (script) => {
-    ((component, prefix = 'lu') => {
-        const tagname = prefix + '-cube';
-        if (customElements.get(tagname)) {
-            return;
-        }
-        customElements.define(tagname, component);
-    })(class extends Luminus.model {
-        constructor() {
-            super();
-            const model = new Luminus.models.cube();
-            const color = this.color;
-            model.color[0] = color[0];
-            model.color[1] = color[1];
-            model.color[2] = color[2];
-            model.color[3] = color[3];
-            model.load();
-            this.model = model;
-        }
-        initStyle() {
-            const style = document.createElement('style');
-            style.innerHTML = [
-                ':host { display: none; color: #99ccfd; }',
-            ].join('');
-            return style;
-        }
-        get color() {
-            return (window.getComputedStyle(this, '').color
-                .replace(/\s/g, '')
-                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
-                .slice(0, 4)
-                .map((v, i) => {
-                return i === 3 ? parseFloat(v) : parseInt(v) / 255.0;
-            });
-        }
-        get length() {
-            return this.model.length;
-        }
-        set length(value) {
-            const length = typeof value === 'number' ? value : parseFloat(value);
-            this.model.length = length;
-            this.setAttribute('length', length + '');
-            this.rerender();
-        }
-        static get observedAttributes() {
-            return ['length'];
-        }
-        attributeChangedCallback(attrName, oldVal, newVal) {
-            if (oldVal === newVal) {
-                return;
-            }
-            this.length = newVal;
-        }
-    }, script.dataset.prefix);
-});
-((script, init) => {
-    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
-        init(script);
-    });
-})(document.currentScript, (script) => {
-    ((component, prefix = 'lu') => {
-        const tagname = prefix + '-line';
-        if (customElements.get(tagname)) {
-            return;
-        }
-        customElements.define(tagname, component);
-    })(class extends Luminus.model {
-        constructor() {
-            super();
-            const model = new Luminus.models.line();
-            this.model = model;
-            this.updatePosition();
-        }
-        updatePosition() {
-            if (this._updatePosition) {
-                clearTimeout(this._updatePosition);
-            }
-            this._updatePosition = setTimeout(() => {
-                this.model.start(this.sx, this.sy, this.sz).end(this.ex, this.ey, this.ez);
-                this._updatePosition = 0;
-                this.rerender();
-            }, 0);
-        }
-        get sx() {
-            return parseFloat(this.getAttribute('sx') || '') || 0;
-        }
-        set sx(value) {
-            const n = typeof value === 'number' ? value : parseFloat(value);
-            this.setAttribute('sx', n + '');
-        }
-        get sy() {
-            return parseFloat(this.getAttribute('sy') || '') || 0;
-        }
-        set sy(value) {
-            const n = typeof value === 'number' ? value : parseFloat(value);
-            this.setAttribute('sy', n + '');
-        }
-        get sz() {
-            return parseFloat(this.getAttribute('sz') || '') || 0;
-        }
-        set sz(value) {
-            const n = typeof value === 'number' ? value : parseFloat(value);
-            this.setAttribute('sz', n + '');
-        }
-        get ex() {
-            return parseFloat(this.getAttribute('ex') || '') || 0;
-        }
-        set ex(value) {
-            const n = typeof value === 'number' ? value : parseFloat(value);
-            this.setAttribute('ex', n + '');
-        }
-        get ey() {
-            return parseFloat(this.getAttribute('ey') || '') || 0;
-        }
-        set ey(value) {
-            const n = typeof value === 'number' ? value : parseFloat(value);
-            this.setAttribute('ey', n + '');
-        }
-        get ez() {
-            return parseFloat(this.getAttribute('ez') || '') || 0;
-        }
-        set ez(value) {
-            const n = typeof value === 'number' ? value : parseFloat(value);
-            this.setAttribute('ez', n + '');
-        }
-        start(x, y, z) {
-            this.sx = x;
-            this.sy = y;
-            this.sz = z;
-            return this;
-        }
-        end(x, y, z) {
-            this.ex = x;
-            this.ey = y;
-            this.ez = z;
-            return this;
-        }
-        color(r0, g0, b0, a0, r1, g1, b1, a1) {
-            return this;
-        }
-        static get observedAttributes() {
-            return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
-        }
-        attributeChangedCallback(attrName, oldVal, newVal) {
-            if (oldVal === newVal) {
-                return;
-            }
-            this.updatePosition();
-        }
-    }, script.dataset.prefix);
-});
 (() => {
-    class Model {
+    Luminus.models.model = class Model {
         load(p) {
             this.loaded = false;
             this.complete = undefined;
@@ -943,565 +731,49 @@ Luminus.matrix = (() => {
         collisionDetection(cd) {
             return Infinity;
         }
-    }
-    Luminus.models.model = Model;
+    };
 })();
-((script, init) => {
-    if (document.readyState !== 'loading') {
-        return init(script);
-    }
-    document.addEventListener('DOMContentLoaded', () => {
-        init(script);
-    });
-})(document.currentScript, (script) => {
-    ((component, prefix = 'lu') => {
-        const tagname = prefix + '-model';
-        if (customElements.get(tagname)) {
-            return;
+(() => {
+    Luminus.states.state = class State {
+        constructor() {
+            this.x = 0;
+            this.y = 0;
+            this.z = 0;
+            this.matrix = Luminus.matrix.identity4();
         }
-        customElements.define(tagname, component);
-        customElements.whenDefined(tagname).then(() => {
-            Luminus.model = (customElements.get(tagname));
-        });
-    })(class extends HTMLElement {
+        update() {
+            Luminus.matrix.translation4(this.x, this.y, this.z, this.matrix);
+        }
+    };
+})();
+(() => {
+    Luminus.states.axisRotate = class AxisRotate extends Luminus.states.state {
         constructor() {
             super();
-            this._timer = 0;
-            const shadow = this.attachShadow({ mode: 'open' });
-            shadow.appendChild(this.initStyle());
-            this._matrix = Luminus.matrix.identity4();
-            this.updateMatrix(true);
+            this.cx = 0;
+            this.cy = 0;
+            this.cz = 0;
+            this.xaxis = 0;
+            this.yaxis = 0;
+            this.zaxis = 0;
+            this.roll = 0;
+            this.pitch = 0;
+            this.yaw = 0;
         }
-        initStyle() {
-            const style = document.createElement('style');
-            style.innerHTML = [
-                ':host { display: none; }',
-            ].join('');
-            return style;
-        }
-        copyMatrix(out) {
-            out.set(this._matrix);
-        }
-        updateMatrix(sync = false) {
-            if (this._timer) {
-                clearTimeout(this._timer);
-            }
-            if (sync) {
-                return this.onUpdateMatrix();
-            }
-            this._timer = setTimeout(() => {
-                this.onUpdateMatrix();
-            }, 0);
-        }
-        onUpdateMatrix() {
+        update() {
             [
                 Luminus.matrix.translation4(this.x, this.y, this.z),
                 Luminus.matrix.rotation4(this.roll + this.xaxis, this.pitch + this.yaxis, this.yaw + this.zaxis),
                 Luminus.matrix.translation4(-this.cx, -this.cy, -this.cz),
             ].reduce((p, n) => {
-                return Luminus.matrix.multiply4(n, p, this._matrix);
+                return Luminus.matrix.multiply4(n, p, this.matrix);
             }, Luminus.matrix.identity4());
+            console.log(this.matrix);
         }
-        collisionDetection(cd) {
-            const tmp = cd.clone();
-            tmp.transform(Luminus.matrix.inverse4(this._matrix));
-            return this.model.collisionDetection(tmp);
-        }
-        get model() {
-            return this._model;
-        }
-        set model(model) {
-            this._model = model;
-            model.afterload = () => {
-                const program = this.program;
-                if (program) {
-                    model.prepare(program);
-                }
-            };
-        }
-        get selectable() {
-            return this.hasAttribute('selectable');
-        }
-        set selectable(value) {
-            if (!value) {
-                this.removeAttribute('selectable');
-            }
-            else {
-                this.setAttribute('selectable', '');
-            }
-        }
-        get cx() {
-            return parseFloat(this.getAttribute('cx') || '0') || 0;
-        }
-        set cx(value) {
-            this.setAttribute('cx', value + '');
-            this.updateMatrix();
-        }
-        get cy() {
-            return parseFloat(this.getAttribute('cy') || '0') || 0;
-        }
-        set cy(value) {
-            this.setAttribute('cy', value + '');
-            this.updateMatrix();
-        }
-        get cz() {
-            return parseFloat(this.getAttribute('cz') || '0') || 0;
-        }
-        set cz(value) {
-            this.setAttribute('cz', value + '');
-            this.updateMatrix();
-        }
-        get xaxis() {
-            return parseFloat(this.getAttribute('xaxis') || '0') || 0;
-        }
-        set xaxis(value) {
-            this.setAttribute('xaxis', value + '');
-            this.updateMatrix();
-        }
-        get yaxis() {
-            return parseFloat(this.getAttribute('yaxis') || '0') || 0;
-        }
-        set yaxis(value) {
-            this.setAttribute('yaxis', value + '');
-            this.updateMatrix();
-        }
-        get zaxis() {
-            return parseFloat(this.getAttribute('zaxis') || '0') || 0;
-        }
-        set zaxis(value) {
-            this.setAttribute('zaxis', value + '');
-            this.updateMatrix();
-        }
-        get x() {
-            return parseFloat(this.getAttribute('x') || '0') || 0;
-        }
-        set x(value) {
-            this.setAttribute('x', value + '');
-            this.updateMatrix();
-        }
-        get y() {
-            return parseFloat(this.getAttribute('y') || '0') || 0;
-        }
-        set y(value) {
-            this.setAttribute('y', value + '');
-            this.updateMatrix();
-        }
-        get z() {
-            return parseFloat(this.getAttribute('z') || '0') || 0;
-        }
-        set z(value) {
-            this.setAttribute('z', value + '');
-            this.updateMatrix();
-        }
-        get roll() {
-            return parseFloat(this.getAttribute('roll') || '0') || 0;
-        }
-        set roll(value) {
-            this.setAttribute('roll', value + '');
-            this.updateMatrix();
-        }
-        get pitch() {
-            return parseFloat(this.getAttribute('pitch') || '0') || 0;
-        }
-        set pitch(value) {
-            this.setAttribute('pitch', value + '');
-            this.updateMatrix();
-        }
-        get yaw() {
-            return parseFloat(this.getAttribute('yaw') || '0') || 0;
-        }
-        set yaw(value) {
-            this.setAttribute('yaw', value + '');
-            this.updateMatrix();
-        }
-        get complete() {
-            return this.model && this.model.complete === true;
-        }
-        get program() {
-            var _a;
-            return (_a = this.parentElement) === null || _a === void 0 ? void 0 : _a.program;
-        }
-        render(program) {
-            this.model.render(program);
-        }
-        rerender() {
-            this.dispatchEvent(new CustomEvent('render'));
-        }
-    }, script.dataset.prefix);
-});
-((script, init) => {
-    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
-        init(script);
-    });
-})(document.currentScript, (script) => {
-    ((component, prefix = 'lu') => {
-        const tagname = prefix + '-vox';
-        if (customElements.get(tagname)) {
-            return;
-        }
-        customElements.define(tagname, component);
-    })(class extends Luminus.model {
-        constructor() {
-            super();
-            const model = new Luminus.models.vox();
-            model.afterload = () => {
-                this.rerender();
-            };
-            this.model = model;
-            if (this.src) {
-                this.load();
-            }
-        }
-        get src() {
-            return this.getAttribute('src') || '';
-        }
-        set src(value) {
-            const old = this.src;
-            if (old === value) {
-                return;
-            }
-            this.setAttribute('src', value);
-            this.load();
-        }
-        load(init) {
-            const url = this.src;
-            if (!url) {
-                return;
-            }
-            this.model.load(fetch(url, init)).then(() => {
-                this.rerender();
-            });
-        }
-        import(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const data = reader.result;
-                    const response = new Response(data);
-                    this.model.load(Promise.resolve(response)).then(() => {
-                        this.rerender();
-                        resolve();
-                    });
-                };
-                reader.onerror = reject;
-                reader.onabort = reject;
-                reader.readAsArrayBuffer(file);
-            }).then(() => {
-                return this;
-            });
-        }
-        export() {
-            return this.model.export();
-        }
-        static get observedAttributes() {
-            return ['src'];
-        }
-        attributeChangedCallback(attrName, oldVal, newVal) {
-            if (oldVal === newVal) {
-                return;
-            }
-        }
-    }, script.dataset.prefix);
-});
-((script, init) => {
-    customElements.whenDefined((script.dataset.prefix || 'lu') + '-model').then(() => {
-        init(script);
-    });
-})(document.currentScript, (script) => {
-    ((component, prefix = 'lu') => {
-        const tagname = prefix + '-world';
-        if (customElements.get(tagname)) {
-            return;
-        }
-        customElements.define(tagname, component);
-    })(class extends HTMLElement {
-        constructor() {
-            super();
-            this._complete = false;
-            const shadow = this.attachShadow({ mode: 'open' });
-            const style = document.createElement('style');
-            style.innerHTML = [
-                ':host { display: block; background: black; --light: white; --ambient: rgba( 255, 255, 255, 0 ); }',
-                'canvas { display: block; width: 100%; height: 100%; }',
-            ].join('');
-            this.canvas = document.createElement('canvas');
-            this.canvas.addEventListener('click', (event) => {
-                this.searchSelectedModels(event.offsetX, event.offsetY);
-            });
-            this.width = (this.hasAttribute('width') ? (parseInt(this.getAttribute('width') || '')) : 0) || 400;
-            this.height = (this.hasAttribute('height') ? (parseInt(this.getAttribute('height') || '')) : 0) || 400;
-            const contents = document.createElement('div');
-            contents.appendChild(this.canvas);
-            shadow.appendChild(style);
-            shadow.appendChild(contents);
-            this.init().then(() => {
-                this.render();
-            });
-            (() => {
-                let timer;
-                this.addEventListener('render', (event) => {
-                    if (timer) {
-                        clearTimeout(timer);
-                    }
-                    timer = setTimeout(() => {
-                        this.render();
-                        timer = 0;
-                    }, 0);
-                }, true);
-            })();
-        }
-        createEvent() {
-            const data = {
-                next: true,
-                event: new CustomEvent('select', {
-                    cancelable: true,
-                }),
-            };
-            data.event.stopPropagation = () => {
-                data.next = false;
-            };
-            return data;
-        }
-        searchSelectedModels(screenX, screenY) {
-            const viewport = this.program.support.getViewport();
-            const origin = this.program.unProject(viewport, screenX, screenY, -1);
-            const position = this.program.unProject(viewport, screenX, screenY, 1);
-            const vector = new Float32Array([
-                position[0] - origin[0],
-                position[1] - origin[1],
-                position[2] - origin[2],
-            ]);
-            const line = document.getElementById('line');
-            line.sx = origin[0];
-            line.sy = origin[1];
-            line.sz = origin[2];
-            line.ex = position[0];
-            line.ey = position[1];
-            line.ez = position[2];
-            const ray = new Luminus.ray(origin, vector);
-            const list = [];
-            for (const child of this.querySelectorAll('[selectable]')) {
-                const model = child;
-                if (!(model instanceof Luminus.model)) {
-                    continue;
-                }
-                const distance = model.collisionDetection(ray);
-                console.log(distance);
-                if (isFinite(distance)) {
-                    list.push({ distance: distance, model: model });
-                }
-            }
-            if (list.length <= 0) {
-                return;
-            }
-            list.sort((a, b) => {
-                return a.distance - b.distance;
-            });
-            const event = this.createEvent();
-            for (const data of list) {
-                console.log('dispatch', data);
-                data.model.dispatchEvent(event.event);
-                if (!event.next) {
-                    continue;
-                }
-            }
-        }
-        get complete() {
-            return this._complete;
-        }
-        get program() {
-            return this.lProgram;
-        }
-        get width() {
-            return this.canvas.width;
-        }
-        set width(value) {
-            this.canvas.width = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0);
-        }
-        get height() {
-            return this.canvas.height;
-        }
-        set height(value) {
-            this.canvas.height = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0);
-        }
-        get top() {
-            return parseFloat(this.getAttribute('top') || '') || 0;
-        }
-        set top(value) {
-            this.setAttribute('top', value + '');
-        }
-        get bottom() {
-            return parseFloat(this.getAttribute('bottom') || '') || 0;
-        }
-        set bottom(value) {
-            this.setAttribute('bottom', value + '');
-        }
-        get left() {
-            return parseFloat(this.getAttribute('left') || '') || 0;
-        }
-        set left(value) {
-            this.setAttribute('left', value + '');
-        }
-        get right() {
-            return parseFloat(this.getAttribute('right') || '') || 0;
-        }
-        set right(value) {
-            this.setAttribute('right', value + '');
-        }
-        get near() {
-            return parseFloat(this.getAttribute('near') || '') || 0;
-        }
-        set near(value) {
-            this.setAttribute('near', value + '');
-        }
-        get far() {
-            return parseFloat(this.getAttribute('far') || '') || 0;
-        }
-        set far(value) {
-            this.setAttribute('far', value + '');
-        }
-        get view() {
-            return this.getAttribute('view') === 'volume' ? 'volume' : 'frustum';
-        }
-        set view(value) {
-            this.setAttribute('view', value === 'volume' ? 'volume' : 'frustum');
-        }
-        get eyex() {
-            return parseFloat(this.getAttribute('eyex') || '') || 0;
-        }
-        set eyex(value) {
-            this.setAttribute('eyex', value + '');
-        }
-        get eyey() {
-            return parseFloat(this.getAttribute('eyey') || '') || 0;
-        }
-        set eyey(value) {
-            this.setAttribute('eyey', value + '');
-        }
-        get eyez() {
-            return parseFloat(this.getAttribute('eyez') || '') || 0;
-        }
-        set eyez(value) {
-            this.setAttribute('eyez', value + '');
-        }
-        get upx() {
-            return parseFloat(this.getAttribute('upx') || '') || 0;
-        }
-        set upx(value) {
-            this.setAttribute('upx', value + '');
-        }
-        get upy() {
-            return parseFloat(this.getAttribute('upy') || '') || 0;
-        }
-        set upy(value) {
-            this.setAttribute('upy', value + '');
-        }
-        get upz() {
-            return parseFloat(this.getAttribute('upz') || '') || 0;
-        }
-        set upz(value) {
-            this.setAttribute('upz', value + '');
-        }
-        get centerx() {
-            return parseFloat(this.getAttribute('centerx') || '') || 0;
-        }
-        set centerx(value) {
-            this.setAttribute('centerx', value + '');
-        }
-        get centery() {
-            return parseFloat(this.getAttribute('centery') || '') || 0;
-        }
-        set centery(value) {
-            this.setAttribute('centery', value + '');
-        }
-        get centerz() {
-            return parseFloat(this.getAttribute('centerz') || '') || 0;
-        }
-        set centerz(value) {
-            this.setAttribute('centerz', value + '');
-        }
-        get lightx() {
-            return parseFloat(this.getAttribute('lightx') || '') || 0;
-        }
-        set lightx(value) {
-            this.setAttribute('lightx', value + '');
-        }
-        get lighty() {
-            return parseFloat(this.getAttribute('lighty') || '') || 0;
-        }
-        set lighty(value) {
-            this.setAttribute('lighty', value + '');
-        }
-        get lightz() {
-            return parseFloat(this.getAttribute('lightz') || '') || 0;
-        }
-        set lightz(value) {
-            this.setAttribute('lightz', value + '');
-        }
-        async init(program) {
-            Luminus.console.info('Start: init lu-world.');
-            this._complete = false;
-            this.lProgram = null;
-            if (!program) {
-                program = new Luminus.program();
-            }
-            const support = Luminus.createSupport(this.canvas.getContext('webgl2'));
-            await program.init(this, support);
-            this.lProgram = !program ? new Luminus.program() : program;
-            this._complete = true;
-        }
-        render() {
-            if (!this.complete) {
-                return;
-            }
-            Luminus.console.info('Render:');
-            this.program.beginRender(this);
-            for (const model of this.children) {
-                if (model instanceof Luminus.model) {
-                    this.program.modelRender(model);
-                }
-            }
-            this.program.endRender();
-        }
-        get ambientColor() {
-            return (window.getComputedStyle(this, '').getPropertyValue('--ambient')
-                .replace(/\s/g, '')
-                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
-                .slice(0, 4)
-                .map((v, i, a) => {
-                return parseInt(v) / 255.0 * parseFloat(a[3]);
-            })
-                .slice(0, 3);
-        }
-        get lightColor() {
-            return (window.getComputedStyle(this, '').getPropertyValue('--light')
-                .replace(/\s/g, '')
-                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
-                .slice(0, 3)
-                .map((v) => {
-                return parseInt(v) / 255.0;
-            });
-        }
-        static get observedAttributes() {
-            return ['width', 'height'];
-        }
-        attributeChangedCallback(attrName, oldVal, newVal) {
-            if (oldVal === newVal) {
-                return;
-            }
-            switch (attrName) {
-                case 'width':
-                    this.width = newVal;
-                    break;
-                case 'height':
-                    this.height = newVal;
-                    break;
-            }
-        }
-    }, script.dataset.prefix);
-});
+    };
+})();
 (() => {
-    class Axis extends Luminus.models.model {
+    Luminus.models.axis = class Axis extends Luminus.models.model {
         constructor() {
             super();
             this.lMin = 1;
@@ -1527,54 +799,18 @@ Luminus.matrix = (() => {
             const positionBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
-                0,
-                0,
-                0,
-                length,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                length,
-                0,
-                0,
-                0,
-                0,
-                0,
-                0,
-                length,
+                0, 0, 0, length, 0, 0,
+                0, 0, 0, 0, length, 0,
+                0, 0, 0, 0, 0, length,
             ]), gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.in.vPosition);
             gl2.vertexAttribPointer(support.in.vPosition, 3, gl2.FLOAT, false, 0, 0);
             const colorBuffer = gl2.createBuffer();
             gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
             gl2.bufferData(gl2.ARRAY_BUFFER, new Float32Array([
-                1,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                1,
-                0,
-                1,
-                0,
-                1,
-                0,
-                1,
-                0,
-                1,
-                0,
-                0,
-                1,
-                1,
-                0,
-                0,
-                1,
-                1,
+                1, 0, 0, 1, 1, 0, 0, 1,
+                0, 1, 0, 1, 0, 1, 0, 1,
+                0, 0, 1, 1, 0, 0, 1, 1,
             ]), gl2.STATIC_DRAW);
             gl2.enableVertexAttribArray(support.in.vColor);
             gl2.vertexAttribPointer(support.in.vColor, 4, gl2.FLOAT, false, 0, 0);
@@ -1592,8 +828,7 @@ Luminus.matrix = (() => {
             gl2.drawArrays(gl2.LINES, 0, 6);
             gl2.bindVertexArray(null);
         }
-    }
-    Luminus.models.axis = Axis;
+    };
 })();
 (() => {
     class Cube extends Luminus.models.model {
@@ -2112,3 +1347,770 @@ Luminus.matrix = (() => {
     }
     Luminus.models.vox = Vox;
 })();
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-axis';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends Luminus.model {
+        constructor() {
+            super();
+            const model = new Luminus.models.axis();
+            this.model = model;
+            setTimeout(() => {
+                if (this.hasAttribute('length')) {
+                    model.length = this.length;
+                }
+                else {
+                    this.length = model.length;
+                }
+            }, 0);
+        }
+        get length() {
+            return this.model.length;
+        }
+        set length(value) {
+            const length = typeof value === 'number' ? value : parseFloat(value);
+            this.model.length = length;
+            this.setAttribute('length', length + '');
+            this.rerender();
+        }
+        static get observedAttributes() {
+            return ['length'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            this.length = newVal;
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-cube';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends Luminus.model {
+        constructor() {
+            super();
+            const model = new Luminus.models.cube();
+            const color = this.color;
+            model.color[0] = color[0];
+            model.color[1] = color[1];
+            model.color[2] = color[2];
+            model.color[3] = color[3];
+            model.load();
+            this.model = model;
+        }
+        initStyle() {
+            const style = document.createElement('style');
+            style.innerHTML = [
+                ':host { display: block; color: #99ccfd; }',
+            ].join('');
+            return style;
+        }
+        get color() {
+            return (window.getComputedStyle(this, '').color
+                .replace(/\s/g, '')
+                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
+                .slice(0, 4)
+                .map((v, i) => {
+                return i === 3 ? parseFloat(v) : parseInt(v) / 255.0;
+            });
+        }
+        get length() {
+            return this.model.length;
+        }
+        set length(value) {
+            const length = typeof value === 'number' ? value : parseFloat(value);
+            this.model.length = length;
+            this.setAttribute('length', length + '');
+            this.rerender();
+        }
+        static get observedAttributes() {
+            return ['length'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            this.length = newVal;
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-line';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends Luminus.model {
+        constructor() {
+            super();
+            const model = new Luminus.models.line();
+            this.model = model;
+            this.updatePosition();
+        }
+        updatePosition() {
+            if (this._updatePosition) {
+                clearTimeout(this._updatePosition);
+            }
+            this._updatePosition = setTimeout(() => {
+                this.model.start(this.sx, this.sy, this.sz).end(this.ex, this.ey, this.ez);
+                this._updatePosition = 0;
+                this.rerender();
+            }, 0);
+        }
+        get sx() {
+            return parseFloat(this.getAttribute('sx') || '') || 0;
+        }
+        set sx(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('sx', n + '');
+        }
+        get sy() {
+            return parseFloat(this.getAttribute('sy') || '') || 0;
+        }
+        set sy(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('sy', n + '');
+        }
+        get sz() {
+            return parseFloat(this.getAttribute('sz') || '') || 0;
+        }
+        set sz(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('sz', n + '');
+        }
+        get ex() {
+            return parseFloat(this.getAttribute('ex') || '') || 0;
+        }
+        set ex(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('ex', n + '');
+        }
+        get ey() {
+            return parseFloat(this.getAttribute('ey') || '') || 0;
+        }
+        set ey(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('ey', n + '');
+        }
+        get ez() {
+            return parseFloat(this.getAttribute('ez') || '') || 0;
+        }
+        set ez(value) {
+            const n = typeof value === 'number' ? value : parseFloat(value);
+            this.setAttribute('ez', n + '');
+        }
+        start(x, y, z) {
+            this.sx = x;
+            this.sy = y;
+            this.sz = z;
+            return this;
+        }
+        end(x, y, z) {
+            this.ex = x;
+            this.ey = y;
+            this.ez = z;
+            return this;
+        }
+        color(r0, g0, b0, a0, r1, g1, b1, a1) {
+            return this;
+        }
+        static get observedAttributes() {
+            return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            this.updatePosition();
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    if (document.readyState !== 'loading') {
+        return init(script);
+    }
+    document.addEventListener('DOMContentLoaded', () => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-model';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+        customElements.whenDefined(tagname).then(() => {
+            Luminus.model = (customElements.get(tagname));
+        });
+    })(class extends HTMLElement {
+        constructor() {
+            super();
+            this._timer = 0;
+            this.state = this.createState();
+            const shadow = this.attachShadow({ mode: 'open' });
+            shadow.appendChild(this.initStyle());
+            this.updateMatrix(true);
+        }
+        createState() {
+            return new Luminus.states.axisRotate();
+        }
+        initStyle() {
+            const style = document.createElement('style');
+            style.innerHTML = [
+                ':host { display: block; }',
+            ].join('');
+            return style;
+        }
+        copyMatrix(out) {
+            out.set(this.state.matrix);
+        }
+        updateMatrix(sync = false) {
+            if (this._timer) {
+                clearTimeout(this._timer);
+            }
+            if (sync) {
+                return this.onUpdateMatrix();
+            }
+            this._timer = setTimeout(() => {
+                this.onUpdateMatrix();
+            }, 0);
+        }
+        onUpdateMatrix() {
+            this.state.update();
+        }
+        collisionDetection(cd) {
+            const tmp = cd.clone();
+            tmp.transform(Luminus.matrix.inverse4(this.state.matrix));
+            return this.model.collisionDetection(tmp);
+        }
+        get model() {
+            return this._model;
+        }
+        set model(model) {
+            this._model = model;
+            model.afterload = () => {
+                const program = this.program;
+                if (program) {
+                    model.prepare(program);
+                }
+            };
+        }
+        get selectable() {
+            return this.hasAttribute('selectable');
+        }
+        set selectable(value) {
+            if (!value) {
+                this.removeAttribute('selectable');
+            }
+            else {
+                this.setAttribute('selectable', '');
+            }
+        }
+        get x() {
+            return parseFloat(this.getAttribute('x') || '0') || 0;
+        }
+        set x(value) {
+            this.setAttribute('x', value + '');
+            this.state.x = value;
+            this.updateMatrix();
+        }
+        get y() {
+            return parseFloat(this.getAttribute('y') || '0') || 0;
+        }
+        set y(value) {
+            this.setAttribute('y', value + '');
+            this.state.y = value;
+            this.updateMatrix();
+        }
+        get z() {
+            return parseFloat(this.getAttribute('z') || '0') || 0;
+        }
+        set z(value) {
+            this.setAttribute('z', value + '');
+            this.state.z = value;
+            this.updateMatrix();
+        }
+        get cx() {
+            return parseFloat(this.getAttribute('cx') || '0') || 0;
+        }
+        set cx(value) {
+            this.setAttribute('cx', value + '');
+            this.state.cx = value;
+            this.updateMatrix();
+        }
+        get cy() {
+            return parseFloat(this.getAttribute('cy') || '0') || 0;
+        }
+        set cy(value) {
+            this.setAttribute('cy', value + '');
+            this.state.cx = value;
+            this.updateMatrix();
+        }
+        get cz() {
+            return parseFloat(this.getAttribute('cz') || '0') || 0;
+        }
+        set cz(value) {
+            this.setAttribute('cz', value + '');
+            this.state.cx = value;
+            this.updateMatrix();
+        }
+        get xaxis() {
+            return parseFloat(this.getAttribute('xaxis') || '0') || 0;
+        }
+        set xaxis(value) {
+            this.setAttribute('xaxis', value + '');
+            this.state.xaxis = value;
+            this.updateMatrix();
+        }
+        get yaxis() {
+            return parseFloat(this.getAttribute('yaxis') || '0') || 0;
+        }
+        set yaxis(value) {
+            this.setAttribute('yaxis', value + '');
+            this.state.yaxis = value;
+            this.updateMatrix();
+        }
+        get zaxis() {
+            return parseFloat(this.getAttribute('zaxis') || '0') || 0;
+        }
+        set zaxis(value) {
+            this.setAttribute('zaxis', value + '');
+            this.state.zaxis = value;
+            this.updateMatrix();
+        }
+        get roll() {
+            return parseFloat(this.getAttribute('roll') || '0') || 0;
+        }
+        set roll(value) {
+            this.setAttribute('roll', value + '');
+            this.state.roll = value;
+            this.updateMatrix();
+        }
+        get pitch() {
+            return parseFloat(this.getAttribute('pitch') || '0') || 0;
+        }
+        set pitch(value) {
+            this.setAttribute('pitch', value + '');
+            this.state.pitch = value;
+            this.updateMatrix();
+        }
+        get yaw() {
+            return parseFloat(this.getAttribute('yaw') || '0') || 0;
+        }
+        set yaw(value) {
+            this.setAttribute('yaw', value + '');
+            this.state.yaw = value;
+            this.updateMatrix();
+        }
+        get complete() {
+            return this.model && this.model.complete === true;
+        }
+        get program() {
+            var _a;
+            return (_a = this.parentElement) === null || _a === void 0 ? void 0 : _a.program;
+        }
+        render(program) {
+            this.model.render(program);
+        }
+        rerender() {
+            this.dispatchEvent(new CustomEvent('render'));
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-world').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-vox';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends Luminus.model {
+        constructor() {
+            super();
+            const model = new Luminus.models.vox();
+            model.afterload = () => {
+                this.rerender();
+            };
+            this.model = model;
+            if (this.src) {
+                this.load();
+            }
+        }
+        get src() {
+            return this.getAttribute('src') || '';
+        }
+        set src(value) {
+            const old = this.src;
+            if (old === value) {
+                return;
+            }
+            this.setAttribute('src', value);
+            this.load();
+        }
+        load(init) {
+            const url = this.src;
+            if (!url) {
+                return;
+            }
+            this.model.load(fetch(url, init)).then(() => {
+                this.rerender();
+            });
+        }
+        import(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const data = reader.result;
+                    const response = new Response(data);
+                    this.model.load(Promise.resolve(response)).then(() => {
+                        this.rerender();
+                        resolve();
+                    });
+                };
+                reader.onerror = reject;
+                reader.onabort = reject;
+                reader.readAsArrayBuffer(file);
+            }).then(() => {
+                return this;
+            });
+        }
+        export() {
+            return this.model.export();
+        }
+        static get observedAttributes() {
+            return ['src'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+        }
+    }, script.dataset.prefix);
+});
+((script, init) => {
+    customElements.whenDefined((script.dataset.prefix || 'lu') + '-model').then(() => {
+        init(script);
+    });
+})(document.currentScript, (script) => {
+    ((component, prefix = 'lu') => {
+        const tagname = prefix + '-world';
+        if (customElements.get(tagname)) {
+            return;
+        }
+        customElements.define(tagname, component);
+    })(class extends HTMLElement {
+        constructor() {
+            super();
+            this._complete = false;
+            const shadow = this.attachShadow({ mode: 'open' });
+            const style = document.createElement('style');
+            style.innerHTML = [
+                ':host { display: block; background: black; --light: white; --ambient: rgba( 255, 255, 255, 0 ); }',
+                'canvas { display: block; width: 100%; height: 100%; }',
+            ].join('');
+            this.canvas = document.createElement('canvas');
+            this.canvas.addEventListener('click', (event) => {
+                const list = this.searchSelectedModels(event.offsetX, event.offsetY);
+                if (list.length <= 0) {
+                    return;
+                }
+                const selectedEvent = this.createSelectedEvent();
+                for (const data of list) {
+                    console.log('dispatch', data);
+                    data.model.dispatchEvent(selectedEvent.event);
+                    if (!selectedEvent.next) {
+                        continue;
+                    }
+                }
+            });
+            this.width = (this.hasAttribute('width') ? (parseInt(this.getAttribute('width') || '')) : 0) || 400;
+            this.height = (this.hasAttribute('height') ? (parseInt(this.getAttribute('height') || '')) : 0) || 400;
+            const contents = document.createElement('div');
+            contents.appendChild(this.canvas);
+            contents.appendChild(document.createElement('slot'));
+            shadow.appendChild(style);
+            shadow.appendChild(contents);
+            this.init().then(() => {
+                this.render();
+            });
+            (() => {
+                let timer;
+                this.addEventListener('render', (event) => {
+                    if (timer) {
+                        clearTimeout(timer);
+                    }
+                    timer = setTimeout(() => {
+                        this.render();
+                        timer = 0;
+                    }, 0);
+                }, true);
+            })();
+        }
+        createSelectedEvent() {
+            const data = {
+                next: true,
+                event: new CustomEvent('select', {
+                    cancelable: true,
+                }),
+            };
+            data.event.stopPropagation = () => {
+                data.next = false;
+            };
+            return data;
+        }
+        searchSelectedModels(screenX, screenY) {
+            const viewport = this.program.support.getViewport();
+            const origin = this.program.unProject(viewport, screenX, screenY, -1);
+            const position = this.program.unProject(viewport, screenX, screenY, 1);
+            const vector = new Float32Array([
+                position[0] - origin[0],
+                position[1] - origin[1],
+                position[2] - origin[2],
+            ]);
+            const line = document.getElementById('line');
+            line.sx = origin[0];
+            line.sy = origin[1];
+            line.sz = origin[2];
+            line.ex = position[0];
+            line.ey = position[1];
+            line.ez = position[2];
+            const ray = new Luminus.ray(origin, vector);
+            const list = [];
+            for (const child of this.querySelectorAll('[selectable]')) {
+                const model = child;
+                if (!(model instanceof Luminus.model)) {
+                    continue;
+                }
+                const distance = model.collisionDetection(ray);
+                if (isFinite(distance)) {
+                    list.push({ distance: distance, model: model });
+                }
+            }
+            if (list.length <= 0) {
+                return list;
+            }
+            list.sort((a, b) => {
+                return a.distance - b.distance;
+            });
+            return list;
+        }
+        get complete() {
+            return this._complete;
+        }
+        get program() {
+            return this.lProgram;
+        }
+        get width() {
+            return this.canvas.width;
+        }
+        set width(value) {
+            this.canvas.width = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0);
+        }
+        get height() {
+            return this.canvas.height;
+        }
+        set height(value) {
+            this.canvas.height = typeof value === 'number' ? Math.floor(value) : (parseInt(value) || 0);
+        }
+        get top() {
+            return parseFloat(this.getAttribute('top') || '') || 0;
+        }
+        set top(value) {
+            this.setAttribute('top', value + '');
+        }
+        get bottom() {
+            return parseFloat(this.getAttribute('bottom') || '') || 0;
+        }
+        set bottom(value) {
+            this.setAttribute('bottom', value + '');
+        }
+        get left() {
+            return parseFloat(this.getAttribute('left') || '') || 0;
+        }
+        set left(value) {
+            this.setAttribute('left', value + '');
+        }
+        get right() {
+            return parseFloat(this.getAttribute('right') || '') || 0;
+        }
+        set right(value) {
+            this.setAttribute('right', value + '');
+        }
+        get near() {
+            return parseFloat(this.getAttribute('near') || '') || 0;
+        }
+        set near(value) {
+            this.setAttribute('near', value + '');
+        }
+        get far() {
+            return parseFloat(this.getAttribute('far') || '') || 0;
+        }
+        set far(value) {
+            this.setAttribute('far', value + '');
+        }
+        get view() {
+            return this.getAttribute('view') === 'volume' ? 'volume' : 'frustum';
+        }
+        set view(value) {
+            this.setAttribute('view', value === 'volume' ? 'volume' : 'frustum');
+        }
+        get eyex() {
+            return parseFloat(this.getAttribute('eyex') || '') || 0;
+        }
+        set eyex(value) {
+            this.setAttribute('eyex', value + '');
+        }
+        get eyey() {
+            return parseFloat(this.getAttribute('eyey') || '') || 0;
+        }
+        set eyey(value) {
+            this.setAttribute('eyey', value + '');
+        }
+        get eyez() {
+            return parseFloat(this.getAttribute('eyez') || '') || 0;
+        }
+        set eyez(value) {
+            this.setAttribute('eyez', value + '');
+        }
+        get upx() {
+            return parseFloat(this.getAttribute('upx') || '') || 0;
+        }
+        set upx(value) {
+            this.setAttribute('upx', value + '');
+        }
+        get upy() {
+            return parseFloat(this.getAttribute('upy') || '') || 0;
+        }
+        set upy(value) {
+            this.setAttribute('upy', value + '');
+        }
+        get upz() {
+            return parseFloat(this.getAttribute('upz') || '') || 0;
+        }
+        set upz(value) {
+            this.setAttribute('upz', value + '');
+        }
+        get centerx() {
+            return parseFloat(this.getAttribute('centerx') || '') || 0;
+        }
+        set centerx(value) {
+            this.setAttribute('centerx', value + '');
+        }
+        get centery() {
+            return parseFloat(this.getAttribute('centery') || '') || 0;
+        }
+        set centery(value) {
+            this.setAttribute('centery', value + '');
+        }
+        get centerz() {
+            return parseFloat(this.getAttribute('centerz') || '') || 0;
+        }
+        set centerz(value) {
+            this.setAttribute('centerz', value + '');
+        }
+        get lightx() {
+            return parseFloat(this.getAttribute('lightx') || '') || 0;
+        }
+        set lightx(value) {
+            this.setAttribute('lightx', value + '');
+        }
+        get lighty() {
+            return parseFloat(this.getAttribute('lighty') || '') || 0;
+        }
+        set lighty(value) {
+            this.setAttribute('lighty', value + '');
+        }
+        get lightz() {
+            return parseFloat(this.getAttribute('lightz') || '') || 0;
+        }
+        set lightz(value) {
+            this.setAttribute('lightz', value + '');
+        }
+        async init(program) {
+            Luminus.console.info('Start: init lu-world.');
+            this._complete = false;
+            this.lProgram = null;
+            if (!program) {
+                program = new Luminus.program();
+            }
+            const support = Luminus.createSupport(this.canvas.getContext('webgl2'));
+            await program.init(this, support);
+            this.lProgram = !program ? new Luminus.program() : program;
+            this._complete = true;
+        }
+        render() {
+            if (!this.complete) {
+                return;
+            }
+            Luminus.console.info('Render:');
+            this.program.beginRender(this);
+            for (const model of this.children) {
+                if (model instanceof Luminus.model) {
+                    this.program.modelRender(model);
+                }
+            }
+            this.program.endRender();
+        }
+        get ambientColor() {
+            return (window.getComputedStyle(this, '').getPropertyValue('--ambient')
+                .replace(/\s/g, '')
+                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
+                .slice(0, 4)
+                .map((v, i, a) => {
+                return parseInt(v) / 255.0 * parseFloat(a[3]);
+            })
+                .slice(0, 3);
+        }
+        get lightColor() {
+            return (window.getComputedStyle(this, '').getPropertyValue('--light')
+                .replace(/\s/g, '')
+                .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
+                .slice(0, 3)
+                .map((v) => {
+                return parseInt(v) / 255.0;
+            });
+        }
+        static get observedAttributes() {
+            return ['width', 'height'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            switch (attrName) {
+                case 'width':
+                    this.width = newVal;
+                    break;
+                case 'height':
+                    this.height = newVal;
+                    break;
+            }
+        }
+    }, script.dataset.prefix);
+});

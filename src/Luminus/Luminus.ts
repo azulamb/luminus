@@ -15,6 +15,7 @@
 		matrix: <any> null,
 		model: <any> null,
 		models: <any> {},
+		states: <any> {},
 		program: <any> null,
 		createSupport: () => {
 			return <any> null;

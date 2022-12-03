@@ -10,8 +10,8 @@
 	},
 	"include": [
 		"./index.ts",
-		"./Components/*.ts",
+		"./State/*.ts",
 		"./Models/*.ts",
-		"./State/*.ts"
+		"./Components/*.ts"
 	]
 }

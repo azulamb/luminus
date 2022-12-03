@@ -1,7 +1,7 @@
 {
 	"tasks": {
 		"build": "tsc -p ./src",
-		"server": "file_server docs"
+		"server": "deno run --allow-read --allow-net --allow-env https://raw.githubusercontent.com/azulamb/minirachne/main/server.ts"
 	},
 	"lint": {
 		"files": {

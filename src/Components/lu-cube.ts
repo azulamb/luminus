@@ -28,7 +28,7 @@
 			public initStyle() {
 				const style = document.createElement('style');
 				style.innerHTML = [
-					':host { display: none; color: #99ccfd; }',
+					':host { display: block; color: #99ccfd; }',
 				].join('');
 
 				return style;
