@@ -1,5 +1,5 @@
 (() => {
-	class Model implements LuminusModel<unknown> {
+	Luminus.models.model = class Model implements LuminusModel<unknown> {
 		public loaded?: boolean;
 		public complete?: boolean;
 		public afterload?: () => unknown;
@@ -59,7 +59,5 @@
 		public collisionDetection(cd: CollisionDetection): number {
 			return Infinity;
 		}
-	}
-
-	Luminus.models.model = Model;
+	};
 })();

@@ -145,6 +145,7 @@
 			const lr = 1 / (left - right);
 			const bt = 1 / (bottom - top);
 			const nf = 1 / (near - far);
+			// deno-fmt-ignore
 			m[1] = m[2] = m[3] = m[4] = m[6] = m[7] = m[8] = m[9] = m[11] = 0;
 			m[0] = -2 * lr;
 			m[5] = -2 * bt;
@@ -163,7 +164,7 @@
 		}
 
 		public getViewport() {
-			return <Int32Array>this.gl.getParameter(this.gl.VIEWPORT);
+			return <Int32Array> this.gl.getParameter(this.gl.VIEWPORT);
 		}
 
 		public loadTexture(image: string | HTMLImageElement, num?: number) {

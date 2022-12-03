@@ -1,5 +1,5 @@
 (() => {
-	class Axis extends Luminus.models.model implements LuminusModelAxis {
+	Luminus.models.axis = class Axis extends Luminus.models.model implements LuminusModelAxis {
 		public lMin: number = 1;
 		public loaded?: boolean = true;
 		public complete?: boolean;
@@ -37,27 +37,13 @@
 
 			const positionBuffer = gl2.createBuffer();
 			gl2.bindBuffer(gl2.ARRAY_BUFFER, positionBuffer);
+			// deno-fmt-ignore
 			gl2.bufferData(
 				gl2.ARRAY_BUFFER,
 				new Float32Array([
-					0,
-					0,
-					0,
-					length,
-					0,
-					0,
-					0,
-					0,
-					0,
-					0,
-					length,
-					0,
-					0,
-					0,
-					0,
-					0,
-					0,
-					length,
+					0, 0, 0, length, 0, 0,
+					0, 0, 0, 0, length, 0,
+					0, 0, 0, 0, 0, length,
 				]),
 				gl2.STATIC_DRAW,
 			);
@@ -66,33 +52,13 @@
 
 			const colorBuffer = gl2.createBuffer();
 			gl2.bindBuffer(gl2.ARRAY_BUFFER, colorBuffer);
+			// deno-fmt-ignore
 			gl2.bufferData(
 				gl2.ARRAY_BUFFER,
 				new Float32Array([
-					1,
-					0,
-					0,
-					1,
-					1,
-					0,
-					0,
-					1,
-					0,
-					1,
-					0,
-					1,
-					0,
-					1,
-					0,
-					1,
-					0,
-					0,
-					1,
-					1,
-					0,
-					0,
-					1,
-					1,
+					1, 0, 0, 1, 1, 0, 0, 1,
+					0, 1, 0, 1, 0, 1, 0, 1,
+					0, 0, 1, 1, 0, 0, 1, 1,
 				]),
 				gl2.STATIC_DRAW,
 			);
@@ -119,6 +85,5 @@
 			gl2.drawArrays(gl2.LINES, 0, 6);
 			gl2.bindVertexArray(null);
 		}
-	}
-	Luminus.models.axis = Axis;
+	};
 })();

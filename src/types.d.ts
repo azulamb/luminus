@@ -38,6 +38,7 @@ interface LuminusWorldElement extends HTMLElement {
 
 interface LuminusModelElement extends HTMLElement {
 	model: LuminusModel<unknown>;
+	state: LuminusState;
 	readonly complete: boolean;
 	readonly program: LuminusProgram | undefined;
 	/** true = This model selectable. */
@@ -66,6 +67,7 @@ interface LuminusModelElement extends HTMLElement {
 	pitch: number;
 	/** Rotation z axis */
 	yaw: number;
+	createState(): LuminusState;
 	initStyle(): HTMLStyleElement;
 	/**
 	 * Update model matrix.
@@ -181,6 +183,33 @@ interface LuminusModelVox extends LuminusModel<Response> {
 }
 
 /**
+ * States
+ */
+
+interface LuminusState {
+	matrix: Float32Array;
+	update(): void;
+
+	x: number;
+	y: number;
+	z: number;
+}
+
+interface LuminusStateAxisRotate extends LuminusState {
+	cx: number;
+	cy: number;
+	cz: number;
+
+	xaxis: number;
+	yaxis: number;
+	zaxis: number;
+
+	roll: number;
+	pitch: number;
+	yaw: number;
+}
+
+/**
  * Luminus
  */
 
@@ -266,6 +295,10 @@ interface Luminus {
 	models: {
 		model: { new (...params: any[]): LuminusModel<unknown> };
 		[keys: string]: { new (...params: any[]): LuminusModel<any> };
+	};
+	states: {
+		state: { new (...params: any[]): LuminusState };
+		[keys: string]: { new (...params: any[]): LuminusState };
 	};
 	ray: {
 		new (x: number, y: number, z: number, vx: number, vy: number, vz: number): LuminusRay;

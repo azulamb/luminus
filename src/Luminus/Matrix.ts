@@ -218,6 +218,7 @@ Luminus.matrix = (() => {
 		m[8] = -sinb;
 		m[9] = cosb * sinc;
 		m[10] = cosb * cosc;
+		// deno-fmt-ignore
 		m[3] = m[7] = m[11] = m[12] = m[13] = m[14] = 0;
 		m[15] = 1;
 
@@ -263,22 +264,10 @@ Luminus.matrix = (() => {
 
 		// deno-fmt-ignore
 		[
-			m[0],
-			m[1],
-			m[2],
-			m[3],
-			m[4],
-			m[5],
-			m[6],
-			m[7],
-			m[8],
-			m[9],
-			m[10],
-			m[11],
-			m[12],
-			m[13],
-			m[14],
-			m[15],
+			m[0], m[1], m[2], m[3],
+			m[4], m[5], m[6], m[7],
+			m[8], m[9], m[10], m[11],
+			m[12], m[13], m[14], m[15],
 		] = [
 			id * (a[5] * a[10] * a[15] + a[6] * a[11] * a[13] + a[7] * a[9] * a[14] - a[5] * a[11] * a[14] - a[6] * a[9] * a[15] - a[7] * a[10] * a[13]),
 			id * (a[1] * a[11] * a[14] + a[2] * a[9] * a[15] + a[3] * a[10] * a[13] - a[1] * a[10] * a[15] - a[2] * a[11] * a[13] - a[3] * a[9] * a[14]),
@@ -327,10 +316,10 @@ Luminus.matrix = (() => {
 	function normalize3(a: Float32Array, m?: Float32Array) {
 		let len = a[0] * a[0] + a[1] * a[1] + a[2] * a[2];
 		if (len > 0) {
-		  len = 1 / Math.sqrt(len);
+			len = 1 / Math.sqrt(len);
 		}
 
-		if(!m) {
+		if (!m) {
 			m = new Float32Array(3);
 		}
 
@@ -351,7 +340,7 @@ Luminus.matrix = (() => {
 
 		const v = multiply4(pv, v4);
 
-		if(v[3] === 0.0) {
+		if (v[3] === 0.0) {
 			return create4();
 		}
 
@@ -360,7 +349,7 @@ Luminus.matrix = (() => {
 		m[2] = v[2] / v[3];
 
 		return m;
-	};
+	}
 
 	return {
 		create4: create4,
