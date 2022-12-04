@@ -80,12 +80,19 @@
 			}
 
 			static get observedAttributes() {
-				return ['src'];
+				return ['src', ...Luminus.model.observedAttributes];
 			}
 
 			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;
+				}
+				switch (attrName) {
+					case 'src':
+						// TODO:
+						break;
+					default:
+						super.attributeChangedCallback(attrName, oldVal, newVal);
 				}
 			}
 		},

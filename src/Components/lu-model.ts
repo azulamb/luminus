@@ -15,7 +15,7 @@
 		}
 		customElements.define(tagname, component);
 		customElements.whenDefined(tagname).then(() => {
-			Luminus.model = <{ new (...params: any[]): LuminusModelElement }> (customElements.get(tagname));
+			Luminus.model = <{ new (...params: any[]): LuminusModelElement; observedAttributes: string[] }> (customElements.get(tagname));
 		});
 	})(
 		class extends HTMLElement implements LuminusModelElement {
@@ -60,6 +60,7 @@
 				}
 				this._timer = setTimeout(() => {
 					this.onUpdateMatrix();
+					this.rerender();
 				}, 0);
 			}
 
@@ -218,6 +219,33 @@
 
 			public rerender() {
 				this.dispatchEvent(new CustomEvent('render'));
+			}
+
+			static get observedAttributes() {
+				return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'xaxis', 'yaxis', 'zaxis', 'roll', 'pitch', 'yaw'];
+			}
+
+			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
+				if (oldVal === newVal) {
+					return;
+				}
+
+				switch (attrName) {
+					case 'x':
+					case 'y':
+					case 'z':
+					case 'cx':
+					case 'cy':
+					case 'cz':
+					case 'xaxis':
+					case 'yaxis':
+					case 'zaxis':
+					case 'roll':
+					case 'pitch':
+					case 'yaw':
+						this[attrName] = parseFloat(newVal);
+						break;
+				}
 			}
 		},
 		script.dataset.prefix,

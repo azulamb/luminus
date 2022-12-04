@@ -171,7 +171,7 @@ interface Luminus {
 	loaded: Promise<void>;
 	matrix: Matrix;
 	world: { new (): LuminusWorld };
-	model: { new (...params: any[]): LuminusModelElement };
+	model: { new (...params: any[]): LuminusModelElement; observedAttributes: string[] };
 	models: {
 		model: { new (...params: any[]): LuminusModel<unknown> };
 		[keys: string]: { new (...params: any[]): LuminusModel<any> };

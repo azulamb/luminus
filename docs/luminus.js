@@ -1469,13 +1469,19 @@ Luminus.matrix = (() => {
             this.rerender();
         }
         static get observedAttributes() {
-            return ['length'];
+            return ['length', ...Luminus.model.observedAttributes];
         }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
             }
-            this.length = newVal;
+            switch (attrName) {
+                case 'length':
+                    this.length = newVal;
+                    break;
+                default:
+                    super.attributeChangedCallback(attrName, oldVal, newVal);
+            }
         }
     }, script.dataset.prefix);
 });
@@ -1623,6 +1629,7 @@ Luminus.matrix = (() => {
             }
             this._timer = setTimeout(() => {
                 this.onUpdateMatrix();
+                this.rerender();
             }, 0);
         }
         onUpdateMatrix() {
@@ -1765,6 +1772,30 @@ Luminus.matrix = (() => {
         rerender() {
             this.dispatchEvent(new CustomEvent('render'));
         }
+        static get observedAttributes() {
+            return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'xaxis', 'yaxis', 'zaxis', 'roll', 'pitch', 'yaw'];
+        }
+        attributeChangedCallback(attrName, oldVal, newVal) {
+            if (oldVal === newVal) {
+                return;
+            }
+            switch (attrName) {
+                case 'x':
+                case 'y':
+                case 'z':
+                case 'cx':
+                case 'cy':
+                case 'cz':
+                case 'xaxis':
+                case 'yaxis':
+                case 'zaxis':
+                case 'roll':
+                case 'pitch':
+                case 'yaw':
+                    this[attrName] = parseFloat(newVal);
+                    break;
+            }
+        }
     }, script.dataset.prefix);
 });
 ((script, init) => {
@@ -1832,11 +1863,17 @@ Luminus.matrix = (() => {
             return this.model.export();
         }
         static get observedAttributes() {
-            return ['src'];
+            return ['src', ...Luminus.model.observedAttributes];
         }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
+            }
+            switch (attrName) {
+                case 'src':
+                    break;
+                default:
+                    super.attributeChangedCallback(attrName, oldVal, newVal);
             }
         }
     }, script.dataset.prefix);

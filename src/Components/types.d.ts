@@ -85,6 +85,7 @@ interface LuminusModelElement extends LuminusModelRender<unknown>, HTMLElement {
 	 */
 	collisionDetection(cd: CollisionDetection): number;
 	rerender(): void;
+	attributeChangedCallback(attrName: string, oldVal: any, newVal: any): unknown;
 }
 
 interface LuminusModelLineElement extends LuminusModelElement {
