@@ -16,7 +16,7 @@
 		model: <any> null,
 		models: <any> {},
 		states: <any> {},
-		program: <any> null,
+		world: <any> null,
 		createSupport: () => {
 			return <any> null;
 		},

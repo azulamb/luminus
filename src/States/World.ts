@@ -1,4 +1,4 @@
-interface LuminusProgramDefault extends LuminusProgram {
+interface LuminusWorldDefault extends LuminusWorld {
 	eye: {
 		x: number;
 		y: number;
@@ -32,7 +32,7 @@ interface LuminusProgramDefault extends LuminusProgram {
 }
 
 (() => {
-	Luminus.program = class implements LuminusProgramDefault {
+	Luminus.world = class implements LuminusWorldDefault {
 		public eye = { x: 0, y: 0, z: 0 };
 		public center = { x: 0, y: 0, z: 0 };
 		public up = { x: 0, y: 0, z: 0 };

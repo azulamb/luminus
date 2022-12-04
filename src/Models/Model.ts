@@ -18,20 +18,20 @@
 			});
 		}
 
-		public prepare(program: LuminusProgram) {
+		public prepare(world: LuminusWorld) {
 			if (!this.loaded) {
 				return Promise.resolve();
 			}
 			this.complete = false;
 
-			return this.onprepare(program).then(() => {
+			return this.onprepare(world).then(() => {
 				this.complete = true;
 			});
 		}
 
-		public render(program: LuminusProgram) {
+		public render(world: LuminusWorld) {
 			if (this.complete) {
-				return this.onrender(program);
+				return this.onrender(world);
 			}
 
 			/*if ( this.loaded === undefined )
@@ -40,8 +40,8 @@
 			}*/
 
 			if (this.loaded === true && this.complete === undefined) {
-				this.prepare(program).then(() => {
-					this.render(program);
+				this.prepare(world).then(() => {
+					this.render(world);
 				});
 			}
 		}
@@ -50,11 +50,11 @@
 			return Promise.resolve();
 		}
 
-		public onprepare(program: LuminusProgram) {
+		public onprepare(world: LuminusWorld) {
 			return Promise.resolve();
 		}
 
-		public onrender(program: LuminusProgram) {}
+		public onrender(world: LuminusWorld) {}
 
 		public collisionDetection(cd: CollisionDetection): number {
 			return Infinity;

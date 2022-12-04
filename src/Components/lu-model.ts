@@ -80,7 +80,7 @@
 				this._model = model;
 				model.afterload = () => {
 					if ((<LuminusWorldElement | null> this.parentElement)?.complete) {
-						model.prepare(<LuminusProgram> this.program);
+						model.prepare(<LuminusWorld> this.world);
 					}
 				};
 			}
@@ -208,12 +208,12 @@
 				return this.model && this.model.complete === true;
 			}
 
-			get program() {
-				return (<LuminusWorldElement | null> this.parentElement)?.program;
+			get world() {
+				return (<LuminusWorldElement | null> this.parentElement)?.world;
 			}
 
-			public render(program: LuminusProgram) {
-				this.model.render(program);
+			public render(world: LuminusWorld) {
+				this.model.render(world);
 			}
 
 			public rerender() {

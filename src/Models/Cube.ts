@@ -18,7 +18,7 @@
 			this._change = true;
 		}
 
-		public onprepare(program: LuminusProgram) {
+		public onprepare(world: LuminusWorld) {
 			Luminus.console.info('Start: cube-prepare.');
 
 			const l = this._length;
@@ -68,14 +68,14 @@
 				],
 			);
 
-			const gl2 = program.support.gl;
+			const gl2 = world.support.gl;
 
 			const vao = gl2.createVertexArray();
 			if (!vao) {
 				return Promise.reject(new Error('Failure createVertexArray.'));
 			}
 
-			const support = program.support;
+			const support = world.support;
 
 			gl2.bindVertexArray(vao);
 
@@ -110,11 +110,11 @@
 			return Promise.resolve();
 		}
 
-		public onrender(program: LuminusProgram) {
-			const gl2 = program.support.gl;
+		public onrender(world: LuminusWorld) {
+			const gl2 = world.support.gl;
 
 			if (this._change) {
-				this.prepare(program);
+				this.prepare(world);
 			}
 
 			gl2.bindVertexArray(this.vao);

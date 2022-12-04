@@ -1,133 +1,4 @@
 /**
- * WebComponents
- */
-
-interface LuminusWorldElement extends HTMLElement {
-	readonly complete: boolean;
-	readonly program: LuminusProgram;
-	// screen
-	width: number;
-	height: number;
-	// camera
-	top: number;
-	bottom: number;
-	left: number;
-	right: number;
-	near: number;
-	far: number;
-	view: 'volume' | 'frustum';
-	eyex: number;
-	eyey: number;
-	eyez: number;
-	upx: number;
-	upy: number;
-	upz: number;
-	centerx: number;
-	centery: number;
-	centerz: number;
-	// light
-	lightx: number;
-	lighty: number;
-	lightz: number;
-	readonly ambientColor: number[];
-	readonly lightColor: number[];
-
-	init(): WebGLProgram | null;
-	render(): void;
-}
-
-interface LuminusModelRender<T> {
-	model: LuminusModel<T>;
-	state: LuminusState;
-	/** Get model matrix. */
-	copyMatrix(out: Float32Array): void;
-	render(program: LuminusProgram): void;
-}
-
-interface LuminusModelElement extends LuminusModelRender<unknown>, HTMLElement {
-	readonly complete: boolean;
-	readonly program: LuminusProgram | undefined;
-	/** true = This model selectable. */
-	selectable: boolean;
-	/** Model center x */
-	cx: number;
-	/** Model center y */
-	cy: number;
-	/** Model center z */
-	cz: number;
-	/** Rotation x axis */
-	xaxis: number;
-	/** Rotation y axis */
-	yaxis: number;
-	/** Rotation z axis */
-	zaxis: number;
-	/** Translate x */
-	x: number;
-	/** Translate y */
-	y: number;
-	/** Translate z */
-	z: number;
-	/** Rotation x axis */
-	roll: number;
-	/** Rotation y axis */
-	pitch: number;
-	/** Rotation z axis */
-	yaw: number;
-	createState(): LuminusState;
-	initStyle(): HTMLStyleElement;
-	/**
-	 * Update model matrix.
-	 * @param sync true = sync
-	 */
-	updateMatrix(sync?: boolean): void;
-	/**
-	 * @return Infinity = not collide. Other number = collide.(distance from origin.)
-	 */
-	collisionDetection(cd: CollisionDetection): number;
-	rerender(): void;
-}
-
-interface LuminusModelLineElement extends LuminusModelElement {
-	/** start x */
-	sx: number;
-	/** start y */
-	sy: number;
-	/** start z */
-	sz: number;
-	/** end x */
-	ex: number;
-	/** end y */
-	ey: number;
-	/** end z */
-	ez: number;
-	start(x: number, y: number, z: number): this;
-	end(x: number, y: number, z: number): this;
-	color(r: number, g: number, b: number): this;
-	color(r: number, g: number, b: number, a: number): this;
-	color(r0: number, g0: number, b0: number, r1: number, g1: number, b1: number): this;
-	color(r0: number, g0: number, b0: number, a0: number, r1: number, g1: number, b1: number, a1: number): this;
-}
-
-interface LuminusModelAxisElement extends LuminusModelElement {
-	model: LuminusModelAxis;
-	length: number;
-}
-
-interface LuminusModelCubeElement extends LuminusModelElement {
-	model: LuminusModelCube;
-	length: number;
-}
-
-// Load .vox model only.
-interface LuminusModelVoxElement extends LuminusModelElement {
-	model: LuminusModelVox;
-	src: string;
-	import(file: File): Promise<this>;
-	// Export minimize vox.
-	export(): Uint8Array;
-}
-
-/**
  * Models
  */
 
@@ -139,6 +10,9 @@ interface CollisionDetection {
 
 interface LuminusModel<T> {
 	/*
+	complete = true
+	        This model can render.
+	--------
 	loaded = complete = undefined
 	        Loading has not started.
 	loaded = false
@@ -146,23 +20,23 @@ interface LuminusModel<T> {
 	loaded = true & complete = undefined
 	        Preparation has not started.
 	loaded = true & complete = false
-	        Now preparation or faiulre.
+	        Now preparation or failure.
 	loaded = complete = true
 	        This model can render.
 	*/
 	loaded?: boolean;
 	complete?: boolean;
 	load(p?: Promise<T>): Promise<void>;
-	prepare(program: LuminusProgram): Promise<void>;
-	render(program: LuminusProgram): void;
+	prepare(world: LuminusWorld): Promise<void>;
+	render(world: LuminusWorld): void;
 
 	afterload?: () => unknown;
 
 	// Overwrite
 	lMin?: number;
 	onload(result: T): Promise<unknown>;
-	onprepare(program: LuminusProgram): Promise<unknown>;
-	onrender(program: LuminusProgram): void;
+	onprepare(world: LuminusWorld): Promise<unknown>;
+	onrender(world: LuminusWorld): void;
 	collisionDetection(cd: CollisionDetection): number;
 }
 
@@ -191,6 +65,15 @@ interface LuminusModelVox extends LuminusModel<Response> {
 /**
  * States
  */
+
+interface LuminusWorld {
+	support: LuminusSupport;
+	init(support: LuminusSupport): Promise<void>;
+	beginRender(): void;
+	endRender(): void;
+	unProject(viewport: Int32Array, screenX: number, screenY: number, z?: number): Float32Array;
+	modelRender(model: LuminusModelRender<unknown>): void;
+}
 
 interface LuminusState {
 	matrix: Float32Array;
@@ -267,15 +150,6 @@ interface LuminusSupport {
 	useTexture(num: number): void;
 }
 
-interface LuminusProgram<T extends {} = {}> {
-	support: LuminusSupport;
-	init(support: LuminusSupport): Promise<void>;
-	beginRender(): void;
-	endRender(): void;
-	unProject(viewport: Int32Array, screenX: number, screenY: number, z?: number): Float32Array;
-	modelRender(model: LuminusModelRender<unknown>): void;
-}
-
 interface LuminusRay extends CollisionDetection {
 	origin: Float32Array;
 	vector: Float32Array;
@@ -296,7 +170,7 @@ interface Luminus {
 	};
 	loaded: Promise<void>;
 	matrix: Matrix;
-	program: { new (): LuminusProgram };
+	world: { new (): LuminusWorld };
 	model: { new (...params: any[]): LuminusModelElement };
 	models: {
 		model: { new (...params: any[]): LuminusModel<unknown> };

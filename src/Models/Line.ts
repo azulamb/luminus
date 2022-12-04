@@ -15,15 +15,15 @@
 			this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
 		}
 
-		public onprepare(program: LuminusProgram) {
-			const gl2 = program.support.gl;
+		public onprepare(world: LuminusWorld) {
+			const gl2 = world.support.gl;
 
 			const vao = gl2.createVertexArray();
 			if (!vao) {
 				return Promise.reject(new Error('Failure createVertexArray.'));
 			}
 
-			const support = program.support;
+			const support = world.support;
 
 			gl2.bindVertexArray(vao);
 
@@ -48,11 +48,11 @@
 			return Promise.resolve();
 		}
 
-		public onrender(program: LuminusProgram) {
-			const gl2 = program.support.gl;
+		public onrender(world: LuminusWorld) {
+			const gl2 = world.support.gl;
 
 			if (this._change) {
-				this.prepare(program);
+				this.prepare(world);
 			}
 
 			gl2.bindVertexArray(this.vao);

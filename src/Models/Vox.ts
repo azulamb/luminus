@@ -309,16 +309,16 @@ interface VoxData {
 			});
 		}
 
-		public onprepare(program: LuminusProgram) {
+		public onprepare(world: LuminusWorld) {
 			Luminus.console.info('Start: vox-prepare.');
-			const gl2 = program.support.gl;
+			const gl2 = world.support.gl;
 
 			const vao = gl2.createVertexArray();
 			if (!vao) {
 				return Promise.reject(new Error('Failure createVertexArray.'));
 			}
 
-			const support = program.support;
+			const support = world.support;
 
 			gl2.bindVertexArray(vao);
 
@@ -351,8 +351,8 @@ interface VoxData {
 			return Promise.resolve();
 		}
 
-		public onrender(program: LuminusProgram) {
-			const gl2 = program.support.gl;
+		public onrender(world: LuminusWorld) {
+			const gl2 = world.support.gl;
 
 			gl2.bindVertexArray(this.vao);
 			gl2.drawElements(gl2.TRIANGLES, this.count, gl2.UNSIGNED_SHORT, 0);

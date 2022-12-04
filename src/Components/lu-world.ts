@@ -15,7 +15,7 @@
 		class extends HTMLElement implements LuminusWorldElement {
 			protected _complete: boolean;
 			protected canvas: HTMLCanvasElement;
-			protected lProgram: LuminusProgram;
+			protected _world: LuminusWorld;
 
 			constructor() {
 				super();
@@ -92,9 +92,9 @@
 			}
 
 			protected searchSelectedModels(screenX: number, screenY: number) {
-				const viewport = this.program.support.getViewport();
-				const origin = this.program.unProject(viewport, screenX, screenY, -1);
-				const position = this.program.unProject(viewport, screenX, screenY, 1);
+				const viewport = this.world.support.getViewport();
+				const origin = this.world.unProject(viewport, screenX, screenY, -1);
+				const position = this.world.unProject(viewport, screenX, screenY, 1);
 				const vector = new Float32Array([
 					position[0] - origin[0],
 					position[1] - origin[1],
@@ -135,8 +135,8 @@
 				return this._complete;
 			}
 
-			get program() {
-				return <LuminusProgramDefault> this.lProgram;
+			get world() {
+				return <LuminusWorldDefault> this._world;
 			}
 
 			get width() {
@@ -158,7 +158,7 @@
 			}
 			set top(value) {
 				this.setAttribute('top', value + '');
-				this.program.screen.top = value;
+				this.world.screen.top = value;
 			}
 
 			get bottom() {
@@ -166,7 +166,7 @@
 			}
 			set bottom(value) {
 				this.setAttribute('bottom', value + '');
-				this.program.screen.bottom = value;
+				this.world.screen.bottom = value;
 			}
 
 			get left() {
@@ -174,7 +174,7 @@
 			}
 			set left(value) {
 				this.setAttribute('left', value + '');
-				this.program.screen.left = value;
+				this.world.screen.left = value;
 			}
 
 			get right() {
@@ -182,7 +182,7 @@
 			}
 			set right(value) {
 				this.setAttribute('right', value + '');
-				this.program.screen.right = value;
+				this.world.screen.right = value;
 			}
 
 			get near() {
@@ -190,7 +190,7 @@
 			}
 			set near(value) {
 				this.setAttribute('near', value + '');
-				this.program.screen.near = value;
+				this.world.screen.near = value;
 			}
 
 			get far() {
@@ -198,7 +198,7 @@
 			}
 			set far(value) {
 				this.setAttribute('far', value + '');
-				this.program.screen.far = value;
+				this.world.screen.far = value;
 			}
 
 			get view() {
@@ -213,7 +213,7 @@
 			}
 			set eyex(value) {
 				this.setAttribute('eyex', value + '');
-				this.program.eye.x = value;
+				this.world.eye.x = value;
 			}
 
 			get eyey() {
@@ -221,7 +221,7 @@
 			}
 			set eyey(value) {
 				this.setAttribute('eyey', value + '');
-				this.program.eye.y = value;
+				this.world.eye.y = value;
 			}
 
 			get eyez() {
@@ -229,7 +229,7 @@
 			}
 			set eyez(value) {
 				this.setAttribute('eyez', value + '');
-				this.program.eye.z = value;
+				this.world.eye.z = value;
 			}
 
 			get centerx() {
@@ -237,7 +237,7 @@
 			}
 			set centerx(value) {
 				this.setAttribute('centerx', value + '');
-				this.program.center.x = value;
+				this.world.center.x = value;
 			}
 
 			get centery() {
@@ -245,7 +245,7 @@
 			}
 			set centery(value) {
 				this.setAttribute('centery', value + '');
-				this.program.center.y = value;
+				this.world.center.y = value;
 			}
 
 			get centerz() {
@@ -253,7 +253,7 @@
 			}
 			set centerz(value) {
 				this.setAttribute('centerz', value + '');
-				this.program.center.z = value;
+				this.world.center.z = value;
 			}
 
 			get upx() {
@@ -261,7 +261,7 @@
 			}
 			set upx(value) {
 				this.setAttribute('upx', value + '');
-				this.program.up.x = value;
+				this.world.up.x = value;
 			}
 
 			get upy() {
@@ -269,7 +269,7 @@
 			}
 			set upy(value) {
 				this.setAttribute('upy', value + '');
-				this.program.up.y = value;
+				this.world.up.y = value;
 			}
 
 			get upz() {
@@ -277,7 +277,7 @@
 			}
 			set upz(value) {
 				this.setAttribute('upz', value + '');
-				this.program.up.z = value;
+				this.world.up.z = value;
 			}
 
 			get lightx() {
@@ -285,7 +285,7 @@
 			}
 			set lightx(value) {
 				this.setAttribute('lightx', value + '');
-				this.program.light.x = value;
+				this.world.light.x = value;
 			}
 
 			get lighty() {
@@ -293,7 +293,7 @@
 			}
 			set lighty(value) {
 				this.setAttribute('lighty', value + '');
-				this.program.light.y = value;
+				this.world.light.y = value;
 			}
 
 			get lightz() {
@@ -301,28 +301,28 @@
 			}
 			set lightz(value) {
 				this.setAttribute('lightz', value + '');
-				this.program.light.z = value;
+				this.world.light.z = value;
 			}
 
-			public async init(program?: LuminusProgram) {
+			public async init(world?: LuminusWorld) {
 				Luminus.console.info('Start: init lu-world.');
 				this._complete = false;
-				this.lProgram = <any> null;
+				this._world = <any> null;
 				const support = Luminus.createSupport(<WebGL2RenderingContext> this.canvas.getContext('webgl2'));
 
-				this.lProgram = !program ? new Luminus.program() : program;
+				this._world = !world ? new Luminus.world() : world;
 
-				this.program.screen.left = this.left;
-				this.program.screen.right = this.right;
-				this.program.screen.bottom = this.bottom;
-				this.program.screen.top = this.top;
-				this.program.screen.near = this.near;
-				this.program.screen.far = this.far;
-				this.program.light.x = this.lightx;
-				this.program.light.y = this.lighty;
-				this.program.light.z = this.lightz;
-				this.program.light.color.set(this.lightColor);
-				this.program.light.ambient.set(this.ambientColor);
+				this.world.screen.left = this.left;
+				this.world.screen.right = this.right;
+				this.world.screen.bottom = this.bottom;
+				this.world.screen.top = this.top;
+				this.world.screen.near = this.near;
+				this.world.screen.far = this.far;
+				this.world.light.x = this.lightx;
+				this.world.light.y = this.lighty;
+				this.world.light.z = this.lightz;
+				this.world.light.color.set(this.lightColor);
+				this.world.light.ambient.set(this.ambientColor);
 
 				if (this.hasAttribute('eyex')) {
 					this.eyex = this.eyex;
@@ -352,7 +352,7 @@
 					this.upx = this.upx;
 				}
 
-				await this.program.init(support);
+				await this.world.init(support);
 
 				this._complete = true;
 			}
@@ -363,17 +363,17 @@
 				}
 				Luminus.console.info('Render:');
 
-				this.program.beginRender();
-				(<LuminusProgramDefault> this.program).light.color.set(this.lightColor);
-				(<LuminusProgramDefault> this.program).light.ambient.set(this.ambientColor);
+				this.world.beginRender();
+				(<LuminusWorldDefault> this.world).light.color.set(this.lightColor);
+				(<LuminusWorldDefault> this.world).light.ambient.set(this.ambientColor);
 
 				for (const model of this.children) {
 					if (model instanceof Luminus.model) {
-						this.program.modelRender(model);
+						this.world.modelRender(model);
 					}
 				}
 
-				this.program.endRender();
+				this.world.endRender();
 			}
 
 			get ambientColor(): number[] {
