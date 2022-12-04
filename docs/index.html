@@ -41,9 +41,9 @@ slider-input { width: 400px; }
 		} );
 
 		const camera = {
-			x: document.querySelector('[edit="eyex"]'),
-			y: document.querySelector('[edit="eyey"]'),
-			z: document.querySelector('[edit="eyez"]'),
+			x: document.querySelector('[edit="eye-x"]'),
+			y: document.querySelector('[edit="eye-y"]'),
+			z: document.querySelector('[edit="eye-z"]'),
 		};
 		document.getElementById('default').addEventListener('click', () => {
 			camera.x.value = 10;
@@ -145,11 +145,11 @@ slider-input { width: 400px; }
 		id="world"
 		width="600" height="400"
 		top="30" bottom="-30" left="-45" right="45" near="-100" far="100"
-		eyex="10" eyey="10" eyez="10"
-		upx="0" upy="1" upz="0"
-		centerx="0" centery="0" centerz="0"
-		lightx="0.5" lighty="1" lightz="0"
-		lightx_="-1" lighty_="0.3" lightz_="0.8"
+		eye-x="10" eye-y="10" eye-z="10"
+		up-x="0" up-y="1" up-z="0"
+		center-x="0" center-y="0" center-z="0"
+		light-x="0.5" light-y="1" light-z="0"
+		light-x_="-1" light-y_="0.3" light-z_="0.8"
 		style="width:600px;height:400px;"
 	>
 		<lu-axis length="50"></lu-axis>
@@ -192,12 +192,12 @@ slider-input { width: 400px; }
 		<button id="front_y">Y</button>
 		<button id="front_z">Z</button>
 	</div>
-	<slider-input target="world" edit="eyex" min="-10" max="10">Camera-x</slider-input>
-	<slider-input target="world" edit="eyey" min="-10" max="10">Camera-y</slider-input>
-	<slider-input target="world" edit="eyez" min="-10" max="10">Camera-z</slider-input>
-	<slider-input target="world" edit="lightx" min="-1" max="1">Light-x</slider-input>
-	<slider-input target="world" edit="lighty" min="-1" max="1">Light-y</slider-input>
-	<slider-input target="world" edit="lightz" min="-1" max="1">Light-z</slider-input>
+	<slider-input target="world" edit="eyeX" min="-10" max="10">Camera-x</slider-input>
+	<slider-input target="world" edit="eyeY" min="-10" max="10">Camera-y</slider-input>
+	<slider-input target="world" edit="eyeZ" min="-10" max="10">Camera-z</slider-input>
+	<slider-input target="world" edit="lightX" min="-1" max="1">Light-x</slider-input>
+	<slider-input target="world" edit="lightY" min="-1" max="1">Light-y</slider-input>
+	<slider-input target="world" edit="lightZ" min="-1" max="1">Light-z</slider-input>
 	<slider-input target="cube" edit="x" min="-10" max="10">Cube-x</slider-input>
 	<slider-input target="cube" edit="y" min="-10" max="10">Cube-y</slider-input>
 	<slider-input target="cube" edit="z" min="-10" max="10">Cube-z</slider-input>

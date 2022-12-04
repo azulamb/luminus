@@ -89,9 +89,9 @@ interface LuminusStateAxisRotate extends LuminusState {
 	cy: number;
 	cz: number;
 
-	xaxis: number;
-	yaxis: number;
-	zaxis: number;
+	xAxis: number;
+	yAxis: number;
+	zAxis: number;
 
 	roll: number;
 	pitch: number;

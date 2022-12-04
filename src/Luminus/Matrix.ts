@@ -19,32 +19,32 @@ Luminus.matrix = (() => {
 			m = create4();
 		}
 
-		const eyex = eye[0], eyey = eye[1], eyez = eye[2];
-		const centerx = center[0], centery = center[1], centerz = center[2];
-		const upx = up[0], upy = up[1], upz = up[2];
+		const eyeX = eye[0], eyeY = eye[1], eyeZ = eye[2];
+		const centerX = center[0], centerY = center[1], centerZ = center[2];
+		const upX = up[0], upY = up[1], upZ = up[2];
 
 		if (
-			Math.abs(eyex - centerx) < 0.000001 &&
-			Math.abs(eyey - centery) < 0.000001 &&
-			Math.abs(eyez - centerz) < 0.000001
+			Math.abs(eyeX - centerX) < 0.000001 &&
+			Math.abs(eyeY - centerY) < 0.000001 &&
+			Math.abs(eyeZ - centerZ) < 0.000001
 		) {
 			return identity4(m);
 		}
 
 		let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
 
-		z0 = eyex - centerx;
-		z1 = eyey - centery;
-		z2 = eyez - centerz;
+		z0 = eyeX - centerX;
+		z1 = eyeY - centerY;
+		z2 = eyeZ - centerZ;
 
 		len = 1 / Math.hypot(z0, z1, z2);
 		z0 *= len;
 		z1 *= len;
 		z2 *= len;
 
-		x0 = upy * z2 - upz * z1;
-		x1 = upz * z0 - upx * z2;
-		x2 = upx * z1 - upy * z0;
+		x0 = upY * z2 - upZ * z1;
+		x1 = upZ * z0 - upX * z2;
+		x2 = upX * z1 - upY * z0;
 		len = Math.hypot(x0, x1, x2);
 
 		if (!len) {
@@ -81,9 +81,9 @@ Luminus.matrix = (() => {
 		m[9] = y2;
 		m[10] = z2;
 		m[11] = 0;
-		m[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
-		m[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
-		m[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+		m[12] = -(x0 * eyeX + x1 * eyeY + x2 * eyeZ);
+		m[13] = -(y0 * eyeX + y1 * eyeY + y2 * eyeZ);
+		m[14] = -(z0 * eyeX + z1 * eyeY + z2 * eyeZ);
 		m[15] = 1;
 
 		return m;

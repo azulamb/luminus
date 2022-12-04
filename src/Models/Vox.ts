@@ -18,7 +18,7 @@ interface VoxData {
 		xyzi: { x: number; y: number; z: number; c: number }[];
 	}[];
 	palette: Uint8Array[];
-	unknows?: { name: string; chunk: number; child: number; data: Uint8Array }[];
+	unknowns?: { name: string; chunk: number; child: number; data: Uint8Array }[];
 }
 
 (() => {
@@ -44,7 +44,7 @@ interface VoxData {
 				palette: [],
 			};
 			if (unknown) {
-				result.unknows = [];
+				result.unknowns = [];
 			}
 
 			// version.
@@ -105,8 +105,8 @@ interface VoxData {
 				if (!(header.name in chunk)) {
 					// Unknown chunk.
 					const unknown = chunk.UNKNOWN(header);
-					if (result.unknows) {
-						result.unknows.push(unknown);
+					if (result.unknowns) {
+						result.unknowns.push(unknown);
 					}
 				}
 

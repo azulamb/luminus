@@ -19,9 +19,9 @@ Luminus is 3d webcomponents. (Use WebGL 2)
 		width="600" height="400"
 		style="background:black;width:600px;height:400px;"
 		top="10" bottom="-10" left="-15" right="15" near="-20" far="20"
-		eyex="5" eyey="5" eyez="5"
-		upx="0" upy="1" upz="0"
-		centerx="0" centery="0" centerz="0"
+		eye-x="5" eye-y="5" eye-z="5"
+		up-x="0" up-y="1" up-z="0"
+		center-x="0" center-y="0" center-z="0"
 	>
 		<lu-axis></lu-axis>
 		<lu-cube></lu-cube>

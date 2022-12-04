@@ -769,9 +769,9 @@ Luminus.matrix = (() => {
             this.cx = 0;
             this.cy = 0;
             this.cz = 0;
-            this.xaxis = 0;
-            this.yaxis = 0;
-            this.zaxis = 0;
+            this.xAxis = 0;
+            this.yAxis = 0;
+            this.zAxis = 0;
             this.roll = 0;
             this.pitch = 0;
             this.yaw = 0;
@@ -779,7 +779,7 @@ Luminus.matrix = (() => {
         update() {
             [
                 Luminus.matrix.translation4(this.x, this.y, this.z),
-                Luminus.matrix.rotation4(this.roll + this.xaxis, this.pitch + this.yaxis, this.yaw + this.zaxis),
+                Luminus.matrix.rotation4(this.roll + this.xAxis, this.pitch + this.yAxis, this.yaw + this.zAxis),
                 Luminus.matrix.translation4(-this.cx, -this.cy, -this.cz),
             ].reduce((p, n) => {
                 return Luminus.matrix.multiply4(n, p, this.matrix);
@@ -1054,7 +1054,7 @@ Luminus.matrix = (() => {
                 palette: [],
             };
             if (unknown) {
-                result.unknows = [];
+                result.unknowns = [];
             }
             result.version = this.readInt(data);
             const chunk = {
@@ -1106,8 +1106,8 @@ Luminus.matrix = (() => {
                 }
                 if (!(header.name in chunk)) {
                     const unknown = chunk.UNKNOWN(header);
-                    if (result.unknows) {
-                        result.unknows.push(unknown);
+                    if (result.unknowns) {
+                        result.unknowns.push(unknown);
                     }
                 }
                 switch (header.name) {
@@ -1711,28 +1711,28 @@ Luminus.matrix = (() => {
             this.state.cx = value;
             this.updateMatrix();
         }
-        get xaxis() {
+        get xAxis() {
             return parseFloat(this.getAttribute('xaxis') || '0') || 0;
         }
-        set xaxis(value) {
+        set xAxis(value) {
             this.setAttribute('xaxis', value + '');
-            this.state.xaxis = value;
+            this.state.xAxis = value;
             this.updateMatrix();
         }
-        get yaxis() {
+        get yAxis() {
             return parseFloat(this.getAttribute('yaxis') || '0') || 0;
         }
-        set yaxis(value) {
+        set yAxis(value) {
             this.setAttribute('yaxis', value + '');
-            this.state.yaxis = value;
+            this.state.yAxis = value;
             this.updateMatrix();
         }
-        get zaxis() {
+        get zAxis() {
             return parseFloat(this.getAttribute('zaxis') || '0') || 0;
         }
-        set zaxis(value) {
+        set zAxis(value) {
             this.setAttribute('zaxis', value + '');
-            this.state.zaxis = value;
+            this.state.zAxis = value;
             this.updateMatrix();
         }
         get roll() {
@@ -1773,7 +1773,7 @@ Luminus.matrix = (() => {
             this.dispatchEvent(new CustomEvent('render'));
         }
         static get observedAttributes() {
-            return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'xaxis', 'yaxis', 'zaxis', 'roll', 'pitch', 'yaw'];
+            return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'x-axis', 'y-axis', 'z-axis', 'roll', 'pitch', 'yaw'];
         }
         attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
@@ -1786,14 +1786,17 @@ Luminus.matrix = (() => {
                 case 'cx':
                 case 'cy':
                 case 'cz':
-                case 'xaxis':
-                case 'yaxis':
-                case 'zaxis':
                 case 'roll':
                 case 'pitch':
                 case 'yaw':
                     this[attrName] = parseFloat(newVal);
                     break;
+                case 'x-axis':
+                    this.xAxis = parseFloat(newVal);
+                case 'y-axis':
+                    this.yAxis = parseFloat(newVal);
+                case 'z-axis':
+                    this.zAxis = parseFloat(newVal);
             }
         }
     }, script.dataset.prefix);
@@ -2051,88 +2054,88 @@ Luminus.matrix = (() => {
         set view(value) {
             this.setAttribute('view', value === 'volume' ? 'volume' : 'frustum');
         }
-        get eyex() {
-            return parseFloat(this.getAttribute('eyex') || '') || 0;
+        get eyeX() {
+            return parseFloat(this.getAttribute('eye-x') || '') || 0;
         }
-        set eyex(value) {
-            this.setAttribute('eyex', value + '');
+        set eyeX(value) {
+            this.setAttribute('eye-x', value + '');
             this.world.eye.x = value;
         }
-        get eyey() {
-            return parseFloat(this.getAttribute('eyey') || '') || 0;
+        get eyeY() {
+            return parseFloat(this.getAttribute('eye-y') || '') || 0;
         }
-        set eyey(value) {
-            this.setAttribute('eyey', value + '');
+        set eyeY(value) {
+            this.setAttribute('eye-y', value + '');
             this.world.eye.y = value;
         }
-        get eyez() {
-            return parseFloat(this.getAttribute('eyez') || '') || 0;
+        get eyeZ() {
+            return parseFloat(this.getAttribute('eye-z') || '') || 0;
         }
-        set eyez(value) {
-            this.setAttribute('eyez', value + '');
+        set eyeZ(value) {
+            this.setAttribute('eye-z', value + '');
             this.world.eye.z = value;
         }
-        get centerx() {
-            return parseFloat(this.getAttribute('centerx') || '') || 0;
+        get centerX() {
+            return parseFloat(this.getAttribute('center-x') || '') || 0;
         }
-        set centerx(value) {
-            this.setAttribute('centerx', value + '');
+        set centerX(value) {
+            this.setAttribute('center-x', value + '');
             this.world.center.x = value;
         }
-        get centery() {
-            return parseFloat(this.getAttribute('centery') || '') || 0;
+        get centerY() {
+            return parseFloat(this.getAttribute('center-y') || '') || 0;
         }
-        set centery(value) {
-            this.setAttribute('centery', value + '');
+        set centerY(value) {
+            this.setAttribute('center-y', value + '');
             this.world.center.y = value;
         }
-        get centerz() {
-            return parseFloat(this.getAttribute('centerz') || '') || 0;
+        get centerZ() {
+            return parseFloat(this.getAttribute('center-z') || '') || 0;
         }
-        set centerz(value) {
-            this.setAttribute('centerz', value + '');
+        set centerZ(value) {
+            this.setAttribute('center-z', value + '');
             this.world.center.z = value;
         }
-        get upx() {
-            return parseFloat(this.getAttribute('upx') || '') || 0;
+        get upX() {
+            return parseFloat(this.getAttribute('up-x') || '') || 0;
         }
-        set upx(value) {
-            this.setAttribute('upx', value + '');
+        set upX(value) {
+            this.setAttribute('up-x', value + '');
             this.world.up.x = value;
         }
-        get upy() {
-            return parseFloat(this.getAttribute('upy') || '') || 0;
+        get upY() {
+            return parseFloat(this.getAttribute('up-y') || '') || 0;
         }
-        set upy(value) {
-            this.setAttribute('upy', value + '');
+        set upY(value) {
+            this.setAttribute('up-y', value + '');
             this.world.up.y = value;
         }
-        get upz() {
-            return parseFloat(this.getAttribute('upz') || '') || 0;
+        get upZ() {
+            return parseFloat(this.getAttribute('up-z') || '') || 0;
         }
-        set upz(value) {
-            this.setAttribute('upz', value + '');
+        set upZ(value) {
+            this.setAttribute('up-z', value + '');
             this.world.up.z = value;
         }
-        get lightx() {
-            return parseFloat(this.getAttribute('lightx') || '') || 0;
+        get lightX() {
+            return parseFloat(this.getAttribute('light-x') || '') || 0;
         }
-        set lightx(value) {
-            this.setAttribute('lightx', value + '');
+        set lightX(value) {
+            this.setAttribute('light-x', value + '');
             this.world.light.x = value;
         }
-        get lighty() {
-            return parseFloat(this.getAttribute('lighty') || '') || 0;
+        get lightY() {
+            return parseFloat(this.getAttribute('light-y') || '') || 0;
         }
-        set lighty(value) {
-            this.setAttribute('lighty', value + '');
+        set lightY(value) {
+            this.setAttribute('light-y', value + '');
             this.world.light.y = value;
         }
-        get lightz() {
-            return parseFloat(this.getAttribute('lightz') || '') || 0;
+        get lightZ() {
+            return parseFloat(this.getAttribute('light-z') || '') || 0;
         }
-        set lightz(value) {
-            this.setAttribute('lightz', value + '');
+        set lightZ(value) {
+            this.setAttribute('light-z', value + '');
             this.world.light.z = value;
         }
         async init(world) {
@@ -2147,37 +2150,37 @@ Luminus.matrix = (() => {
             this.world.screen.top = this.top;
             this.world.screen.near = this.near;
             this.world.screen.far = this.far;
-            this.world.light.x = this.lightx;
-            this.world.light.y = this.lighty;
-            this.world.light.z = this.lightz;
+            this.world.light.x = this.lightX;
+            this.world.light.y = this.lightY;
+            this.world.light.z = this.lightZ;
             this.world.light.color.set(this.lightColor);
             this.world.light.ambient.set(this.ambientColor);
-            if (this.hasAttribute('eyex')) {
-                this.eyex = this.eyex;
+            if (this.hasAttribute('eye-x')) {
+                this.eyeX = this.eyeX;
             }
-            if (this.hasAttribute('eyey')) {
-                this.eyey = this.eyey;
+            if (this.hasAttribute('eye-y')) {
+                this.eyeY = this.eyeY;
             }
-            if (this.hasAttribute('eyez')) {
-                this.eyez = this.eyez;
+            if (this.hasAttribute('eye-z')) {
+                this.eyeZ = this.eyeZ;
             }
-            if (this.hasAttribute('centerx')) {
-                this.centerx = this.centerx;
+            if (this.hasAttribute('center-x')) {
+                this.centerX = this.centerX;
             }
-            if (this.hasAttribute('centery')) {
-                this.centery = this.centery;
+            if (this.hasAttribute('center-y')) {
+                this.centerY = this.centerY;
             }
-            if (this.hasAttribute('centerz')) {
-                this.centerz = this.centerz;
+            if (this.hasAttribute('center-z')) {
+                this.centerZ = this.centerZ;
             }
-            if (this.hasAttribute('upx')) {
-                this.upx = this.upx;
+            if (this.hasAttribute('up-x')) {
+                this.upX = this.upX;
             }
-            if (this.hasAttribute('upy')) {
-                this.upy = this.upy;
+            if (this.hasAttribute('up-y')) {
+                this.upY = this.upY;
             }
-            if (this.hasAttribute('upx')) {
-                this.upx = this.upx;
+            if (this.hasAttribute('up-z')) {
+                this.upZ = this.upZ;
             }
             await this.world.init(support);
             this._complete = true;

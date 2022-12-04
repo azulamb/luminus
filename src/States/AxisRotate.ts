@@ -4,9 +4,9 @@
 		public cy: number = 0;
 		public cz: number = 0;
 
-		public xaxis: number = 0;
-		public yaxis: number = 0;
-		public zaxis: number = 0;
+		public xAxis: number = 0;
+		public yAxis: number = 0;
+		public zAxis: number = 0;
 
 		public roll: number = 0;
 		public pitch: number = 0;
@@ -19,7 +19,7 @@
 		public update() {
 			[
 				Luminus.matrix.translation4(this.x, this.y, this.z), // Move
-				Luminus.matrix.rotation4(this.roll + this.xaxis, this.pitch + this.yaxis, this.yaw + this.zaxis), // Rotate model
+				Luminus.matrix.rotation4(this.roll + this.xAxis, this.pitch + this.yAxis, this.yaw + this.zAxis), // Rotate model
 				Luminus.matrix.translation4(-this.cx, -this.cy, -this.cz), // Move center
 			].reduce((p, n) => {
 				return Luminus.matrix.multiply4(n, p, this.matrix);

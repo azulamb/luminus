@@ -16,19 +16,19 @@ interface LuminusWorldElement extends HTMLElement {
 	near: number;
 	far: number;
 	view: 'volume' | 'frustum';
-	eyex: number;
-	eyey: number;
-	eyez: number;
-	upx: number;
-	upy: number;
-	upz: number;
-	centerx: number;
-	centery: number;
-	centerz: number;
+	eyeX: number;
+	eyeY: number;
+	eyeZ: number;
+	upX: number;
+	upY: number;
+	upZ: number;
+	centerX: number;
+	centerY: number;
+	centerZ: number;
 	// light
-	lightx: number;
-	lighty: number;
-	lightz: number;
+	lightX: number;
+	lightY: number;
+	lightZ: number;
 	readonly ambientColor: number[];
 	readonly lightColor: number[];
 
@@ -56,11 +56,11 @@ interface LuminusModelElement extends LuminusModelRender<unknown>, HTMLElement {
 	/** Model center z */
 	cz: number;
 	/** Rotation x axis */
-	xaxis: number;
+	xAxis: number;
 	/** Rotation y axis */
-	yaxis: number;
+	yAxis: number;
 	/** Rotation z axis */
-	zaxis: number;
+	zAxis: number;
 	/** Translate x */
 	x: number;
 	/** Translate y */

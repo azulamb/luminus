@@ -151,30 +151,30 @@
 				this.updateMatrix();
 			}
 
-			get xaxis() {
+			get xAxis() {
 				return parseFloat(this.getAttribute('xaxis') || '0') || 0;
 			}
-			set xaxis(value) {
+			set xAxis(value) {
 				this.setAttribute('xaxis', value + '');
-				this.state.xaxis = value;
+				this.state.xAxis = value;
 				this.updateMatrix();
 			}
 
-			get yaxis() {
+			get yAxis() {
 				return parseFloat(this.getAttribute('yaxis') || '0') || 0;
 			}
-			set yaxis(value) {
+			set yAxis(value) {
 				this.setAttribute('yaxis', value + '');
-				this.state.yaxis = value;
+				this.state.yAxis = value;
 				this.updateMatrix();
 			}
 
-			get zaxis() {
+			get zAxis() {
 				return parseFloat(this.getAttribute('zaxis') || '0') || 0;
 			}
-			set zaxis(value) {
+			set zAxis(value) {
 				this.setAttribute('zaxis', value + '');
-				this.state.zaxis = value;
+				this.state.zAxis = value;
 				this.updateMatrix();
 			}
 
@@ -222,7 +222,7 @@
 			}
 
 			static get observedAttributes() {
-				return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'xaxis', 'yaxis', 'zaxis', 'roll', 'pitch', 'yaw'];
+				return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'x-axis', 'y-axis', 'z-axis', 'roll', 'pitch', 'yaw'];
 			}
 
 			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
@@ -237,14 +237,17 @@
 					case 'cx':
 					case 'cy':
 					case 'cz':
-					case 'xaxis':
-					case 'yaxis':
-					case 'zaxis':
 					case 'roll':
 					case 'pitch':
 					case 'yaw':
 						this[attrName] = parseFloat(newVal);
 						break;
+					case 'x-axis':
+						this.xAxis = parseFloat(newVal);
+					case 'y-axis':
+						this.yAxis = parseFloat(newVal);
+					case 'z-axis':
+						this.zAxis = parseFloat(newVal);
 				}
 			}
 		},
