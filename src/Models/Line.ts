@@ -15,7 +15,7 @@
 			this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
 		}
 
-		public onprepare(world: LuminusWorld) {
+		public onPrepare(world: LuminusWorld) {
 			const gl2 = world.support.gl;
 
 			const vao = gl2.createVertexArray();
@@ -48,7 +48,7 @@
 			return Promise.resolve();
 		}
 
-		public onrender(world: LuminusWorld) {
+		public onRender(world: LuminusWorld) {
 			const gl2 = world.support.gl;
 
 			if (this._change) {

@@ -21,7 +21,7 @@
 			this._change = true;
 		}
 
-		public onprepare(world: LuminusWorld) {
+		public onPrepare(world: LuminusWorld) {
 			const length = this.length;
 
 			const gl2 = world.support.gl;
@@ -74,7 +74,7 @@
 			return Promise.resolve();
 		}
 
-		public onrender(world: LuminusWorld) {
+		public onRender(world: LuminusWorld) {
 			const gl2 = world.support.gl;
 
 			if (this._change) {

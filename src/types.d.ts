@@ -35,8 +35,8 @@ interface LuminusModel<T> {
 	// Overwrite
 	lMin?: number;
 	onload(result: T): Promise<unknown>;
-	onprepare(world: LuminusWorld): Promise<unknown>;
-	onrender(world: LuminusWorld): void;
+	onPrepare(world: LuminusWorld): Promise<unknown>;
+	onRender(world: LuminusWorld): void;
 	collisionDetection(cd: CollisionDetection): number;
 }
 

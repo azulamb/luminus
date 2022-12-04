@@ -704,13 +704,13 @@ Luminus.matrix = (() => {
                 return Promise.resolve();
             }
             this.complete = false;
-            return this.onprepare(world).then(() => {
+            return this.onPrepare(world).then(() => {
                 this.complete = true;
             });
         }
         render(world) {
             if (this.complete) {
-                return this.onrender(world);
+                return this.onRender(world);
             }
             if (this.loaded === true && this.complete === undefined) {
                 this.prepare(world).then(() => {
@@ -721,10 +721,10 @@ Luminus.matrix = (() => {
         onload(_arg) {
             return Promise.resolve();
         }
-        onprepare(_world) {
+        onPrepare(_world) {
             return Promise.resolve();
         }
-        onrender(_world) { }
+        onRender(_world) { }
         collisionDetection(_cd) {
             return Infinity;
         }
@@ -783,7 +783,7 @@ Luminus.matrix = (() => {
             this._length = value;
             this._change = true;
         }
-        onprepare(world) {
+        onPrepare(world) {
             const length = this.length;
             const gl2 = world.support.gl;
             const vao = gl2.createVertexArray();
@@ -815,7 +815,7 @@ Luminus.matrix = (() => {
             this._change = false;
             return Promise.resolve();
         }
-        onrender(world) {
+        onRender(world) {
             const gl2 = world.support.gl;
             if (this._change) {
                 this.prepare(world);
@@ -841,7 +841,7 @@ Luminus.matrix = (() => {
             this._length = value;
             this._change = true;
         }
-        onprepare(world) {
+        onPrepare(world) {
             Luminus.console.info('Start: cube-prepare.');
             const l = this._length;
             this.verts = new Float32Array([
@@ -907,7 +907,7 @@ Luminus.matrix = (() => {
             this._change = false;
             return Promise.resolve();
         }
-        onrender(world) {
+        onRender(world) {
             const gl2 = world.support.gl;
             if (this._change) {
                 this.prepare(world);
@@ -931,7 +931,7 @@ Luminus.matrix = (() => {
             this.position = new Float32Array([0, 0, 0, 0, 0, 0]);
             this.colors = new Float32Array([1, 1, 1, 1, 1, 1, 1, 1]);
         }
-        onprepare(world) {
+        onPrepare(world) {
             const gl2 = world.support.gl;
             const vao = gl2.createVertexArray();
             if (!vao) {
@@ -954,7 +954,7 @@ Luminus.matrix = (() => {
             this._change = false;
             return Promise.resolve();
         }
-        onrender(world) {
+        onRender(world) {
             const gl2 = world.support.gl;
             if (this._change) {
                 this.prepare(world);
@@ -1247,7 +1247,7 @@ Luminus.matrix = (() => {
                 this.faces = new Uint16Array(faces);
             });
         }
-        onprepare(world) {
+        onPrepare(world) {
             Luminus.console.info('Start: vox-prepare.');
             const gl2 = world.support.gl;
             const vao = gl2.createVertexArray();
@@ -1279,7 +1279,7 @@ Luminus.matrix = (() => {
             this.count = this.faces.length;
             return Promise.resolve();
         }
-        onrender(world) {
+        onRender(world) {
             const gl2 = world.support.gl;
             gl2.bindVertexArray(this.vao);
             gl2.drawElements(gl2.TRIANGLES, this.count, gl2.UNSIGNED_SHORT, 0);

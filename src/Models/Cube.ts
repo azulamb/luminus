@@ -18,7 +18,7 @@
 			this._change = true;
 		}
 
-		public onprepare(world: LuminusWorld) {
+		public onPrepare(world: LuminusWorld) {
 			Luminus.console.info('Start: cube-prepare.');
 
 			const l = this._length;
@@ -110,7 +110,7 @@
 			return Promise.resolve();
 		}
 
-		public onrender(world: LuminusWorld) {
+		public onRender(world: LuminusWorld) {
 			const gl2 = world.support.gl;
 
 			if (this._change) {

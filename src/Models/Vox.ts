@@ -309,7 +309,7 @@ interface VoxData {
 			});
 		}
 
-		public onprepare(world: LuminusWorld) {
+		public onPrepare(world: LuminusWorld) {
 			Luminus.console.info('Start: vox-prepare.');
 			const gl2 = world.support.gl;
 
@@ -351,7 +351,7 @@ interface VoxData {
 			return Promise.resolve();
 		}
 
-		public onrender(world: LuminusWorld) {
+		public onRender(world: LuminusWorld) {
 			const gl2 = world.support.gl;
 
 			gl2.bindVertexArray(this.vao);

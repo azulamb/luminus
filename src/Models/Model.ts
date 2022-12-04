@@ -25,14 +25,14 @@
 			}
 			this.complete = false;
 
-			return this.onprepare(world).then(() => {
+			return this.onPrepare(world).then(() => {
 				this.complete = true;
 			});
 		}
 
 		public render(world: LuminusWorld) {
 			if (this.complete) {
-				return this.onrender(world);
+				return this.onRender(world);
 			}
 
 			/*if ( this.loaded === undefined )
@@ -52,11 +52,11 @@
 			return Promise.resolve();
 		}
 
-		public onprepare(_world: LuminusWorld) {
+		public onPrepare(_world: LuminusWorld) {
 			return Promise.resolve();
 		}
 
-		public onrender(_world: LuminusWorld) {}
+		public onRender(_world: LuminusWorld) {}
 
 		public collisionDetection(_cd: CollisionDetection): number {
 			return Infinity;
