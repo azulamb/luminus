@@ -83,6 +83,7 @@
 				return ['src', ...Luminus.model.observedAttributes];
 			}
 
+			// deno-lint-ignore no-explicit-any
 			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;

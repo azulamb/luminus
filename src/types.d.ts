@@ -162,22 +162,30 @@ interface LuminusRay extends CollisionDetection {
 interface Luminus {
 	version: string;
 	console: {
+		// deno-lint-ignore no-explicit-any
 		debug(...data: any[]): void;
+		// deno-lint-ignore no-explicit-any
 		error(...data: any[]): void;
+		// deno-lint-ignore no-explicit-any
 		info(...data: any[]): void;
+		// deno-lint-ignore no-explicit-any
 		log(...data: any[]): void;
+		// deno-lint-ignore no-explicit-any
 		warn(...data: any[]): void;
 	};
 	loaded: Promise<void>;
 	matrix: Matrix;
 	world: { new (): LuminusWorld };
-	model: { new (...params: any[]): LuminusModelElement; observedAttributes: string[] };
 	models: {
+		// deno-lint-ignore no-explicit-any
 		model: { new (...params: any[]): LuminusModel<unknown> };
+		// deno-lint-ignore no-explicit-any
 		[keys: string]: { new (...params: any[]): LuminusModel<any> };
 	};
 	states: {
+		// deno-lint-ignore no-explicit-any
 		state: { new (...params: any[]): LuminusState };
+		// deno-lint-ignore no-explicit-any
 		[keys: string]: { new (...params: any[]): LuminusState };
 	};
 	ray: {
@@ -186,5 +194,3 @@ interface Luminus {
 	};
 	createSupport(gl2: WebGL2RenderingContext): LuminusSupport;
 }
-
-declare const Luminus: Luminus;

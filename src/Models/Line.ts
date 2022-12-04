@@ -1,6 +1,6 @@
 (() => {
 	class Line extends Luminus.models.model implements LuminusModelLine {
-		public lMin: number = 1;
+		public lMin = 1;
 		public loaded?: boolean = true;
 		public complete?: boolean;
 		private _change: boolean;

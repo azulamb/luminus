@@ -23,7 +23,7 @@ interface VoxData {
 
 (() => {
 	class VoxReader {
-		protected r: number = 0;
+		protected r = 0;
 
 		constructor() {
 		}
@@ -51,17 +51,17 @@ interface VoxData {
 			result.version = this.readInt(data);
 
 			const chunk = {
-				PACK: (header: VoxChunkHeader) => {
+				PACK: (_header: VoxChunkHeader) => {
 					return { models: this.readInt(data) };
 				},
-				SIZE: (header: VoxChunkHeader) => {
+				SIZE: (_header: VoxChunkHeader) => {
 					return {
 						x: this.readInt(data),
 						y: this.readInt(data),
 						z: this.readInt(data),
 					};
 				},
-				XYZI: (header: VoxChunkHeader) => {
+				XYZI: (_header: VoxChunkHeader) => {
 					const count = this.readInt(data);
 					const boxes: { x: number; y: number; z: number; c: number }[] = [];
 					for (let i = 0; i < count; ++i) {

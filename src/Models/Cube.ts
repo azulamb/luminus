@@ -5,7 +5,7 @@
 		public color: Float32Array = new Float32Array(4);
 		protected verts: Float32Array;
 		protected faces: Uint16Array;
-		private _length: number = 1;
+		private _length = 1;
 		private _change: boolean;
 
 		protected vao: WebGLVertexArrayObject;

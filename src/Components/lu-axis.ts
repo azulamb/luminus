@@ -42,7 +42,8 @@
 				return ['length'];
 			}
 
-			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
+			// deno-lint-ignore no-explicit-any
+			public attributeChangedCallback(_attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;
 				}

@@ -8,6 +8,7 @@
 			this.loaded = false;
 			this.complete = undefined;
 
+			// deno-lint-ignore no-explicit-any
 			return (p || Promise.resolve(<any> null)).then((result) => {
 				return this.onload(result);
 			}).then(() => {
@@ -46,17 +47,18 @@
 			}
 		}
 
-		public onload(arg: any) {
+		// deno-lint-ignore no-explicit-any
+		public onload(_arg: any) {
 			return Promise.resolve();
 		}
 
-		public onprepare(world: LuminusWorld) {
+		public onprepare(_world: LuminusWorld) {
 			return Promise.resolve();
 		}
 
-		public onrender(world: LuminusWorld) {}
+		public onrender(_world: LuminusWorld) {}
 
-		public collisionDetection(cd: CollisionDetection): number {
+		public collisionDetection(_cd: CollisionDetection): number {
 			return Infinity;
 		}
 	};

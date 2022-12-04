@@ -15,13 +15,14 @@
 		}
 		customElements.define(tagname, component);
 		customElements.whenDefined(tagname).then(() => {
+			// deno-lint-ignore no-explicit-any
 			Luminus.model = <{ new (...params: any[]): LuminusModelElement; observedAttributes: string[] }> (customElements.get(tagname));
 		});
 	})(
 		class extends HTMLElement implements LuminusModelElement {
 			private _model: LuminusModel<unknown>;
 			public state: LuminusStateAxisRotate;
-			protected _timer: number = 0;
+			protected _timer = 0;
 
 			constructor() {
 				super();
@@ -225,6 +226,7 @@
 				return ['x', 'y', 'z', 'cx', 'cy', 'cz', 'x-axis', 'y-axis', 'z-axis', 'roll', 'pitch', 'yaw'];
 			}
 
+			// deno-lint-ignore no-explicit-any
 			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;
@@ -244,10 +246,13 @@
 						break;
 					case 'x-axis':
 						this.xAxis = parseFloat(newVal);
+						break;
 					case 'y-axis':
 						this.yAxis = parseFloat(newVal);
+						break;
 					case 'z-axis':
 						this.zAxis = parseFloat(newVal);
+						break;
 				}
 			}
 		},

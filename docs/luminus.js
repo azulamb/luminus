@@ -28,7 +28,7 @@
     }
     window.Luminus = luminus;
 })(document.currentScript);
-Luminus.version = '0.1.0';
+Luminus.version = '0.2.0';
 (() => {
     Luminus.world = class {
         constructor() {
@@ -135,25 +135,25 @@ Luminus.matrix = (() => {
         if (!m) {
             m = create4();
         }
-        const eyex = eye[0], eyey = eye[1], eyez = eye[2];
-        const centerx = center[0], centery = center[1], centerz = center[2];
-        const upx = up[0], upy = up[1], upz = up[2];
-        if (Math.abs(eyex - centerx) < 0.000001 &&
-            Math.abs(eyey - centery) < 0.000001 &&
-            Math.abs(eyez - centerz) < 0.000001) {
+        const eyeX = eye[0], eyeY = eye[1], eyeZ = eye[2];
+        const centerX = center[0], centerY = center[1], centerZ = center[2];
+        const upX = up[0], upY = up[1], upZ = up[2];
+        if (Math.abs(eyeX - centerX) < 0.000001 &&
+            Math.abs(eyeY - centerY) < 0.000001 &&
+            Math.abs(eyeZ - centerZ) < 0.000001) {
             return identity4(m);
         }
         let x0, x1, x2, y0, y1, y2, z0, z1, z2, len;
-        z0 = eyex - centerx;
-        z1 = eyey - centery;
-        z2 = eyez - centerz;
+        z0 = eyeX - centerX;
+        z1 = eyeY - centerY;
+        z2 = eyeZ - centerZ;
         len = 1 / Math.hypot(z0, z1, z2);
         z0 *= len;
         z1 *= len;
         z2 *= len;
-        x0 = upy * z2 - upz * z1;
-        x1 = upz * z0 - upx * z2;
-        x2 = upx * z1 - upy * z0;
+        x0 = upY * z2 - upZ * z1;
+        x1 = upZ * z0 - upX * z2;
+        x2 = upX * z1 - upY * z0;
         len = Math.hypot(x0, x1, x2);
         if (!len) {
             x0 = x1 = x2 = 0;
@@ -189,9 +189,9 @@ Luminus.matrix = (() => {
         m[9] = y2;
         m[10] = z2;
         m[11] = 0;
-        m[12] = -(x0 * eyex + x1 * eyey + x2 * eyez);
-        m[13] = -(y0 * eyex + y1 * eyey + y2 * eyez);
-        m[14] = -(z0 * eyex + z1 * eyey + z2 * eyez);
+        m[12] = -(x0 * eyeX + x1 * eyeY + x2 * eyeZ);
+        m[13] = -(y0 * eyeX + y1 * eyeY + y2 * eyeZ);
+        m[14] = -(z0 * eyeX + z1 * eyeY + z2 * eyeZ);
         m[15] = 1;
         return m;
     }
@@ -261,25 +261,6 @@ Luminus.matrix = (() => {
                 a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3],
             ];
         }
-        return m;
-    }
-    function quaternion(roll, pitch, yaw, m) {
-        if (!m) {
-            m = new Float32Array(4);
-        }
-        roll = roll / 180 * Math.PI;
-        pitch = pitch / 180 * Math.PI;
-        yaw = yaw / 180 * Math.PI;
-        const cosRoll = Math.cos(roll / 2.0);
-        const sinRoll = Math.sin(roll / 2.0);
-        const cosPitch = Math.cos(pitch / 2.0);
-        const sinPitch = Math.sin(pitch / 2.0);
-        const cosYaw = Math.cos(yaw / 2.0);
-        const sinYaw = Math.sin(yaw / 2.0);
-        m[0] = cosRoll * cosPitch * cosYaw + sinRoll * sinPitch * sinYaw;
-        m[1] = sinRoll * cosPitch * cosYaw - cosRoll * sinPitch * sinYaw;
-        m[2] = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-        m[3] = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
         return m;
     }
     function rotation4(roll, pitch, yaw, m) {
@@ -737,14 +718,14 @@ Luminus.matrix = (() => {
                 });
             }
         }
-        onload(arg) {
+        onload(_arg) {
             return Promise.resolve();
         }
-        onprepare(world) {
+        onprepare(_world) {
             return Promise.resolve();
         }
-        onrender(world) { }
-        collisionDetection(cd) {
+        onrender(_world) { }
+        collisionDetection(_cd) {
             return Infinity;
         }
     };
@@ -1058,17 +1039,17 @@ Luminus.matrix = (() => {
             }
             result.version = this.readInt(data);
             const chunk = {
-                PACK: (header) => {
+                PACK: (_header) => {
                     return { models: this.readInt(data) };
                 },
-                SIZE: (header) => {
+                SIZE: (_header) => {
                     return {
                         x: this.readInt(data),
                         y: this.readInt(data),
                         z: this.readInt(data),
                     };
                 },
-                XYZI: (header) => {
+                XYZI: (_header) => {
                     const count = this.readInt(data);
                     const boxes = [];
                     for (let i = 0; i < count; ++i) {
@@ -1412,7 +1393,7 @@ Luminus.matrix = (() => {
         static get observedAttributes() {
             return ['length'];
         }
-        attributeChangedCallback(attrName, oldVal, newVal) {
+        attributeChangedCallback(_attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
             }
@@ -1573,7 +1554,7 @@ Luminus.matrix = (() => {
         static get observedAttributes() {
             return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
         }
-        attributeChangedCallback(attrName, oldVal, newVal) {
+        attributeChangedCallback(_attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
             }
@@ -1793,10 +1774,13 @@ Luminus.matrix = (() => {
                     break;
                 case 'x-axis':
                     this.xAxis = parseFloat(newVal);
+                    break;
                 case 'y-axis':
                     this.yAxis = parseFloat(newVal);
+                    break;
                 case 'z-axis':
                     this.zAxis = parseFloat(newVal);
+                    break;
             }
         }
     }, script.dataset.prefix);
@@ -1929,7 +1913,7 @@ Luminus.matrix = (() => {
             });
             (() => {
                 let timer;
-                this.addEventListener('render', (event) => {
+                this.addEventListener('render', (_event) => {
                     if (timer) {
                         clearTimeout(timer);
                     }
@@ -2205,7 +2189,7 @@ Luminus.matrix = (() => {
                 .replace(/\s/g, '')
                 .replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
                 .slice(0, 4)
-                .map((v, i, a) => {
+                .map((v, _i, a) => {
                 return parseInt(v) / 255.0 * parseFloat(a[3]);
             })
                 .slice(0, 3);

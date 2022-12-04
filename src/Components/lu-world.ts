@@ -66,7 +66,7 @@
 				(() => {
 					let timer: number;
 
-					this.addEventListener('render', (event) => {
+					this.addEventListener('render', (_event) => {
 						if (timer) {
 							clearTimeout(timer);
 						}
@@ -307,6 +307,7 @@
 			public async init(world?: LuminusWorld) {
 				Luminus.console.info('Start: init lu-world.');
 				this._complete = false;
+				// deno-lint-ignore no-explicit-any
 				this._world = <any> null;
 				const support = Luminus.createSupport(<WebGL2RenderingContext> this.canvas.getContext('webgl2'));
 
@@ -325,30 +326,39 @@
 				this.world.light.ambient.set(this.ambientColor);
 
 				if (this.hasAttribute('eye-x')) {
+					// deno-lint-ignore no-self-assign
 					this.eyeX = this.eyeX;
 				}
 				if (this.hasAttribute('eye-y')) {
+					// deno-lint-ignore no-self-assign
 					this.eyeY = this.eyeY;
 				}
 				if (this.hasAttribute('eye-z')) {
+					// deno-lint-ignore no-self-assign
 					this.eyeZ = this.eyeZ;
 				}
 				if (this.hasAttribute('center-x')) {
+					// deno-lint-ignore no-self-assign
 					this.centerX = this.centerX;
 				}
 				if (this.hasAttribute('center-y')) {
+					// deno-lint-ignore no-self-assign
 					this.centerY = this.centerY;
 				}
 				if (this.hasAttribute('center-z')) {
+					// deno-lint-ignore no-self-assign
 					this.centerZ = this.centerZ;
 				}
 				if (this.hasAttribute('up-x')) {
+					// deno-lint-ignore no-self-assign
 					this.upX = this.upX;
 				}
 				if (this.hasAttribute('up-y')) {
+					// deno-lint-ignore no-self-assign
 					this.upY = this.upY;
 				}
 				if (this.hasAttribute('up-z')) {
+					// deno-lint-ignore no-self-assign
 					this.upZ = this.upZ;
 				}
 
@@ -381,7 +391,7 @@
 					.replace(/\s/g, '')
 					.replace(/rgba{0,1}\(([0-9\.\,]+)\)/, '$1') + ',1').split(',')
 					.slice(0, 4)
-					.map((v, i, a) => {
+					.map((v, _i, a) => {
 						return parseInt(v) / 255.0 * parseFloat(a[3]);
 					})
 					.slice(0, 3);
@@ -401,6 +411,7 @@
 				return ['width', 'height'];
 			}
 
+			// deno-lint-ignore no-explicit-any
 			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;

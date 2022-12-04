@@ -1,16 +1,16 @@
 (() => {
 	Luminus.states.axisRotate = class AxisRotate extends Luminus.states.state implements LuminusStateAxisRotate {
-		public cx: number = 0;
-		public cy: number = 0;
-		public cz: number = 0;
+		public cx = 0;
+		public cy = 0;
+		public cz = 0;
 
-		public xAxis: number = 0;
-		public yAxis: number = 0;
-		public zAxis: number = 0;
+		public xAxis = 0;
+		public yAxis = 0;
+		public zAxis = 0;
 
-		public roll: number = 0;
-		public pitch: number = 0;
-		public yaw: number = 0;
+		public roll = 0;
+		public pitch = 0;
+		public yaw = 0;
 
 		constructor() {
 			super();

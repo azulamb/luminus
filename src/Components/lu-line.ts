@@ -103,7 +103,9 @@
 			public color(r: number, g: number, b: number, a: number): this;
 			public color(r0: number, g0: number, b0: number, r1: number, g1: number, b1: number): this;
 			public color(r0: number, g0: number, b0: number, a0: number, r1: number, g1: number, b1: number, a1: number): this;
+			// deno-lint-ignore no-unused-vars
 			color(r0: number, g0: number, b0: number, a0?: number, r1?: number, g1?: number, b1?: number, a1?: number) {
+				// TODO:
 				return this;
 			}
 
@@ -111,7 +113,8 @@
 				return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
 			}
 
-			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
+			// deno-lint-ignore no-explicit-any
+			public attributeChangedCallback(_attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;
 				}

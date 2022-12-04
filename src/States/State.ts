@@ -1,9 +1,9 @@
 (() => {
 	Luminus.states.state = class State implements LuminusState {
 		public matrix: Float32Array;
-		public x: number = 0;
-		public y: number = 0;
-		public z: number = 0;
+		public x = 0;
+		public y = 0;
+		public z = 0;
 
 		constructor() {
 			this.matrix = Luminus.matrix.identity4();

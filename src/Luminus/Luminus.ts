@@ -8,18 +8,25 @@
 		],
 	).then(() => {});
 
-	const luminus: Luminus = {
+	const luminus: LuminusBrowser = {
 		version: '',
 		console: console,
 		loaded: loaded,
+		// deno-lint-ignore no-explicit-any
 		matrix: <any> null,
+		// deno-lint-ignore no-explicit-any
 		model: <any> null,
+		// deno-lint-ignore no-explicit-any
 		models: <any> {},
+		// deno-lint-ignore no-explicit-any
 		states: <any> {},
+		// deno-lint-ignore no-explicit-any
 		world: <any> null,
 		createSupport: () => {
+			// deno-lint-ignore no-explicit-any
 			return <any> null;
 		},
+		// deno-lint-ignore no-explicit-any
 		ray: <any> null,
 	};
 
@@ -33,5 +40,6 @@
 		};
 	}
 
+	// deno-lint-ignore no-explicit-any
 	(<any> window).Luminus = luminus;
 })(<HTMLScriptElement> document.currentScript);

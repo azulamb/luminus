@@ -167,7 +167,7 @@ void main(void) {
 			this.support.gl.flush();
 		}
 
-		public unProject(viewport: Int32Array, screenX: number, screenY: number, z: number = 1): Float32Array {
+		public unProject(viewport: Int32Array, screenX: number, screenY: number, z = 1): Float32Array {
 			const x = (screenX - viewport[0]) * 2 / viewport[2] - 1;
 			const y = 1 - (screenY - viewport[1]) * 2 / viewport[3];
 

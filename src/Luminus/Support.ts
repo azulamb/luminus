@@ -116,12 +116,14 @@
 			let result: RegExpExecArray | null;
 
 			const inReg = new RegExp(/\sin [^\s]+ ([^\;\s]+)\;/sg);
+			// deno-lint-ignore no-cond-assign
 			while (result = inReg.exec(vertex)) {
 				const key = result[1];
 				inPosition[key] = gl.getAttribLocation(program, key);
 			}
 
 			const uniformReg = new RegExp(/\suniform [^\s]+ ([^\;\s]+)\;/sg);
+			// deno-lint-ignore no-cond-assign
 			while (result = uniformReg.exec(vertex)) {
 				const key = result[1];
 				uniformPosition[key] = <WebGLUniformLocation> gl.getUniformLocation(program, key);
@@ -172,6 +174,7 @@
 			const index = num === undefined ? this.texture.length : num;
 
 			if (!this.texture[index]) {
+				// deno-lint-ignore no-explicit-any
 				this.texture[index] = <any> null;
 			}
 

@@ -165,7 +165,7 @@ Luminus.matrix = (() => {
 		return m;
 	}
 
-	function quaternion(roll: number, pitch: number, yaw: number, m?: Float32Array) {
+	/*function quaternion(roll: number, pitch: number, yaw: number, m?: Float32Array) {
 		if (!m) {
 			m = new Float32Array(4);
 		}
@@ -183,7 +183,7 @@ Luminus.matrix = (() => {
 		m[2] = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
 		m[3] = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
 		return m;
-	}
+	}*/
 
 	function rotation4(roll: number, pitch: number, yaw: number, m?: Float32Array) {
 		if (!m) {

@@ -1,3 +1,10 @@
+interface LuminusBrowser extends Luminus {
+	// deno-lint-ignore no-explicit-any
+	model: { new (...params: any[]): LuminusModelElement; observedAttributes: string[] };
+}
+
+declare const Luminus: LuminusBrowser;
+
 /**
  * WebComponents
  */
@@ -85,6 +92,7 @@ interface LuminusModelElement extends LuminusModelRender<unknown>, HTMLElement {
 	 */
 	collisionDetection(cd: CollisionDetection): number;
 	rerender(): void;
+	// deno-lint-ignore no-explicit-any
 	attributeChangedCallback(attrName: string, oldVal: any, newVal: any): unknown;
 }
 
