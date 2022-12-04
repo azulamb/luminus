@@ -12,6 +12,7 @@
 		"./index.ts",
 		"./States/*.ts",
 		"./Models/*.ts",
-		"./Components/*.ts"
+		"./Components/*.ts",
+		"Browser/World.ts"
 	]
 }

@@ -1391,13 +1391,19 @@ Luminus.matrix = (() => {
             this.rerender();
         }
         static get observedAttributes() {
-            return ['length'];
+            return ['length', ...Luminus.model.observedAttributes];
         }
-        attributeChangedCallback(_attrName, oldVal, newVal) {
+        attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
             }
-            this.length = newVal;
+            switch (attrName) {
+                case 'length':
+                    this.length = newVal;
+                    break;
+                default:
+                    super.attributeChangedCallback(attrName, oldVal, newVal);
+            }
         }
     }, script.dataset.prefix);
 });
@@ -1549,16 +1555,28 @@ Luminus.matrix = (() => {
             return this;
         }
         color(r0, g0, b0, a0, r1, g1, b1, a1) {
+            this.model.color(r0, g0, b0, a0, r1, g1, b1, a1);
             return this;
         }
         static get observedAttributes() {
-            return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
+            return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez', ...Luminus.model.observedAttributes];
         }
-        attributeChangedCallback(_attrName, oldVal, newVal) {
+        attributeChangedCallback(attrName, oldVal, newVal) {
             if (oldVal === newVal) {
                 return;
             }
-            this.updatePosition();
+            switch (attrName) {
+                case 'sx':
+                case 'sy':
+                case 'sz':
+                case 'ex':
+                case 'ey':
+                case 'ez':
+                    this.updatePosition();
+                    break;
+                default:
+                    super.attributeChangedCallback(attrName, oldVal, newVal);
+            }
         }
     }, script.dataset.prefix);
 });

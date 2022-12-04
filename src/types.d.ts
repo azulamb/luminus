@@ -128,11 +128,10 @@ interface LuminusSupport {
 
 	enables(...enables: number[]): this;
 
-	init(vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement): Promise<WebGLProgram>;
+	init(vertex: string, fragment: string): Promise<WebGLProgram>;
 
-	initShader(vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement): void;
+	initShader(vertex: string, fragment: string): void;
 
-	loadShader(element: HTMLScriptElement): Promise<{ type: number; source: string }>;
 	loadShader(type: number, source: string): Promise<{ type: number; source: string }>;
 
 	createShader(type: number, source: string): Promise<WebGLShader>;
@@ -146,7 +145,6 @@ interface LuminusSupport {
 	getViewport(): Int32Array;
 
 	// Texture
-	loadTexture(image: string | HTMLImageElement, num?: number): Promise<number>;
 	useTexture(num: number): void;
 }
 

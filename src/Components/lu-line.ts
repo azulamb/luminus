@@ -11,6 +11,7 @@
 		customElements.define(tagname, component);
 	})(
 		class extends Luminus.model implements LuminusModelLineElement {
+			public model: LuminusModelLine;
 			private _updatePosition?: number;
 
 			constructor() {
@@ -103,22 +104,32 @@
 			public color(r: number, g: number, b: number, a: number): this;
 			public color(r0: number, g0: number, b0: number, r1: number, g1: number, b1: number): this;
 			public color(r0: number, g0: number, b0: number, a0: number, r1: number, g1: number, b1: number, a1: number): this;
-			// deno-lint-ignore no-unused-vars
 			color(r0: number, g0: number, b0: number, a0?: number, r1?: number, g1?: number, b1?: number, a1?: number) {
-				// TODO:
+				this.model.color(r0, g0, b0, <number> a0, <number> r1, <number> g1, <number> b1, <number> a1);
 				return this;
 			}
 
 			static get observedAttributes() {
-				return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez'];
+				return ['sx', 'sy', 'sz', 'ex', 'ey', 'ez', ...Luminus.model.observedAttributes];
 			}
 
 			// deno-lint-ignore no-explicit-any
-			public attributeChangedCallback(_attrName: string, oldVal: any, newVal: any) {
+			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;
 				}
-				this.updatePosition();
+				switch (attrName) {
+					case 'sx':
+					case 'sy':
+					case 'sz':
+					case 'ex':
+					case 'ey':
+					case 'ez':
+						this.updatePosition();
+						break;
+					default:
+						super.attributeChangedCallback(attrName, oldVal, newVal);
+				}
 			}
 		},
 		script.dataset.prefix,

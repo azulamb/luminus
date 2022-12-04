@@ -1,5 +1,5 @@
 (() => {
-	class Support implements LuminusSupport {
+	class Support implements LuminusSupportBrowser {
 		public gl: WebGL2RenderingContext;
 		public program: WebGLProgram;
 

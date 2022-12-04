@@ -1,9 +1,21 @@
 interface LuminusBrowser extends Luminus {
 	// deno-lint-ignore no-explicit-any
 	model: { new (...params: any[]): LuminusModelElement; observedAttributes: string[] };
+	createSupport(gl2: WebGL2RenderingContext): LuminusSupportBrowser;
 }
 
 declare const Luminus: LuminusBrowser;
+
+interface LuminusSupportBrowser extends LuminusSupport {
+	init(vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement): Promise<WebGLProgram>;
+
+	initShader(vertex: string | HTMLScriptElement, fragment: string | HTMLScriptElement): void;
+
+	loadShader(element: HTMLScriptElement): Promise<{ type: number; source: string }>;
+	loadShader(type: number, source: string): Promise<{ type: number; source: string }>;
+
+	loadTexture(image: string | HTMLImageElement, num?: number): Promise<number>;
+}
 
 /**
  * WebComponents
@@ -97,6 +109,7 @@ interface LuminusModelElement extends LuminusModelRender<unknown>, HTMLElement {
 }
 
 interface LuminusModelLineElement extends LuminusModelElement {
+	model: LuminusModelLine;
 	/** start x */
 	sx: number;
 	/** start y */

@@ -136,7 +136,7 @@
 			}
 
 			get world() {
-				return <LuminusWorldDefault> this._world;
+				return <LuminusWorldBrowser> this._world;
 			}
 
 			get width() {
@@ -374,8 +374,8 @@
 				Luminus.console.info('Render:');
 
 				this.world.beginRender();
-				(<LuminusWorldDefault> this.world).light.color.set(this.lightColor);
-				(<LuminusWorldDefault> this.world).light.ambient.set(this.ambientColor);
+				this.world.light.color.set(this.lightColor);
+				this.world.light.ambient.set(this.ambientColor);
 
 				for (const model of this.children) {
 					if (model instanceof Luminus.model) {

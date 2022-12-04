@@ -39,15 +39,21 @@
 			}
 
 			static get observedAttributes() {
-				return ['length'];
+				return ['length', ...Luminus.model.observedAttributes];
 			}
 
 			// deno-lint-ignore no-explicit-any
-			public attributeChangedCallback(_attrName: string, oldVal: any, newVal: any) {
+			public attributeChangedCallback(attrName: string, oldVal: any, newVal: any) {
 				if (oldVal === newVal) {
 					return;
 				}
-				this.length = newVal;
+				switch (attrName) {
+					case 'length':
+						this.length = newVal;
+						break;
+					default:
+						super.attributeChangedCallback(attrName, oldVal, newVal);
+				}
 			}
 		},
 		script.dataset.prefix,

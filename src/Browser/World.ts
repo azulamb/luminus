@@ -1,4 +1,4 @@
-interface LuminusWorldDefault extends LuminusWorld {
+interface LuminusWorldBrowser extends LuminusWorld {
 	eye: {
 		x: number;
 		y: number;
@@ -32,7 +32,7 @@ interface LuminusWorldDefault extends LuminusWorld {
 }
 
 (() => {
-	Luminus.world = class implements LuminusWorldDefault {
+	Luminus.world = class implements LuminusWorldBrowser {
 		public eye = { x: 0, y: 0, z: 0 };
 		public center = { x: 0, y: 0, z: 0 };
 		public up = { x: 0, y: 0, z: 0 };
@@ -51,7 +51,7 @@ interface LuminusWorldDefault extends LuminusWorld {
 			near: 0,
 			far: 0,
 		};
-		public support: LuminusSupport;
+		public support: LuminusSupportBrowser;
 
 		// Matrix
 		private uProjection: Float32Array;
@@ -59,7 +59,7 @@ interface LuminusWorldDefault extends LuminusWorld {
 		private uModel: Float32Array;
 		private iModel: Float32Array;
 
-		public async init(support: LuminusSupport) {
+		public async init(support: LuminusSupportBrowser) {
 			this.support = support;
 
 			const vertex = `#version 300 es
