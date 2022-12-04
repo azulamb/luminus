@@ -11,6 +11,8 @@
 		customElements.define(tagname, component);
 	})(
 		class extends Luminus.model implements LuminusModelCubeElement {
+			public model: LuminusModelCube;
+
 			constructor() {
 				super();
 
@@ -45,11 +47,11 @@
 			}
 
 			get length() {
-				return (<LuminusModelCube> this.model).length;
+				return this.model.length;
 			}
 			set length(value) {
 				const length = typeof value === 'number' ? value : parseFloat(value);
-				(<LuminusModelCube> this.model).length = length;
+				this.model.length = length;
 				this.setAttribute('length', length + '');
 				this.rerender();
 			}

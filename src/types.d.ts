@@ -36,9 +36,15 @@ interface LuminusWorldElement extends HTMLElement {
 	render(): void;
 }
 
-interface LuminusModelElement extends HTMLElement {
-	model: LuminusModel<unknown>;
+interface LuminusModelRender<T> {
+	model: LuminusModel<T>;
 	state: LuminusState;
+	/** Get model matrix. */
+	copyMatrix(out: Float32Array): void;
+	render(program: LuminusProgram): void;
+}
+
+interface LuminusModelElement extends LuminusModelRender<unknown>, HTMLElement {
 	readonly complete: boolean;
 	readonly program: LuminusProgram | undefined;
 	/** true = This model selectable. */
@@ -74,13 +80,10 @@ interface LuminusModelElement extends HTMLElement {
 	 * @param sync true = sync
 	 */
 	updateMatrix(sync?: boolean): void;
-	/** Get model matrix. */
-	copyMatrix(out: Float32Array): void;
 	/**
 	 * @return Infinity = not collide. Other number = collide.(distance from origin.)
 	 */
 	collisionDetection(cd: CollisionDetection): number;
-	render(program: LuminusProgram): void;
 	rerender(): void;
 }
 
@@ -106,10 +109,12 @@ interface LuminusModelLineElement extends LuminusModelElement {
 }
 
 interface LuminusModelAxisElement extends LuminusModelElement {
+	model: LuminusModelAxis;
 	length: number;
 }
 
 interface LuminusModelCubeElement extends LuminusModelElement {
+	model: LuminusModelCube;
 	length: number;
 }
 
@@ -262,13 +267,13 @@ interface LuminusSupport {
 	useTexture(num: number): void;
 }
 
-interface LuminusProgram {
+interface LuminusProgram<T extends {} = {}> {
 	support: LuminusSupport;
-	init(world: LuminusWorldElement, support: LuminusSupport): Promise<void>;
-	beginRender(world: LuminusWorldElement): void;
-	modelRender(model: LuminusModelElement): void;
+	init(support: LuminusSupport): Promise<void>;
+	beginRender(): void;
 	endRender(): void;
 	unProject(viewport: Int32Array, screenX: number, screenY: number, z?: number): Float32Array;
+	modelRender(model: LuminusModelRender<unknown>): void;
 }
 
 interface LuminusRay extends CollisionDetection {

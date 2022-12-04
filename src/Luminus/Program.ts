@@ -1,10 +1,57 @@
-(() => {
-	Luminus.program = class implements LuminusProgram {
-		public support: LuminusSupport;
+interface LuminusProgramDefault extends LuminusProgram {
+	eye: {
+		x: number;
+		y: number;
+		z: number;
+	};
+	center: {
+		x: number;
+		y: number;
+		z: number;
+	};
+	up: {
+		x: number;
+		y: number;
+		z: number;
+	};
+	light: {
+		x: number;
+		y: number;
+		z: number;
+		color: Float32Array;
+		ambient: Float32Array;
+	};
+	screen: {
+		left: number;
+		right: number;
+		bottom: number;
+		top: number;
+		near: number;
+		far: number;
+	};
+}
 
-		// Light
-		private lColor: Float32Array;
-		private aColor: Float32Array;
+(() => {
+	Luminus.program = class implements LuminusProgramDefault {
+		public eye = { x: 0, y: 0, z: 0 };
+		public center = { x: 0, y: 0, z: 0 };
+		public up = { x: 0, y: 0, z: 0 };
+		public light = {
+			x: 0,
+			y: 0,
+			z: 0,
+			color: new Float32Array([0, 0, 0]),
+			ambient: new Float32Array([0, 0, 0]),
+		};
+		public screen = {
+			left: 0,
+			right: 0,
+			bottom: 0,
+			top: 0,
+			near: 0,
+			far: 0,
+		};
+		public support: LuminusSupport;
 
 		// Matrix
 		private uProjection: Float32Array;
@@ -12,7 +59,7 @@
 		private uModel: Float32Array;
 		private iModel: Float32Array;
 
-		public async init(world: LuminusWorldElement, support: LuminusSupport) {
+		public async init(support: LuminusSupport) {
 			this.support = support;
 
 			const vertex = `#version 300 es
@@ -49,24 +96,27 @@ void main(void) {
 
 			support.enables(support.gl.DEPTH_TEST, support.gl.CULL_FACE);
 
-			this.lColor = new Float32Array(world.lightColor);
-			this.aColor = new Float32Array(world.ambientColor);
-
 			// TODO: frustum
-			this.uProjection = support.orthographic(world.left, world.right, world.bottom, world.top, world.near, world.far);
+			this.uProjection = support.orthographic(
+				this.screen.left,
+				this.screen.right,
+				this.screen.bottom,
+				this.screen.top,
+				this.screen.near,
+				this.screen.far,
+			);
 			this.uView = support.matrix.identity4();
 			this.uModel = support.matrix.identity4();
-
 			this.iModel = support.matrix.identity4();
 		}
 
-		public beginRender(world: LuminusWorldElement) {
+		public beginRender() {
 			const gl2 = this.support.gl;
 
 			this.support.matrix.lookAt(
-				[world.eyex, world.eyey, world.eyez],
-				[world.centerx, world.centery, world.centerz],
-				[world.upx, world.upy, world.upz],
+				[this.eye.x, this.eye.y, this.eye.z],
+				[this.center.x, this.center.y, this.center.z],
+				[this.up.x, this.up.y, this.up.z],
 				this.uView,
 			);
 			//Luminus.matrix.inverse4(this.uView, this.uView);
@@ -83,17 +133,15 @@ void main(void) {
 			gl2.uniformMatrix4fv(this.support.uniform.uModel, false, this.uModel);
 
 			// Light.
-			gl2.uniform3f(this.support.uniform.lDirection, world.lightx, world.lighty, world.lightz);
-			this.lColor.set(world.lightColor);
-			gl2.uniform3fv(this.support.uniform.lColor, this.lColor);
-			this.aColor.set(world.ambientColor);
-			gl2.uniform3fv(this.support.uniform.aColor, this.aColor);
+			gl2.uniform3f(this.support.uniform.lDirection, this.light.x, this.light.y, this.light.z);
+			gl2.uniform3fv(this.support.uniform.lColor, this.light.color);
+			gl2.uniform3fv(this.support.uniform.aColor, this.light.ambient);
 			gl2.uniformMatrix4fv(this.support.uniform.iModel, false, this.iModel);
 
 			this.support.clear();
 		}
 
-		public modelRender(model: LuminusModelElement) {
+		public modelRender(model: LuminusModelRender<unknown>) {
 			const gl2 = this.support.gl;
 
 			/*const r = this.support.matrix.rotation4(model.roll + model.xaxis, model.pitch + model.yaxis, model.yaw + model.zaxis);

@@ -13,9 +13,9 @@
 		customElements.define(tagname, component);
 	})(
 		class extends HTMLElement implements LuminusWorldElement {
-			private _complete: boolean;
-			private canvas: HTMLCanvasElement;
-			private lProgram: LuminusProgram;
+			protected _complete: boolean;
+			protected canvas: HTMLCanvasElement;
+			protected lProgram: LuminusProgram;
 
 			constructor() {
 				super();
@@ -136,7 +136,7 @@
 			}
 
 			get program() {
-				return this.lProgram;
+				return <LuminusProgramDefault> this.lProgram;
 			}
 
 			get width() {
@@ -158,6 +158,7 @@
 			}
 			set top(value) {
 				this.setAttribute('top', value + '');
+				this.program.screen.top = value;
 			}
 
 			get bottom() {
@@ -165,6 +166,7 @@
 			}
 			set bottom(value) {
 				this.setAttribute('bottom', value + '');
+				this.program.screen.bottom = value;
 			}
 
 			get left() {
@@ -172,6 +174,7 @@
 			}
 			set left(value) {
 				this.setAttribute('left', value + '');
+				this.program.screen.left = value;
 			}
 
 			get right() {
@@ -179,6 +182,7 @@
 			}
 			set right(value) {
 				this.setAttribute('right', value + '');
+				this.program.screen.right = value;
 			}
 
 			get near() {
@@ -186,6 +190,7 @@
 			}
 			set near(value) {
 				this.setAttribute('near', value + '');
+				this.program.screen.near = value;
 			}
 
 			get far() {
@@ -193,6 +198,7 @@
 			}
 			set far(value) {
 				this.setAttribute('far', value + '');
+				this.program.screen.far = value;
 			}
 
 			get view() {
@@ -207,6 +213,7 @@
 			}
 			set eyex(value) {
 				this.setAttribute('eyex', value + '');
+				this.program.eye.x = value;
 			}
 
 			get eyey() {
@@ -214,6 +221,7 @@
 			}
 			set eyey(value) {
 				this.setAttribute('eyey', value + '');
+				this.program.eye.y = value;
 			}
 
 			get eyez() {
@@ -221,27 +229,7 @@
 			}
 			set eyez(value) {
 				this.setAttribute('eyez', value + '');
-			}
-
-			get upx() {
-				return parseFloat(this.getAttribute('upx') || '') || 0;
-			}
-			set upx(value) {
-				this.setAttribute('upx', value + '');
-			}
-
-			get upy() {
-				return parseFloat(this.getAttribute('upy') || '') || 0;
-			}
-			set upy(value) {
-				this.setAttribute('upy', value + '');
-			}
-
-			get upz() {
-				return parseFloat(this.getAttribute('upz') || '') || 0;
-			}
-			set upz(value) {
-				this.setAttribute('upz', value + '');
+				this.program.eye.z = value;
 			}
 
 			get centerx() {
@@ -249,6 +237,7 @@
 			}
 			set centerx(value) {
 				this.setAttribute('centerx', value + '');
+				this.program.center.x = value;
 			}
 
 			get centery() {
@@ -256,6 +245,7 @@
 			}
 			set centery(value) {
 				this.setAttribute('centery', value + '');
+				this.program.center.y = value;
 			}
 
 			get centerz() {
@@ -263,6 +253,31 @@
 			}
 			set centerz(value) {
 				this.setAttribute('centerz', value + '');
+				this.program.center.z = value;
+			}
+
+			get upx() {
+				return parseFloat(this.getAttribute('upx') || '') || 0;
+			}
+			set upx(value) {
+				this.setAttribute('upx', value + '');
+				this.program.up.x = value;
+			}
+
+			get upy() {
+				return parseFloat(this.getAttribute('upy') || '') || 0;
+			}
+			set upy(value) {
+				this.setAttribute('upy', value + '');
+				this.program.up.y = value;
+			}
+
+			get upz() {
+				return parseFloat(this.getAttribute('upz') || '') || 0;
+			}
+			set upz(value) {
+				this.setAttribute('upz', value + '');
+				this.program.up.z = value;
 			}
 
 			get lightx() {
@@ -270,6 +285,7 @@
 			}
 			set lightx(value) {
 				this.setAttribute('lightx', value + '');
+				this.program.light.x = value;
 			}
 
 			get lighty() {
@@ -277,6 +293,7 @@
 			}
 			set lighty(value) {
 				this.setAttribute('lighty', value + '');
+				this.program.light.y = value;
 			}
 
 			get lightz() {
@@ -284,21 +301,58 @@
 			}
 			set lightz(value) {
 				this.setAttribute('lightz', value + '');
+				this.program.light.z = value;
 			}
 
 			public async init(program?: LuminusProgram) {
 				Luminus.console.info('Start: init lu-world.');
 				this._complete = false;
 				this.lProgram = <any> null;
-
-				if (!program) {
-					program = new Luminus.program();
-				}
-
 				const support = Luminus.createSupport(<WebGL2RenderingContext> this.canvas.getContext('webgl2'));
 
-				await program.init(this, support);
 				this.lProgram = !program ? new Luminus.program() : program;
+
+				this.program.screen.left = this.left;
+				this.program.screen.right = this.right;
+				this.program.screen.bottom = this.bottom;
+				this.program.screen.top = this.top;
+				this.program.screen.near = this.near;
+				this.program.screen.far = this.far;
+				this.program.light.x = this.lightx;
+				this.program.light.y = this.lighty;
+				this.program.light.z = this.lightz;
+				this.program.light.color.set(this.lightColor);
+				this.program.light.ambient.set(this.ambientColor);
+
+				if (this.hasAttribute('eyex')) {
+					this.eyex = this.eyex;
+				}
+				if (this.hasAttribute('eyey')) {
+					this.eyey = this.eyey;
+				}
+				if (this.hasAttribute('eyez')) {
+					this.eyez = this.eyez;
+				}
+				if (this.hasAttribute('centerx')) {
+					this.centerx = this.centerx;
+				}
+				if (this.hasAttribute('centery')) {
+					this.centery = this.centery;
+				}
+				if (this.hasAttribute('centerz')) {
+					this.centerz = this.centerz;
+				}
+				if (this.hasAttribute('upx')) {
+					this.upx = this.upx;
+				}
+				if (this.hasAttribute('upy')) {
+					this.upy = this.upy;
+				}
+				if (this.hasAttribute('upx')) {
+					this.upx = this.upx;
+				}
+
+				await this.program.init(support);
 
 				this._complete = true;
 			}
@@ -309,7 +363,9 @@
 				}
 				Luminus.console.info('Render:');
 
-				this.program.beginRender(this);
+				this.program.beginRender();
+				(<LuminusProgramDefault> this.program).light.color.set(this.lightColor);
+				(<LuminusProgramDefault> this.program).light.ambient.set(this.ambientColor);
 
 				for (const model of this.children) {
 					if (model instanceof Luminus.model) {

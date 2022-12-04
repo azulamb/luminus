@@ -11,6 +11,8 @@
 		customElements.define(tagname, component);
 	})(
 		class extends Luminus.model implements LuminusModelAxisElement {
+			public model: LuminusModelAxis;
+
 			constructor() {
 				super();
 
@@ -27,11 +29,11 @@
 			}
 
 			get length() {
-				return (<LuminusModelAxis> this.model).length;
+				return this.model.length;
 			}
 			set length(value) {
 				const length = typeof value === 'number' ? value : parseFloat(value);
-				(<LuminusModelAxis> this.model).length = length;
+				this.model.length = length;
 				this.setAttribute('length', length + '');
 				this.rerender();
 			}

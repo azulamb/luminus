@@ -79,9 +79,8 @@
 			set model(model: LuminusModel<unknown>) {
 				this._model = model;
 				model.afterload = () => {
-					const program = this.program;
-					if (program) {
-						model.prepare(program);
+					if ((<LuminusWorldElement | null> this.parentElement)?.complete) {
+						model.prepare(<LuminusProgram> this.program);
 					}
 				};
 			}
